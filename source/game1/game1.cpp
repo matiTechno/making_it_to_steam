@@ -12,7 +12,7 @@ Game1::Game1(const Systems& systems, bool is_opaque):
     num_frames(0),
     acc_time(0)
 {
-    systems.sound_system->play_music(music, true, 30);
+    systems.sound_system->play_music(music, true, 10);
 }
 
 void Game1::on_quit_event()
@@ -99,7 +99,6 @@ void Game1::render()
             text_fps.text += "OFF";
         text_fps.position = glm::vec2(20.f, 20.f);
         text_fps.color = glm::vec4(1.f, 0.f, 1.f, 0.1f);
-        text_fps.render_quads = true;
         renderer_2D->render(text_fps);
     }
     systems.renderer_2D->end_batching();
@@ -117,7 +116,7 @@ void Game1::process_event(SDL_Event& event)
             SDL_GL_SetSwapInterval(v_sync);
         }
         else if(event.key.keysym.sym == SDLK_2)
-            systems.sound_system->play_sample(sample, 30);
+            systems.sound_system->play_sample(sample, 10);
         else if(event.key.keysym.sym == SDLK_ESCAPE)
             App::should_close = true;
     }
