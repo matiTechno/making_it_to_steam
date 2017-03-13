@@ -118,7 +118,7 @@ void Renderer_2D::end_batching() const
 
         vbo_dynamic.bind(GL_ARRAY_BUFFER);
         glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(sizeof(Vbo_instance) * batch.size()),
-                     batch.data(), GL_STATIC_DRAW);
+                     batch.data(), GL_STREAM_DRAW);
 
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, static_cast<GLsizei>(batch.size()));
     }

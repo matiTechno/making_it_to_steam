@@ -58,6 +58,9 @@ void Game1::render()
         sprite.bloom = true;
         renderer_2D->render(sprite);
 
+        for(int i = 0; i < 1000; ++i)
+            renderer_2D->render(sprite);
+
         sprite.position = glm::vec2(100.f, 150.f);
         renderer_2D->render(sprite);
         sprite.position = glm::vec2(100.f, 200.f);
