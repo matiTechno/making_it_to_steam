@@ -36,6 +36,7 @@ void Game1::update(float dt)
 #include "../rendering/text.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
+#include <random>
 
 void Game1::render()
 {
@@ -58,9 +59,6 @@ void Game1::render()
         sprite.bloom = true;
         renderer_2D->render(sprite);
 
-        for(int i = 0; i < 1000; ++i)
-            renderer_2D->render(sprite);
-
         sprite.position = glm::vec2(100.f, 150.f);
         renderer_2D->render(sprite);
         sprite.position = glm::vec2(100.f, 200.f);
@@ -76,6 +74,20 @@ void Game1::render()
         sprite.position = glm::vec2(400.f, 280.f);
         sprite.blend_dfactor = GL_ONE;
         renderer_2D->render(sprite);
+
+        sprite.size = glm::vec2(2.f, 2.f);
+        sprite.rotation_point = sprite.size / 2.f;
+        sprite.bloom = true;
+        sprite.color.a = 0.1f;
+        std::random_device rd;
+        std::mt19937 mt(rd());
+        std::uniform_real_distribution<float> uni_x(0.f, width);
+        std::uniform_real_distribution<float> uni_y(0.f, height);
+        for(int i = 0; i < 20000; ++i)
+        {
+            sprite.position = glm::vec2(uni_x(mt), uni_y(mt));
+            renderer_2D->render(sprite);
+        }
 
         Text text(&font);
         text.position = glm::vec2(150, 300);
@@ -101,12 +113,12 @@ void Game1::render()
         else
             text_fps.text += "OFF";
         text_fps.position = glm::vec2(20.f, 20.f);
-        text_fps.color = glm::vec4(1.f, 0.f, 1.f, 0.1f);
+        text_fps.color = glm::vec4(1.f, 0.f, 1.f, 0.5f);
         renderer_2D->render(text_fps);
     }
     systems.renderer_2D->end_batching();
     systems.pp_unit->endRender(2, true);
-    systems.pp_unit->render(false);
+    systems.pp_unit->render(true);
 }
 
 void Game1::process_event(SDL_Event& event)
