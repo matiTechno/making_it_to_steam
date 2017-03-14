@@ -45,7 +45,7 @@ void Game1::update(float dt)
 #include "../rendering/text.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
-#include <random>
+//#include <random>
 
 void Game1::render()
 {
@@ -84,19 +84,19 @@ void Game1::render()
         sprite.blend_dfactor = GL_ONE;
         renderer_2D->render(sprite);
 
-        sprite.size = glm::vec2(2.f, 2.f);
-        sprite.rotation_point = sprite.size / 2.f;
-        sprite.bloom = true;
-        sprite.color.a = 0.1f;
-        std::random_device rd;
-        std::mt19937 mt(rd());
-        std::uniform_real_distribution<float> uni_x(0.f, width);
-        std::uniform_real_distribution<float> uni_y(0.f, height);
-        for(int i = 0; i < 20000; ++i)
-        {
-            sprite.position = glm::vec2(uni_x(mt), uni_y(mt));
-            renderer_2D->render(sprite);
-        }
+        //        sprite.size = glm::vec2(2.f, 2.f);
+        //        sprite.rotation_point = sprite.size / 2.f;
+        //        sprite.bloom = true;
+        //        sprite.color.a = 0.1f;
+        //        std::random_device rd;
+        //        std::mt19937 mt(rd());
+        //        std::uniform_real_distribution<float> uni_x(0.f, width);
+        //        std::uniform_real_distribution<float> uni_y(0.f, height);
+        //        for(int i = 0; i < 20000; ++i)
+        //        {
+        //            sprite.position = glm::vec2(uni_x(mt), uni_y(mt));
+        //            renderer_2D->render(sprite);
+        //        }
 
         Text text(&font);
         text.position = glm::vec2(150, 300);
@@ -141,6 +141,7 @@ void Game1::render()
     systems.pp_unit->endRender(2, true);
     systems.pp_unit->render(true);
 
+    ImGui::SetNextWindowPos(ImVec2(300, 300), ImGuiSetCond_::ImGuiSetCond_Once);
     ImGui::ShowTestWindow();
     ImGui::Render();
 }
@@ -157,7 +158,7 @@ void Game1::process_event(SDL_Event& event)
         else if(event.key.keysym.sym == SDLK_2)
             systems.sound_system->play_sample(sample, 10);
         else if(event.key.keysym.sym == SDLK_ESCAPE)
-            App::should_close = true;
+            num_scenes_to_pop = 1;
     }
 }
 

@@ -84,19 +84,14 @@ App::App()
         pp_unit = std::make_unique<Postprocessor>(width, height);
     }
 
-    scenes.push_back(std::make_unique<Game1>(Systems{sound_system.get(), renderer_2D.get(),
-                                                     font_loader.get(), pp_unit.get(),
-                                                     sdl_win->get_id()}, false));
-
     set_opengl_states();
-    run();
 }
 
 void App::run()
 {
     auto current_time = std::chrono::high_resolution_clock::now();
 
-    while(!should_close)
+    while(!should_close && scenes.size())
     {
         processInput();
 
@@ -167,9 +162,6 @@ void App::manage_scenes()
 
     if(new_scene)
         scenes.push_back(std::move(new_scene));
-
-    if(scenes.empty())
-        should_close = true;
 }
 
 Wrp_sdl_lib::Wrp_sdl_lib():

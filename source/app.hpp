@@ -8,6 +8,7 @@
 struct SDL_Window;
 typedef void *SDL_GLContext;
 #include "res_class.h"
+#include <assert.h>
 
 // wrapper calsses for SDL2
 class Wrp_sdl_lib: public Res_class<void*>
@@ -40,6 +41,18 @@ public:
     App();
     App(const App&) = delete;
     ~App();
+
+    template<typename T>
+    void start()
+    {
+        assert(!should_close); // if should_close = true no more scenes can be added
+        // to reuse this function scenes must be empty (last scene must pop itself and don't
+        // change should_close to true
+        scenes.push_back(std::make_unique<T>(Systems{sound_system.get(), renderer_2D.get(),
+                                                     font_loader.get(), pp_unit.get(),
+                                                     sdl_win->get_id()}, false));
+        run();
+    }
 
     static bool should_close;
 
