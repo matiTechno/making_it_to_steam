@@ -33,6 +33,9 @@ public:
     friend class App;
 
     Scene(const Systems& systems, bool is_opaque);
+    // no copy no move operations for safety
+    Scene(const Scene&) = delete;
+    Scene& operator=(const Scene&) = delete;
 
     virtual ~Scene() = default;
 
@@ -65,6 +68,8 @@ private:
 
     // SDL_QUIT events are never passed to this function
     virtual void process_event(SDL_Event& event);
+    virtual void beg_processInput();
+    virtual void end_processInput();
 };
 
 #endif // SCENE_H

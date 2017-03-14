@@ -1,10 +1,13 @@
 #include "game1.h"
 #include "../app.hpp"
 #include "../systems.h"
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_sdl_gl3.h"
 
 Game1::Game1(const Systems& systems, bool is_opaque):
     Scene(systems, is_opaque),
     font(systems.font_loader->loadFont("res/Inconsolata-Regular.ttf", 40)),
+    font_progy(systems.font_loader->loadFont("res/ProggyClean.ttf", 15)),
     texture("res/Candies_Jerom_CCBYSA3.png", true),
     music("res/Path to Lake Land.ogg"),
     sample("res/sfx_exp_cluster1.wav"),
@@ -13,6 +16,12 @@ Game1::Game1(const Systems& systems, bool is_opaque):
     acc_time(0)
 {
     systems.sound_system->play_music(music, true, 10);
+    ImGui_ImplSdlGL3_Init(systems.window);
+}
+
+Game1::~Game1()
+{
+    ImGui_ImplSdlGL3_Shutdown();
 }
 
 void Game1::on_quit_event()
@@ -47,7 +56,7 @@ void Game1::render()
     systems.renderer_2D->load_projection(proj);
 
     systems.pp_unit->begRender();
-    systems.renderer_2D->beg_batching();
+    renderer_2D->beg_batching();
     {
         Sprite sprite;
         sprite.position = glm::vec2(100.f, 100.f);
@@ -115,10 +124,25 @@ void Game1::render()
         text_fps.position = glm::vec2(20.f, 20.f);
         text_fps.color = glm::vec4(1.f, 0.f, 1.f, 0.5f);
         renderer_2D->render(text_fps);
+
+        Text small_t(&font_progy);
+        small_t.text = "is small font looking good? i'm curious.\n"
+                       "it's been a long time,  fam.\n"
+                       "can we see tomorrow?";
+        small_t.position = glm::vec2(100.f, 200.f);
+        Sprite small_t_bb;
+        small_t_bb.color = glm::vec4(0.f, 0.f, 0.f, 1.f);
+        small_t_bb.position = small_t.position - glm::vec2(10.f, 10.f);
+        small_t_bb.size = small_t.getSize() + glm::vec2(20.f, 20.f);
+        renderer_2D->render(small_t_bb);
+        renderer_2D->render(small_t);
     }
-    systems.renderer_2D->end_batching();
+    renderer_2D->end_batching();
     systems.pp_unit->endRender(2, true);
     systems.pp_unit->render(true);
+
+    ImGui::ShowTestWindow();
+    ImGui::Render();
 }
 
 void Game1::process_event(SDL_Event& event)
@@ -135,4 +159,9 @@ void Game1::process_event(SDL_Event& event)
         else if(event.key.keysym.sym == SDLK_ESCAPE)
             App::should_close = true;
     }
+}
+
+void Game1::end_processInput()
+{
+    ImGui_ImplSdlGL3_NewFrame(systems.window);
 }

@@ -9,6 +9,8 @@ Scene::Scene(const Systems& systems, bool is_opaque):
 
 void Scene::processInput()
 {
+    beg_processInput();
+
     SDL_Event event;
     while(SDL_PollEvent(&event))
     {
@@ -16,6 +18,8 @@ void Scene::processInput()
             continue;
         process_event(event);
     }
+
+    end_processInput();
 }
 
 void Scene::update(float dt)
@@ -26,3 +30,9 @@ void Scene::render()
 
 void Scene::process_event(SDL_Event& event)
 {(void)event;}
+
+void Scene::beg_processInput()
+{}
+
+void Scene::end_processInput()
+{}

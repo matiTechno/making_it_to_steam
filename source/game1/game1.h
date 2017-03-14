@@ -9,6 +9,7 @@ class Game1: public Scene
 {
 public:
     Game1(const Systems& systems, bool is_opaque);
+    ~Game1();
 
     void on_quit_event() override;
 
@@ -16,10 +17,12 @@ public:
 
     void render() override;
 
+    void end_processInput() override;
+
 private:
     void process_event(SDL_Event& event) override;
 
-    Font font;
+    Font font, font_progy;
     Texture texture;
     Music music;
     Sample sample;

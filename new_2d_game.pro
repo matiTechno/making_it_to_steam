@@ -38,8 +38,15 @@ HEADERS += \
     source/sound_system.h \
     source/res_class.h \
     source/scene.h \
+    source/systems.h \
     source/game1/game1.h \
-    source/systems.h
+    source/imgui/imconfig.h \
+    source/imgui/imgui.h \
+    source/imgui/imgui_impl_sdl_gl3.h \
+    source/imgui/imgui_internal.h \
+    source/imgui/stb_rect_pack.h \
+    source/imgui/stb_textedit.h \
+    source/imgui/stb_truetype.h
 
 SOURCES += \
     source/app.cpp \
@@ -54,4 +61,8 @@ SOURCES += \
     source/rendering/text.cpp \
     source/sound_system.cpp \
     source/scene.cpp \
-    source/game1/game1.cpp
+    source/game1/game1.cpp \
+    source/imgui/imgui.cpp \
+    source/imgui/imgui_demo.cpp \
+    source/imgui/imgui_draw.cpp \
+    source/imgui/imgui_impl_sdl_gl3.cpp
