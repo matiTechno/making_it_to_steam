@@ -23,6 +23,10 @@ std::unique_ptr<Postprocessor> App::pp_unit;
 
 App::~App()
 {
+    // Sample and Music objects must be freed
+    // before sound_system
+    scenes.clear();
+
     pp_unit.reset();
     font_loader.reset();
     renderer.reset();
