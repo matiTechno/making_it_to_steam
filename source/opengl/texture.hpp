@@ -18,7 +18,7 @@ public:
     // for 1 and 2 target is GL_TEXTURE_2D
     // 2 - to update texture call glTexSubImage2D
     // 3 - generates id and calls bind, nothing more
-    /*1*/Texture(const std::string& filename, bool sRGB = false, GLsizei levels = 1);
+    /*1*/Texture(const std::string& filename, bool sRGB, GLsizei levels = 1);
     /*2*/Texture(GLenum internal_format, GLsizei width, GLsizei height, GLsizei levels = 1);
     /*3*/Texture();
 

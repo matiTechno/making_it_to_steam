@@ -1,4 +1,4 @@
-#include "sound_system.h"
+#include "sound_system.hpp"
 #include <iostream>
 #include <stdexcept>
 #include <assert.h>

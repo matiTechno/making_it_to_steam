@@ -1,23 +1,21 @@
-#ifndef GAME1_H
-#define GAME1_H
+#ifndef TEST_SCENE_HPP
+#define TEST_SCENE_HPP
 
-#include "../scene.h"
+#include "../scene.hpp"
 #include "../rendering/font_loader.hpp"
-#include "../sound_system.h"
+#include "../sound_system.hpp"
+#include "../opengl/shader.hpp"
 
-class Game1: public Scene
+class Test_scene: public Scene
 {
 public:
-    Game1(const Systems& systems, bool is_opaque);
-    ~Game1();
+    Test_scene(const Systems& systems, bool is_opaque);
 
     void on_quit_event() override;
 
     void update(float dt) override;
 
     void render() override;
-
-    void end_processInput() override;
 
 private:
     void process_event(SDL_Event& event) override;
@@ -30,6 +28,7 @@ private:
     int num_frames;
     float acc_time;
     float frame_time;
+    Shader red_effect;
 };
 
-#endif // GAME1_H
+#endif // TEST_SCENE_HPP

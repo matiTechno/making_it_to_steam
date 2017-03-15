@@ -4,11 +4,21 @@
 #include "glad/glad.h"
 #include <memory>
 #include <vector>
-#include "scene.h"
+#include "scene.hpp"
 struct SDL_Window;
 typedef void *SDL_GLContext;
-#include "res_class.h"
+#include "res_class.hpp"
 #include <assert.h>
+
+// define USE_IMGUI to support ImGui
+// all you need to do in your scene class
+// is to create imgui window and call ImGui::Render()
+// also include:
+// imgui/imgui.h
+// imgui/imgui_impl_sdl_gl3.h
+// from source dir
+
+// NOTE: not all functionality is tested
 
 // wrapper calsses for SDL2
 class Wrp_sdl_lib: public Res_class<void*>
@@ -32,6 +42,13 @@ class Wrp_sdl_context: public Res_class<SDL_GLContext>
 {
 public:
     Wrp_sdl_context(SDL_GLContext id);
+};
+
+// wrapper class for ImGui
+class Wrp_ImGui: public Res_class<void*>
+{
+public:
+    Wrp_ImGui();
 };
 
 // NOTE: do not change blend factors manually
@@ -65,6 +82,7 @@ private:
     std::unique_ptr<Font_loader> font_loader;
     std::unique_ptr<Postprocessor> pp_unit;
     std::vector<std::unique_ptr<Scene>> scenes;
+    std::unique_ptr<Wrp_ImGui> wrp_imgui;
 
     void run();
     void processInput();

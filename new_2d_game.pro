@@ -5,7 +5,7 @@ CONFIG -= qt
 
 QMAKE_CXXFLAGS += -pedantic
 
-DEFINES += GLM_FORCE_NO_CTOR_INIT
+DEFINES += GLM_FORCE_NO_CTOR_INIT USE_IMGUI
 
 LIBS += -lGL -lfreetype -ldl -lSDL2_mixer -lSDL2
 
@@ -18,7 +18,9 @@ DISTFILES += \
     shaders/shader_2d.vert \
     shaders/shader_fb.vert \
     shaders/shader_2d_batching.frag \
-    shaders/shader_2d_batching.vert
+    shaders/shader_2d_batching.vert \
+    shaders/shader_fb_test_red.frag \
+    shaders/shader_fb_final.frag
 
 HEADERS += \
     source/app.hpp \
@@ -35,18 +37,18 @@ HEADERS += \
     source/rendering/render_obj_base.hpp \
     source/rendering/sprite.hpp \
     source/rendering/text.hpp \
-    source/sound_system.h \
-    source/res_class.h \
-    source/scene.h \
-    source/systems.h \
-    source/game1/game1.h \
     source/imgui/imconfig.h \
     source/imgui/imgui.h \
     source/imgui/imgui_impl_sdl_gl3.h \
     source/imgui/imgui_internal.h \
     source/imgui/stb_rect_pack.h \
     source/imgui/stb_textedit.h \
-    source/imgui/stb_truetype.h
+    source/imgui/stb_truetype.h \
+    source/test_scene/test_scene.hpp \
+    source/res_class.hpp \
+    source/scene.hpp \
+    source/sound_system.hpp \
+    source/systems.hpp
 
 SOURCES += \
     source/app.cpp \
@@ -61,7 +63,7 @@ SOURCES += \
     source/rendering/text.cpp \
     source/sound_system.cpp \
     source/scene.cpp \
-    source/game1/game1.cpp \
+    source/test_scene/test_scene.cpp \
     source/imgui/imgui.cpp \
     source/imgui/imgui_demo.cpp \
     source/imgui/imgui_draw.cpp \

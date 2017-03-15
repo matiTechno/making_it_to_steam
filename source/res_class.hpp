@@ -1,5 +1,5 @@
-#ifndef RES_CLASS_H
-#define RES_CLASS_H
+#ifndef RES_CLASS_HPP
+#define RES_CLASS_HPP
 
 #include <functional>
 #include <assert.h>
@@ -54,4 +54,4 @@ private:
     std::function<void(T)> deleter;
 };
 
-#endif // RES_CLASS_H
+#endif // RES_CLASS_HPP

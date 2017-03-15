@@ -2,7 +2,7 @@
 #define BASE_HPP
 
 #include "../glad/glad.h"
-#include "../res_class.h"
+#include "../res_class.hpp"
 
 typedef Res_class<GLuint> GL_Base;
 

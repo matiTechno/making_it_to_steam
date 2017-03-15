@@ -1,7 +1,7 @@
-#ifndef SOUND_SYSTEM_H
-#define SOUND_SYSTEM_H
+#ifndef SOUND_SYSTEM_HPP
+#define SOUND_SYSTEM_HPP
 
-#include "res_class.h"
+#include "res_class.hpp"
 #include <string>
 struct Mix_Chunk;
 typedef struct _Mix_Music Mix_Music;
@@ -58,4 +58,4 @@ private:
     static bool isCurrent;
 };
 
-#endif // SOUND_SYSTEM_H
+#endif // SOUND_SYSTEM_HPP

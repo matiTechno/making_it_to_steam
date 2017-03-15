@@ -1,5 +1,5 @@
-#ifndef SCENE_H
-#define SCENE_H
+#ifndef SCENE_HPP
+#define SCENE_HPP
 
 #include <memory>
 class Sound_system;
@@ -72,4 +72,4 @@ private:
     virtual void end_processInput();
 };
 
-#endif // SCENE_H
+#endif // SCENE_HPP

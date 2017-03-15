@@ -1,4 +1,4 @@
-#include "scene.h"
+#include "scene.hpp"
 #include <SDL2/SDL.h>
 
 Scene::Scene(const Systems& systems, bool is_opaque):

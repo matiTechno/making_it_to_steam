@@ -5,10 +5,13 @@
 #include <stdexcept>
 #include <string>
 #include <deque>
-#include "game1/game1.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
-#include "systems.h"
+#include "systems.hpp"
+#ifdef USE_IMGUI
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_sdl_gl3.h"
+#endif
 
 bool App::isCurrent  = false;
 bool App::should_close = false;
@@ -85,6 +88,12 @@ App::App()
     }
 
     set_opengl_states();
+
+#ifdef USE_IMGUI
+    wrp_imgui = std::make_unique<Wrp_ImGui>();
+    ImGui_ImplSdlGL3_Init(sdl_win->get_id());
+#endif
+
 }
 
 void App::run()
@@ -115,6 +124,10 @@ void App::processInput()
         scenes.back()->on_quit_event();
 
     scenes.back()->processInput();
+
+#ifdef USE_IMGUI
+    ImGui_ImplSdlGL3_NewFrame(sdl_win->get_id());
+#endif
 }
 
 void App::update(float dt)
@@ -138,7 +151,11 @@ void App::render()
             break;
     }
     for(auto& scene: scenes_to_render)
+    {
         scene->render();
+        if(!pp_unit->has_finished())
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 
     SDL_GL_SwapWindow(sdl_win->get_id());
 }
@@ -179,3 +196,9 @@ Wrp_sdl_context::Wrp_sdl_context(SDL_GLContext id):
 {
 this->id = id;
 }
+
+#ifdef USE_IMGUI
+Wrp_ImGui::Wrp_ImGui():
+    Res_class([](void*){ImGui_ImplSdlGL3_Shutdown();})
+{}
+#endif

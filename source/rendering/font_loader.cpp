@@ -1,7 +1,7 @@
 #include "font_loader.hpp"
 #include <stdexcept>
 #include <vector>
-#include "../res_class.h"
+#include "../res_class.hpp"
 
 class Wrp_face: public Res_class<FT_Face>
 {

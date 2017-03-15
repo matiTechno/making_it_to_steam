@@ -1,35 +1,35 @@
-#include "game1.h"
+#include "test_scene.hpp"
 #include "../app.hpp"
-#include "../systems.h"
+#include "../systems.hpp"
+#ifdef USE_IMGUI
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_sdl_gl3.h"
+#endif
 
-Game1::Game1(const Systems& systems, bool is_opaque):
+static std::string res_path = "source/test_scene/res/";
+
+Test_scene::Test_scene(const Systems& systems, bool is_opaque):
     Scene(systems, is_opaque),
-    font(systems.font_loader->loadFont("res/Inconsolata-Regular.ttf", 40)),
-    font_progy(systems.font_loader->loadFont("res/ProggyClean.ttf", 15)),
-    texture("res/Candies_Jerom_CCBYSA3.png", true),
-    music("res/Path to Lake Land.ogg"),
-    sample("res/sfx_exp_cluster1.wav"),
+    font(systems.font_loader->loadFont(res_path + "Inconsolata-Regular.ttf", 40)),
+    font_progy(systems.font_loader->loadFont(res_path + "ProggyClean.ttf", 15)),
+    texture(res_path + "Candies_Jerom_CCBYSA3.png", true),
+    music(res_path + "Path to Lake Land.ogg"),
+    sample(res_path + "sfx_exp_cluster1.wav"),
     v_sync(SDL_GL_GetSwapInterval()),
     num_frames(0),
-    acc_time(0)
+    acc_time(0),
+    red_effect("shaders/shader_fb.vert", "shaders/shader_fb_test_red.frag", std::string(),
+               true, "red_effect")
 {
     systems.sound_system->play_music(music, true, 10);
-    ImGui_ImplSdlGL3_Init(systems.window);
 }
 
-Game1::~Game1()
+void Test_scene::on_quit_event()
 {
-    ImGui_ImplSdlGL3_Shutdown();
+    num_scenes_to_pop = 1;
 }
 
-void Game1::on_quit_event()
-{
-    App::should_close = true;
-}
-
-void Game1::update(float dt)
+void Test_scene::update(float dt)
 {
     ++num_frames;
     acc_time += dt;
@@ -47,7 +47,7 @@ void Game1::update(float dt)
 #include <glm/gtc/constants.hpp>
 //#include <random>
 
-void Game1::render()
+void Test_scene::render()
 {
     int width, height;
     SDL_GL_GetDrawableSize(systems.window, &width, &height);
@@ -84,7 +84,8 @@ void Game1::render()
         sprite.blend_dfactor = GL_ONE;
         renderer_2D->render(sprite);
 
-        //        sprite.size = glm::vec2(2.f, 2.f);
+        // FOR PERFORMANCE TEST
+        //        sprite.size = glm::vec2(5.f, 5.f);
         //        sprite.rotation_point = sprite.size / 2.f;
         //        sprite.bloom = true;
         //        sprite.color.a = 0.1f;
@@ -138,15 +139,19 @@ void Game1::render()
         renderer_2D->render(small_t);
     }
     renderer_2D->end_batching();
-    systems.pp_unit->endRender(2, true);
-    systems.pp_unit->render(true);
+    systems.pp_unit->endRender(2);
+    systems.pp_unit->apply_effect(red_effect);
+    systems.pp_unit->apply_effect(red_effect);
+    systems.pp_unit->render(false);
 
+#ifdef USE_IMGUI
     ImGui::SetNextWindowPos(ImVec2(300, 300), ImGuiSetCond_::ImGuiSetCond_Once);
     ImGui::ShowTestWindow();
     ImGui::Render();
+#endif
 }
 
-void Game1::process_event(SDL_Event& event)
+void Test_scene::process_event(SDL_Event& event)
 {
     if(event.type == SDL_KEYDOWN && !event.key.repeat)
     {
@@ -160,9 +165,4 @@ void Game1::process_event(SDL_Event& event)
         else if(event.key.keysym.sym == SDLK_ESCAPE)
             num_scenes_to_pop = 1;
     }
-}
-
-void Game1::end_processInput()
-{
-    ImGui_ImplSdlGL3_NewFrame(systems.window);
 }
