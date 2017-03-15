@@ -25,7 +25,6 @@ struct Font
     unsigned pixel_size;
 };
 
-
 // no kerning support for now
 // to do: implement valve solution
 // for better font rendering

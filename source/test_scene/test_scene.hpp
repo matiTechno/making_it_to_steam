@@ -9,9 +9,7 @@
 class Test_scene: public Scene
 {
 public:
-    Test_scene(const Systems& systems, bool is_opaque);
-
-    void on_quit_event() override;
+    Test_scene();
 
     void update(float dt) override;
 

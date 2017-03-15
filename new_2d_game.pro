@@ -48,7 +48,7 @@ HEADERS += \
     source/res_class.hpp \
     source/scene.hpp \
     source/sound_system.hpp \
-    source/systems.hpp
+    source/common_scene.hpp
 
 SOURCES += \
     source/app.cpp \

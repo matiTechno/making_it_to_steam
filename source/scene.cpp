@@ -1,10 +1,13 @@
 #include "scene.hpp"
 #include <SDL2/SDL.h>
+#include "app.hpp"
 
-Scene::Scene(const Systems& systems, bool is_opaque):
-    systems(systems),
-    is_opaque(is_opaque),
-    renderer_2D(systems.renderer_2D)
+Scene::Scene():
+    sdl_win_handle(App::sdl_win_handle),
+    sound_system(*App::sound_system),
+    renderer(*App::renderer),
+    font_loader(*App::font_loader),
+    pp_unit(*App::pp_unit)
 {}
 
 void Scene::processInput()
@@ -36,3 +39,8 @@ void Scene::beg_processInput()
 
 void Scene::end_processInput()
 {}
+
+void Scene::on_quit_event()
+{
+    App::should_close = true;
+}

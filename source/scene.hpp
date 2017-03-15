@@ -9,30 +9,19 @@ class Postprocessor;
 union SDL_Event;
 struct SDL_Window;
 
-// declarations for common resources
-class Font;
-class Texture;
-class Music;
-class Sample;
-
-struct Systems
-{
-    const Sound_system* sound_system;
-    const Renderer_2D* renderer_2D;
-    const Font_loader* font_loader;
-    const Postprocessor* pp_unit;
-    // use with care
-    SDL_Window* window;
-};
-
 // num_scenes_to_pop && new_scene
 // requests are executed at the end of frame
+// by default Scene is opaque
+
+// Sample / Music / Texture / Font and possibly other
+// objects must be local to your scenes (non-static)
+
 class Scene
 {
 public:
     friend class App;
 
-    Scene(const Systems& systems, bool is_opaque);
+    Scene();
     // no copy no move operations for safety
     Scene(const Scene&) = delete;
     Scene& operator=(const Scene&) = delete;
@@ -45,23 +34,28 @@ public:
 
     virtual void render();
 
-    virtual void on_quit_event() = 0;
+    virtual void on_quit_event();
 
 protected:
     // including this scene
     // must be in range [0, num_scenes] or assertion will fail
     int num_scenes_to_pop = 0;
-    const Systems systems;
-    bool is_opaque;
 
-    template<typename T>
-    void set_new_scene(bool is_opaque)
+    bool is_opaque = true;
+
+    template<typename T, typename ...Args>
+    void set_new_scene(Args... args)
     {
-        new_scene = std::make_unique<T>(systems, is_opaque);
+        new_scene = std::make_unique<T>(std::forward<Args>(args)...);
     }
 
-    // shortcut
-    const Renderer_2D* const renderer_2D;
+    // use with care
+    SDL_Window* const sdl_win_handle;
+
+    const Sound_system& sound_system;
+    const Renderer_2D& renderer;
+    const Font_loader& font_loader;
+    const Postprocessor& pp_unit;
 
 private:
     std::unique_ptr<Scene> new_scene;

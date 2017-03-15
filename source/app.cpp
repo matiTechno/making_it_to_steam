@@ -5,9 +5,9 @@
 #include <stdexcept>
 #include <string>
 #include <deque>
-#include <SDL2/SDL.h>
+#include "glad/glad.h"
+#include "common_scene.hpp"
 #include <SDL2/SDL_mixer.h>
-#include "systems.hpp"
 #ifdef USE_IMGUI
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl_gl3.h"
@@ -15,8 +15,19 @@
 
 bool App::isCurrent  = false;
 bool App::should_close = false;
+SDL_Window* App::sdl_win_handle;
+std::unique_ptr<Sound_system> App::sound_system;
+std::unique_ptr<Renderer_2D> App::renderer;
+std::unique_ptr<Font_loader> App::font_loader;
+std::unique_ptr<Postprocessor> App::pp_unit;
 
-App::~App() = default;
+App::~App()
+{
+    pp_unit.reset();
+    font_loader.reset();
+    renderer.reset();
+    sound_system.reset();
+}
 
 App::App()
 {
@@ -50,11 +61,12 @@ App::App()
             throw std::runtime_error(std::string("SDL2 window creation failed: ") + SDL_GetError());
 
         sdl_win = std::make_unique<Wrp_sdl_win>(temp);
+        sdl_win_handle = temp;
     }
 
     // SDL2 context
     {
-        SDL_GLContext temp = SDL_GL_CreateContext(sdl_win->get_id());
+        SDL_GLContext temp = SDL_GL_CreateContext(sdl_win_handle);
         if(temp == nullptr)
             throw std::runtime_error(std::string("SDL2 context creation failed: ") + SDL_GetError());
 
@@ -78,12 +90,12 @@ App::App()
     // rest...
     sound_system = std::make_unique<Sound_system>(MIX_INIT_OGG);
 
-    renderer_2D = std::make_unique<Renderer_2D>();
+    renderer = std::make_unique<Renderer_2D>();
     font_loader = std::make_unique<Font_loader>();
 
     {
         int width, height;
-        SDL_GL_GetDrawableSize(sdl_win->get_id(), &width, &height);
+        SDL_GL_GetDrawableSize(sdl_win_handle, &width, &height);
         pp_unit = std::make_unique<Postprocessor>(width, height);
     }
 
@@ -91,7 +103,7 @@ App::App()
 
 #ifdef USE_IMGUI
     wrp_imgui = std::make_unique<Wrp_ImGui>();
-    ImGui_ImplSdlGL3_Init(sdl_win->get_id());
+    ImGui_ImplSdlGL3_Init(sdl_win_handle);
 #endif
 
 }
@@ -126,7 +138,7 @@ void App::processInput()
     scenes.back()->processInput();
 
 #ifdef USE_IMGUI
-    ImGui_ImplSdlGL3_NewFrame(sdl_win->get_id());
+    ImGui_ImplSdlGL3_NewFrame(sdl_win_handle);
 #endif
 }
 
@@ -139,7 +151,7 @@ void App::render()
 {
     glClear(GL_COLOR_BUFFER_BIT);
     int width, height;
-    SDL_GL_GetDrawableSize(sdl_win->get_id(), &width, &height);
+    SDL_GL_GetDrawableSize(sdl_win_handle, &width, &height);
     glViewport(0, 0, width, height);
     pp_unit->set_new_size(width, height);
 
@@ -157,7 +169,7 @@ void App::render()
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    SDL_GL_SwapWindow(sdl_win->get_id());
+    SDL_GL_SwapWindow(sdl_win_handle);
 }
 
 void App::set_opengl_states()

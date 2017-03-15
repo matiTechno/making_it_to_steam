@@ -6,7 +6,6 @@
 #include <glm/vec2.hpp>
 #include "../opengl/shader.hpp"
 #include <memory>
-#include <vector>
 
 // HOW TO USE:
 // begRender()

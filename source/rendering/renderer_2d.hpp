@@ -9,7 +9,6 @@ class Text;
 #include "../opengl/buffers.hpp"
 #include "../opengl/texture.hpp"
 #include "../opengl/shader.hpp"
-#include <memory>
 #include <vector>
 #include "render_obj_base.hpp"
 

@@ -1,7 +1,6 @@
 #ifndef APP_HPP
 #define APP_HPP
 
-#include "glad/glad.h"
 #include <memory>
 #include <vector>
 #include "scene.hpp"
@@ -31,11 +30,6 @@ class Wrp_sdl_win: public Res_class<SDL_Window*>
 {
 public:
     Wrp_sdl_win(SDL_Window* id);
-
-    SDL_Window* get_id()
-    {
-        return id;
-    }
 };
 
 class Wrp_sdl_context: public Res_class<SDL_GLContext>
@@ -55,19 +49,19 @@ public:
 class App
 {
 public:
+    friend class Scene;
+
     App();
     App(const App&) = delete;
     ~App();
 
-    template<typename T>
-    void start()
+    template<typename T, typename ...Args>
+    void start(Args... args)
     {
         assert(!should_close); // if should_close = true no more scenes can be added
         // to reuse this function scenes must be empty (last scene must pop itself and don't
         // change should_close to true
-        scenes.push_back(std::make_unique<T>(Systems{sound_system.get(), renderer_2D.get(),
-                                                     font_loader.get(), pp_unit.get(),
-                                                     sdl_win->get_id()}, false));
+        scenes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
         run();
     }
 
@@ -77,10 +71,11 @@ private:
     std::unique_ptr<Wrp_sdl_lib> sdl_lib;
     std::unique_ptr<Wrp_sdl_win> sdl_win;
     std::unique_ptr<Wrp_sdl_context> sdl_context;
-    std::unique_ptr<Sound_system> sound_system;
-    std::unique_ptr<Renderer_2D> renderer_2D;
-    std::unique_ptr<Font_loader> font_loader;
-    std::unique_ptr<Postprocessor> pp_unit;
+    static SDL_Window* sdl_win_handle;
+    static std::unique_ptr<Sound_system> sound_system;
+    static std::unique_ptr<Renderer_2D> renderer;
+    static std::unique_ptr<Font_loader> font_loader;
+    static std::unique_ptr<Postprocessor> pp_unit;
     std::vector<std::unique_ptr<Scene>> scenes;
     std::unique_ptr<Wrp_ImGui> wrp_imgui;
 
