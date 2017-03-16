@@ -1,13 +1,12 @@
 #include "shader.hpp"
 #include <stdexcept>
-#include <assert.h>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 GLuint Shader::bound_id = 0;
-std::vector<std::string> Shader::id_names;
 
 ShaderPart::ShaderPart(GLenum shader_type):
     GL_Base([](GLuint id){glDeleteShader(id);})
@@ -25,15 +24,6 @@ Shader::Shader(const std::string& vertex_d, const std::string& fragment_d, const
     GL_Base([](GLuint id){glDeleteProgram(id);}),
     id_name(id_name)
 {
-    if(id_name.size())
-    {
-        for(auto& str: id_names)
-        {
-            assert(id_name != str);
-        }
-        id_names.push_back(id_name);
-    }
-
     std::unique_ptr<ShaderPart> vertex_shader, fragment_shader, geometry_shader;
 
     if(is_from_file)
@@ -53,9 +43,7 @@ Shader::Shader(const std::string& vertex_d, const std::string& fragment_d, const
 
     bool vertex_error = false, fragment_error = false, geometry_error = false;
 
-    std::string pre_msg;
-    if(id_name.size())
-        pre_msg = id_name + ": ";
+    std::string pre_msg = id_name + ": ";
 
     vertex_error = isError(false, vertex_shader->get_id(), GL_COMPILE_STATUS, pre_msg + "vertex shader compilation error:");
     fragment_error = isError(false, fragment_shader->get_id(), GL_COMPILE_STATUS, pre_msg + "fragment shader compilation error:");
@@ -99,11 +87,8 @@ void Shader::bind() const
 GLint Shader::getUniLocation(const std::string& uniform_name) const
 {
     auto uniform_loc = uniform_locations.find(uniform_name);
-    std::string pre_msg;
-    if(id_name.size())
-        pre_msg = id_name + ": ";
     if(uniform_loc == uniform_locations.end())
-        throw std::runtime_error(pre_msg + "no active uniform: " + uniform_name);
+        throw std::runtime_error(id_name + ": " + "no active uniform: " + uniform_name);
     return uniform_loc->second;
 }
 

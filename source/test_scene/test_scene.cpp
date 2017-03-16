@@ -1,5 +1,6 @@
 #include "test_scene.hpp"
 #include "../common_scene.hpp"
+#include "../app.hpp"
 #ifdef USE_IMGUI
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_sdl_gl3.h"
@@ -156,6 +157,6 @@ void Test_scene::process_event(SDL_Event& event)
         else if(event.key.keysym.sym == SDLK_2)
             sound_system.play_sample(sample, 10);
         else if(event.key.keysym.sym == SDLK_ESCAPE)
-            num_scenes_to_pop = 1;
+            App::should_close = true;
     }
 }
