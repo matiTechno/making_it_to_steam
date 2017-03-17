@@ -15,7 +15,7 @@ typedef void *SDL_GLContext;
 // also include:
 // imgui/imgui.h
 // imgui/imgui_impl_sdl_gl3.h
-// from source dir
+// from source dir or 'common_scene.hpp'
 
 // NOTE: not all functionality is tested
 
@@ -45,7 +45,6 @@ public:
     Wrp_ImGui();
 };
 
-// NOTE: do not change blend factors manually
 class App
 {
 public:
@@ -58,9 +57,10 @@ public:
     template<typename T, typename ...Args>
     void start(Args... args)
     {
-        assert(!should_close); // if should_close = true no more scenes can be added
+        // if should_close = true no more scenes can be added
         // to reuse this function scenes must be empty (last scene must pop itself and don't
         // change should_close to true
+        assert(!should_close);
         scenes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
         run();
     }

@@ -11,33 +11,66 @@ class Text;
 #include "../opengl/shader.hpp"
 #include <vector>
 #include "render_obj_base.hpp"
+struct P_data;
+struct P_data_tCs;
+
+// any change in the following sprite / text members will start new batch:
+// * blend_sfactor
+// * blend_dfactor
+// * sampl_type
+// * texture / font
+// ...
+// calling rend_particles() after beg_batching
+// will:
+// * implicitly call end_batching()
+// * render particles
+// * call beg_batching() if batching was enabled before
+
+// WHEN to use rend_particles?
+// * no rotation needed
+// * P_data - one common 'texCoords' vec / texture might be null
+// * p_data_tCs - each particle have it's own 'texCoords' vec
+//   / texture must not be null
+
+// WHEN to use batching?
+// * when rendering text
+// * when rendering sprites with common texture && blending && sampling
+// ...
+// when not to:
+// * when rendering single sprite or when rendering sprites with diffrent textures
 
 // NOTE: do not change blend factors manually
+
+// NOTE:
+// white font on dark background looks much better than black font
+// on white background (postprocessing has some effect on this, gamma correction)
+// in future i will build much more capable font rendering pipeline
+
 class Renderer_2D
 {
 public:
     Renderer_2D();
     Renderer_2D(const Renderer_2D&) = delete;
 
-    // this is good for text / particles (single texture atlas) rendering
-    // between these calls render function will batch sprite / text data
-    // any change in the following sprite / text members will start new batch:
-    // * blend_sfactor
-    // * blend_dfactor
-    // * sampl_type
-    // * texture / font
     void beg_batching() const;
     void end_batching() const;
 
     void render(const Sprite& sprite) const;
     void render(const Text& text) const;
 
+    void rend_particles(const P_data& p_data) const;
+    void rend_particles(const P_data_tCs& p_data) const;
+
+    // assertions:
+    // * left < right
+    // * top < bottom
+    void load_projection(float left, float right, float top, float bottom) const;
     void load_projection(const glm::mat4& matrix) const;
 
 private:
     static bool isCurrent;
 
-    mutable bool is_batching_on;
+    mutable bool is_batching;
 
     VAO vao;
     BO vbo_static;
@@ -61,7 +94,7 @@ private:
         GLenum blend_sfactor;
         GLenum blend_dfactor;
         Texture* texture;
-        Render_obj_base::Sampl_type sampl_type;
+        Sampl_type sampl_type;
     };
 
     // members for batching system
@@ -70,12 +103,18 @@ private:
     BO vbo_dynamic;
     Shader shader_batching;
 
+    // members for particle rendering
+    VAO vao_p, vao_p_tCs;
+    Shader shader_p, shader_p_tCs;
+
     void set_blend_func(GLenum sfactor, GLenum dfactor) const;
 
     void uniform_render(const Sprite& sprite) const;
     void uniform_render(const Text& text) const;
     void batch_render(const Sprite& sprite) const;
     void batch_render(const Text& text) const;
+
+    void load_proj_impl(const glm::mat4& matrix) const;
 };
 
 #endif // RENDERER_2D_HPP

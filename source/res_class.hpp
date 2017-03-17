@@ -5,7 +5,7 @@
 #include <assert.h>
 
 // take care of throwing exceptions
-// in derived class
+// in derived class constructor
 template <typename T>
 class Res_class
 {

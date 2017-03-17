@@ -26,8 +26,7 @@ struct Font
 };
 
 // no kerning support for now
-// to do: implement valve solution
-// for better font rendering
+// to do: implement valve solution and better packing
 class Font_loader
 {
 public:

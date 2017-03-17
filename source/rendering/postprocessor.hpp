@@ -37,6 +37,7 @@ public:
 
     void render(bool tone_maping) const;
 
+    // used by App
     bool has_finished() const
     {return finished;}
 

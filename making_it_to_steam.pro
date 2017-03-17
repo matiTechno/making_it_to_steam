@@ -20,7 +20,11 @@ DISTFILES += \
     shaders/shader_2d_batching.frag \
     shaders/shader_2d_batching.vert \
     shaders/shader_fb_test_red.frag \
-    shaders/shader_fb_final.frag
+    shaders/shader_fb_final.frag \
+    shaders/shader_2d_p.frag \
+    shaders/shader_2d_p.vert \
+    shaders/shader_2d_p_tCs.frag \
+    shaders/shader_2d_p_tCs.vert
 
 HEADERS += \
     source/app.hpp \
@@ -48,7 +52,8 @@ HEADERS += \
     source/res_class.hpp \
     source/scene.hpp \
     source/sound_system.hpp \
-    source/common_scene.hpp
+    source/common_scene.hpp \
+    source/rendering/vbo_particle.hpp
 
 SOURCES += \
     source/app.cpp \

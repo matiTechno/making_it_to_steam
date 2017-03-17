@@ -3,17 +3,21 @@
 #include "sprite.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include "text.hpp"
+#include "vbo_particle.hpp"
 
 bool Renderer_2D::isCurrent = false;
 
 Renderer_2D::Renderer_2D():
-    is_batching_on(false),
+    is_batching(false),
     blend_sfactor(GL_ONE),
     blend_dfactor(GL_ZERO),
     shader_uniform("shaders/shader_2d.vert", "shaders/shader_2d.frag", "", true, "renderer_2D"),
-    shader_batching("shaders/shader_2d_batching.vert",
-                    "shaders/shader_2d_batching.frag", "", true,
-                    "renderer_2D_batching")
+    shader_batching("shaders/shader_2d_batching.vert", "shaders/shader_2d_batching.frag", "", true,
+                    "renderer_2D_batching"),
+    shader_p("shaders/shader_2d_p.vert", "shaders/shader_2d_p.frag", "", true,
+             "renderer_2D_particles"),
+    shader_p_tCs("shaders/shader_2d_p_tCs.vert", "shaders/shader_2d_p_tCs.frag", "", true,
+                 "renderer_2D_particles_texCoords")
 {
     assert(!isCurrent);
     isCurrent = true;
@@ -47,7 +51,7 @@ Renderer_2D::Renderer_2D():
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
 
-    // vao && vbo_dynamic configuration for batching system
+    // vao configuration for batching system
     {
         vbo_dynamic.bind(GL_ARRAY_BUFFER);
 
@@ -84,11 +88,57 @@ Renderer_2D::Renderer_2D():
         glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(Vbo_instance),
                               reinterpret_cast<const void*>(5 * sizeof(glm::vec4) + sizeof(glm::ivec2)));
     }
+    // vao_p
+    {
+        vao_p.bind();
+        vbo_static.bind(GL_ARRAY_BUFFER);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(0);
+
+        vbo_dynamic.bind(GL_ARRAY_BUFFER);
+
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vbo_p), 0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribDivisor(1, 1);
+
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vbo_p),
+                              reinterpret_cast<const void*>(sizeof(glm::vec4)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribDivisor(2, 1);
+    }
+    // vao_p_texCoords
+    {
+        vao_p_tCs.bind();
+        vbo_static.bind(GL_ARRAY_BUFFER);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(0);
+
+        vbo_dynamic.bind(GL_ARRAY_BUFFER);
+
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vbo_p_tCs), 0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribDivisor(1, 1);
+
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vbo_p_tCs),
+                              reinterpret_cast<const void*>(sizeof(glm::vec4)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribDivisor(2, 1);
+
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vbo_p_tCs),
+                              reinterpret_cast<const void*>(2 * sizeof(glm::vec4)));
+        glEnableVertexAttribArray(3);
+        glVertexAttribDivisor(3, 1);
+
+        glVertexAttribIPointer(4, 1, GL_INT, sizeof(Vbo_p_tCs),
+                               reinterpret_cast<const void*>(3 * sizeof(glm::vec4)));
+        glEnableVertexAttribArray(4);
+        glVertexAttribDivisor(4, 1);
+    }
 }
 
 void Renderer_2D::beg_batching() const
 {
-    is_batching_on = true;
+    is_batching = true;
 }
 
 void Renderer_2D::end_batching() const
@@ -106,7 +156,7 @@ void Renderer_2D::end_batching() const
         {
             state_it->texture->bind();
 
-            if(state_it->sampl_type == Render_obj_base::linear)
+            if(state_it->sampl_type == Sampl_type::linear)
                 sampler_linear.bind();
             else
                 sampler_nearest.bind();
@@ -125,12 +175,12 @@ void Renderer_2D::end_batching() const
 
     batches.clear();
     b_states.clear();
-    is_batching_on = false;
+    is_batching = false;
 }
 
 void Renderer_2D::render(const Sprite& sprite) const
 {
-    if(is_batching_on)
+    if(is_batching)
         batch_render(sprite);
     else
         uniform_render(sprite);
@@ -138,13 +188,26 @@ void Renderer_2D::render(const Sprite& sprite) const
 
 void Renderer_2D::render(const Text& text) const
 {
-    if(is_batching_on)
+    if(is_batching)
         batch_render(text);
     else
         uniform_render(text);
 }
 
+void Renderer_2D::load_projection(float left, float right, float top, float bottom) const
+{
+    assert(left < right);
+    assert(top < bottom);
+    glm::mat4 matrix = glm::ortho(left, right, bottom, top);
+    load_proj_impl(matrix);
+}
+
 void Renderer_2D::load_projection(const glm::mat4& matrix) const
+{
+    load_proj_impl(matrix);
+}
+
+void Renderer_2D::load_proj_impl(const glm::mat4& matrix) const
 {
     shader_uniform.bind();
     glUniformMatrix4fv(shader_uniform.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
@@ -153,6 +216,14 @@ void Renderer_2D::load_projection(const glm::mat4& matrix) const
     shader_batching.bind();
     glUniformMatrix4fv(shader_batching.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
     glUniformMatrix4fv(shader_batching.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
+
+    shader_p.bind();
+    glUniformMatrix4fv(shader_p.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
+    glUniformMatrix4fv(shader_p.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
+
+    shader_p_tCs.bind();
+    glUniformMatrix4fv(shader_p_tCs.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
+    glUniformMatrix4fv(shader_p_tCs.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
 }
 
 void Renderer_2D::set_blend_func(GLenum sfactor, GLenum dfactor) const
@@ -173,7 +244,7 @@ void Renderer_2D::uniform_render(const Sprite& sprite) const
 
     if(sprite.texture)
     {
-        if(sprite.sampl_type == Render_obj_base::linear)
+        if(sprite.sampl_type == Sampl_type::linear)
             sampler_linear.bind();
         else
             sampler_nearest.bind();
@@ -227,7 +298,7 @@ void Renderer_2D::uniform_render(const Text& text) const
 
     if(!text.render_quads)
     {
-        if(text.sampl_type == Render_obj_base::linear)
+        if(text.sampl_type == Sampl_type::linear)
             sampler_linear.bind();
         else
             sampler_nearest.bind();
@@ -340,7 +411,6 @@ void Renderer_2D::batch_render(const Sprite& sprite) const
     batches.back().emplace_back();
     Vbo_instance& instance = batches.back().back();
 
-    // texData + type
     if(sprite.texture)
     {
         instance.bloom_type.y = 0;
@@ -358,7 +428,6 @@ void Renderer_2D::batch_render(const Sprite& sprite) const
     else
         instance.bloom_type.y = 1;
 
-    // model matrix
     glm::mat4 model(1.f);
     model = glm::translate(model, glm::vec3(sprite.position, 0.f));
     if(sprite.rotation != 0.f)
@@ -370,10 +439,8 @@ void Renderer_2D::batch_render(const Sprite& sprite) const
     model = glm::scale(model, glm::vec3(sprite.size, 1.f));
     instance.model = std::move(model);
 
-    // color
     instance.color = sprite.color;
 
-    // bloom
     if(sprite.bloom)
         instance.bloom_type.x = 1;
     else
@@ -424,9 +491,8 @@ void Renderer_2D::batch_render(const Text& text) const
         batches.back().emplace_back();
         Vbo_instance& instance = batches.back().back();
 
-        // color
         instance.color = text.color;
-        // bloom
+
         if(text.bloom)
             instance.bloom_type.x = 1;
         else
@@ -485,4 +551,89 @@ void Renderer_2D::batch_render(const Text& text) const
 
         pen_pos.x += static_cast<float>(this_char.advance) * text.scale;
     }
+}
+
+void Renderer_2D::rend_particles(const P_data& p_data) const
+{
+    bool was_batching = is_batching;
+    end_batching();
+
+    vao_p.bind();
+
+    shader_p.bind();
+
+    set_blend_func(p_data.blend_sfactor, p_data.blend_dfactor);
+
+    if(p_data.texture)
+    {
+        if(p_data.sampl_type == Sampl_type::linear)
+            sampler_linear.bind();
+        else
+            sampler_nearest.bind();
+
+        p_data.texture->bind();
+
+        glUniform1i(shader_p.getUniLocation("type"), 0);
+
+        auto& coords = p_data.texCoords;
+        auto texSize = p_data.texture->getSize();
+
+        glm::vec2 texSize_gl(static_cast<float>(coords.z) / static_cast<float>(texSize.x),
+                             static_cast<float>(coords.w) / static_cast<float>(texSize.y));
+        glm::vec2 texShift(static_cast<float>(coords.x) / static_cast<float>(texSize.x),
+                           static_cast<float>(coords.y) / static_cast<float>(texSize.y));
+
+        glUniform2f(shader_p.getUniLocation("texSize"), texSize_gl.x, texSize_gl.y);
+        glUniform2f(shader_p.getUniLocation("texShift"), texShift.x, texShift.y);
+
+    }
+    else
+        glUniform1i(shader_p.getUniLocation("type"), 1);
+
+    if(p_data.bloom)
+        glUniform1i(shader_p.getUniLocation("isBloom"), 1);
+    else
+        glUniform1i(shader_p.getUniLocation("isBloom"), 0);
+
+    vbo_dynamic.bind(GL_ARRAY_BUFFER);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(sizeof(Vbo_p) * p_data.num_to_render),
+                 p_data.vbo_data.data(), GL_STREAM_DRAW);
+
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, static_cast<GLsizei>(p_data.num_to_render));
+
+    if(was_batching)
+        is_batching = true;
+}
+
+void Renderer_2D::rend_particles(const P_data_tCs& p_data) const
+{
+    assert(p_data.texture);
+
+    bool was_batching = is_batching;
+    end_batching();
+
+    vao_p_tCs.bind();
+
+    shader_p_tCs.bind();
+
+    set_blend_func(p_data.blend_sfactor, p_data.blend_dfactor);
+
+    if(p_data.sampl_type == Sampl_type::linear)
+        sampler_linear.bind();
+    else
+        sampler_nearest.bind();
+
+    p_data.texture->bind();
+
+    glUniform2f(shader_p_tCs.getUniLocation("texSize"), static_cast<float>(p_data.texture->getSize().x),
+                static_cast<float>(p_data.texture->getSize().y));
+
+    vbo_dynamic.bind(GL_ARRAY_BUFFER);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(sizeof(Vbo_p_tCs) * p_data.num_to_render),
+                 p_data.vbo_data.data(), GL_STREAM_DRAW);
+
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, static_cast<GLsizei>(p_data.num_to_render));
+
+    if(was_batching)
+        is_batching = true;
 }

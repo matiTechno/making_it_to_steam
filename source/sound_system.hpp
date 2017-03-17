@@ -48,7 +48,7 @@ public:
     static void stop_samples();
 
     // music
-    // only one at a time
+    // only one at a time (one music channel)
     void play_music(const Music& music, bool loop, int volume = 128) const;
     void pause_music() const;
     void resume_music() const;

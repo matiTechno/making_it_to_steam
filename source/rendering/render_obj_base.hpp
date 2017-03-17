@@ -8,6 +8,12 @@
 class No_init
 {};
 
+enum class Sampl_type
+{
+    linear,
+    nearest
+};
+
 class Render_obj_base
 {
 public:
@@ -17,7 +23,7 @@ public:
         bloom(false),
         blend_sfactor(GL_SRC_ALPHA),
         blend_dfactor(GL_ONE_MINUS_SRC_ALPHA),
-        sampl_type(linear)
+        sampl_type(Sampl_type::linear)
     {}
 
     Render_obj_base(No_init)
@@ -31,12 +37,6 @@ public:
     float rotation;
     bool bloom;
     GLenum blend_sfactor, blend_dfactor;
-
-    enum Sampl_type
-    {
-        linear,
-        nearest
-    };
 
     Sampl_type sampl_type;
 };

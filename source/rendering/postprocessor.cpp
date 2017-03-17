@@ -1,6 +1,17 @@
 #include "postprocessor.hpp"
 #include <assert.h>
 
+class Wrp_blend
+{
+public:
+    Wrp_blend()
+    {glDisable(GL_BLEND);}
+    ~Wrp_blend()
+    {glEnable(GL_BLEND);}
+    Wrp_blend(const Wrp_blend&) = delete;
+    Wrp_blend& operator=(const Wrp_blend&) = delete;
+};
+
 bool Postprocessor::isCurrent = false;
 
 Postprocessor::Postprocessor(int width, int height):
@@ -102,6 +113,9 @@ void Postprocessor::begRender() const
 
 void Postprocessor::endRender(int num_blurs) const
 {
+    Wrp_blend wrp_blend;
+    (void)wrp_blend;
+
     // blur
     vao.bind();
     shader_blur.bind();
@@ -149,11 +163,13 @@ void Postprocessor::endRender(int num_blurs) const
     tex_base->bind(0);
     tex_pp2->bind(1);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-
 }
 
 void Postprocessor::apply_effect(const Shader& shader) const
 {
+    Wrp_blend wrp_blend;
+    (void)wrp_blend;
+
     vao.bind();
     shader.bind();
     sampler_nearest.bind();
@@ -175,6 +191,9 @@ void Postprocessor::apply_effect(const Shader& shader) const
 
 void Postprocessor::render(bool tone_mapping) const
 {
+    Wrp_blend wrp_blend;
+    (void)wrp_blend;
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     vao.bind();
