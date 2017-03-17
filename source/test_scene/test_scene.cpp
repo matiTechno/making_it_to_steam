@@ -222,7 +222,7 @@ void Test_scene::render()
             Text text(&font_progy);
             text.position = glm::vec2(PD_X, PD_TOP_Y - 35.f);
             text.text = "100k P_data particles\n"
-                        "with activate texture";
+                        "with active texture";
             Sprite sprite;
             sprite.color = glm::vec4(0.f, 0.f, 0.f, 0.9f);
             sprite.position = text.position;
