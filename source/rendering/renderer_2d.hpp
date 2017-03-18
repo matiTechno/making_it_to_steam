@@ -93,7 +93,7 @@ private:
     {
         GLenum blend_sfactor;
         GLenum blend_dfactor;
-        Texture* texture;
+        const Texture* texture;
         Sampl_type sampl_type;
     };
 

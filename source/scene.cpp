@@ -1,43 +1,40 @@
 #include "scene.hpp"
-#include <SDL2/SDL.h>
 #include "app.hpp"
+#include <SDL2/SDL_events.h>
 
 Scene::Scene():
     sdl_win_handle(App::sdl_win_handle),
     sound_system(*App::sound_system),
     renderer(*App::renderer),
     font_loader(*App::font_loader),
-    pp_unit(*App::pp_unit)
+    pp_unit(*App::pp_unit),
+    is_top(true)
 {}
 
-void Scene::processInput()
+void Scene::processInput(std::queue<SDL_Event>& events)
 {
-    beg_processInput();
-
-    SDL_Event event;
-    while(SDL_PollEvent(&event))
+    beg_events();
+    while(events.size())
     {
-        if(event.type == SDL_QUIT)
-            continue;
-        process_event(event);
+        processEvent(events.front());
+        events.pop();
     }
-
-    end_processInput();
+    end_events();
 }
+
+void Scene::beg_events()
+{}
+
+void Scene::end_events()
+{}
+
+void Scene::processEvent(SDL_Event& event)
+{(void)event;}
 
 void Scene::update(float dt)
 {(void)dt;}
 
 void Scene::render()
-{}
-
-void Scene::process_event(SDL_Event& event)
-{(void)event;}
-
-void Scene::beg_processInput()
-{}
-
-void Scene::end_processInput()
 {}
 
 void Scene::on_quit_event()

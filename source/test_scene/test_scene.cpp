@@ -2,6 +2,7 @@
 #include <random>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
+#include "snake1.hpp"
 
 #define SP_TOP_Y 50.f
 #define SP_SIZE_Y 200.f
@@ -14,12 +15,13 @@
 #define PDT_X 600.f
 
 static std::string res_path = "source/test_scene/res/";
+bool Test_scene::isCurrent = false;
+const Test_scene* Test_scene::handle;
 
 Test_scene::Test_scene():
-    font(font_loader.loadFont(res_path + "Inconsolata-Regular.ttf", 40)),
+    font(font_loader.loadFont(res_path + "DejaVuSans.ttf", 30)),
     font_progy(font_loader.loadFont(res_path + "ProggyClean.ttf", 20)),
     tex_sprite(res_path + "Candies_Jerom_CCBYSA3.png", true),
-    tex_parti(res_path + "particle.png", false),
     tex_tC_parti(res_path + "explo.png", true),
     music(res_path + "Path to Lake Land.ogg"),
     sample(res_path + "sfx_exp_cluster1.wav"),
@@ -30,6 +32,10 @@ Test_scene::Test_scene():
     red_effect("shaders/shader_fb.vert", "shaders/shader_fb_test_red.frag", std::string(),
                true, "red_effect")
 {
+    assert(!isCurrent);
+    isCurrent = true;
+    handle = this;
+
     sound_system.play_music(music, true, 10);
 
     std::random_device rd;
@@ -49,11 +55,9 @@ Test_scene::Test_scene():
         }
     }
     {
-        p_data.vbo_data.reserve(100000);
+        p_data.vbo_data.reserve(10000);
         p_data.num_to_render = p_data.vbo_data.capacity();
         p_data.bloom = true;
-        p_data.texture = &tex_parti;
-        p_data.texCoords = glm::ivec4(0.f, 0.f, p_data.texture->getSize());
         p_data.blend_dfactor = GL_ONE;
         glm::vec2 position(PD_X, PD_TOP_Y);
         std::uniform_real_distribution<float> x(0.f, 100.f);
@@ -62,7 +66,7 @@ Test_scene::Test_scene():
         {
             Vbo_p p;
             p.color = glm::vec4(1.f, 1.f, 1.f, 0.1f);
-            p.size = glm::vec2(1.f, 1.f);
+            p.size = glm::vec2(2.f, 2.f);
             p.pos = position + glm::vec2(x(mt), y(mt));
             p_data.vbo_data.push_back(std::move(p));
         }
@@ -135,6 +139,10 @@ void Test_scene::update(float dt)
 
 void Test_scene::render()
 {
+    // I don't load projection matrix in Snake1 and Snake1_end_menu
+    // classes because:
+    // * they are not opaque so they should play on parent Scene projection rules
+    // * this code still runs when they are on top (useful when window is resized)
     int width, height;
     SDL_GL_GetDrawableSize(sdl_win_handle, &width, &height);
     glm::mat4 proj = glm::ortho(0.f, static_cast<float>(width),
@@ -147,6 +155,7 @@ void Test_scene::render()
     {
         {
             Text text(&font);
+            text.bloom = true;
             text.text = "rotation for Text class supported :)";
             text.rotation = -glm::pi<float>() / 4.f;
             text.rotation_point = text.getSize() / 2.f;
@@ -220,9 +229,8 @@ void Test_scene::render()
         }
         {
             Text text(&font_progy);
-            text.position = glm::vec2(PD_X, PD_TOP_Y - 35.f);
-            text.text = "100k P_data particles\n"
-                        "with active texture";
+            text.position = glm::vec2(PD_X, PD_TOP_Y - 20.f);
+            text.text = "10k P_data particles";
             Sprite sprite;
             sprite.color = glm::vec4(0.f, 0.f, 0.f, 0.9f);
             sprite.position = text.position;
@@ -272,14 +280,20 @@ void Test_scene::render()
         renderer.end_batching();
     }
 
-#ifdef USE_IMGUI
-    ImGui::SetNextWindowPos(ImVec2(150.f, 450.f), ImGuiSetCond_::ImGuiSetCond_Once);
-    ImGui::ShowTestWindow();
-    ImGui::Render();
-#endif
+    if(is_on_top())
+    {
+        ImGui::SetNextWindowPos(ImVec2(150.f, 450.f), ImGuiSetCond_::ImGuiSetCond_Once);
+        ImGui::ShowTestWindow();
+        ImGui::SetNextWindowPos(ImVec2(250.f, 300.f), ImGuiSetCond_::ImGuiSetCond_Once);
+        ImGui::Begin("demo snake game");
+        if(ImGui::Button("start game"))
+            set_new_scene<Snake1>();
+        ImGui::End();
+        ImGui::Render();
+    }
 }
 
-void Test_scene::process_event(SDL_Event& event)
+void Test_scene::processEvent(SDL_Event& event)
 {
     if(event.type == SDL_KEYDOWN && !event.key.repeat)
     {

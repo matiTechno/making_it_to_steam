@@ -2,6 +2,7 @@
 #define SCENE_HPP
 
 #include <memory>
+#include <queue>
 class Sound_system;
 class Renderer_2D;
 class Font_loader;
@@ -11,10 +12,19 @@ struct SDL_Window;
 
 // num_scenes_to_pop && new_scene
 // requests are executed at the end of frame
+// only for top scene
 // by default Scene is opaque
 
 // Sample / Music / Texture / Font and possibly other
 // objects must be local to your scenes (non-static)
+
+// to use ImGui:
+// * create ImGui windows
+// * call ImGui::Render()
+// ...
+// input processing is already done in App class
+// you shouldn't use ImGui when your scene is not on top
+// (check it with is_on_top())
 
 class Scene
 {
@@ -28,7 +38,17 @@ public:
 
     virtual ~Scene() = default;
 
-    void processInput();
+    // by default calls:
+    // ...
+    // * beg_events()
+    // * processEvent(SDL_Event& event)
+    // * end_events()
+    // ...
+    // how to std::queue:
+    // while(size())
+    // front()
+    // pop()
+    virtual void processInput(std::queue<SDL_Event>& events);
 
     virtual void update(float dt);
 
@@ -44,7 +64,7 @@ protected:
     bool is_opaque = true;
 
     template<typename T, typename ...Args>
-    void set_new_scene(Args... args)
+    void set_new_scene(Args&&... args)
     {
         new_scene = std::make_unique<T>(std::forward<Args>(args)...);
     }
@@ -57,13 +77,16 @@ protected:
     const Font_loader& font_loader;
     const Postprocessor& pp_unit;
 
+    bool is_on_top() const
+    {return is_top;}
+
 private:
     std::unique_ptr<Scene> new_scene;
+    bool is_top;
 
-    // SDL_QUIT events are never passed to this function
-    virtual void process_event(SDL_Event& event);
-    virtual void beg_processInput();
-    virtual void end_processInput();
+    virtual void beg_events();
+    virtual void processEvent(SDL_Event& event);
+    virtual void end_events();
 };
 
 #endif // SCENE_HPP

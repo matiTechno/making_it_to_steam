@@ -449,7 +449,7 @@ void Renderer_2D::batch_render(const Sprite& sprite) const
 
 void Renderer_2D::batch_render(const Text& text) const
 {
-    Texture* temp = nullptr;
+    const Texture* temp = nullptr;
     if(!text.render_quads)
         temp = &text.font->atlas;
 

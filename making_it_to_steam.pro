@@ -5,7 +5,7 @@ CONFIG -= qt
 
 QMAKE_CXXFLAGS += -pedantic
 
-DEFINES += GLM_FORCE_NO_CTOR_INIT USE_IMGUI
+DEFINES += GLM_FORCE_NO_CTOR_INIT
 
 LIBS += -lGL -lfreetype -ldl -lSDL2_mixer -lSDL2
 
@@ -53,7 +53,9 @@ HEADERS += \
     source/scene.hpp \
     source/sound_system.hpp \
     source/common_scene.hpp \
-    source/rendering/vbo_particle.hpp
+    source/rendering/vbo_particle.hpp \
+    source/test_scene/snake1.hpp \
+    source/test_scene/snake1_end_menu.hpp
 
 SOURCES += \
     source/app.cpp \
@@ -72,4 +74,6 @@ SOURCES += \
     source/imgui/imgui.cpp \
     source/imgui/imgui_demo.cpp \
     source/imgui/imgui_draw.cpp \
-    source/imgui/imgui_impl_sdl_gl3.cpp
+    source/imgui/imgui_impl_sdl_gl3.cpp \
+    source/test_scene/snake1.cpp \
+    source/test_scene/snake1_end_menu.cpp

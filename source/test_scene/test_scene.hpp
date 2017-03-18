@@ -1,7 +1,6 @@
 #ifndef TEST_SCENE_HPP
 #define TEST_SCENE_HPP
 
-#include "../scene.hpp"
 #include "../common_scene.hpp"
 
 class Test_scene: public Scene
@@ -14,10 +13,9 @@ public:
     void render() override;
 
 private:
-    void process_event(SDL_Event& event) override;
 
     Font font, font_progy;
-    Texture tex_sprite, tex_parti, tex_tC_parti;
+    Texture tex_sprite, tex_tC_parti;
     Music music;
     Sample sample;
     bool v_sync;
@@ -29,6 +27,16 @@ private:
     P_data p_data;
     P_data_tCs p_data_tcs;
     std::vector<Sprite> vec_sprites;
+
+    // resource class design
+    // exposed only by const
+    friend class Snake1;
+    friend class Snake1_end_menu;
+    static const Test_scene* handle;
+
+    static bool isCurrent;
+
+    void processEvent(SDL_Event& event) override;
 };
 
 #endif // TEST_SCENE_HPP

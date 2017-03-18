@@ -18,7 +18,7 @@ public:
 
     glm::vec2 size;
     glm::ivec4 texCoords;
-    Texture* texture;
+    const Texture* texture;
 };
 
 #endif // SPRITE_HPP

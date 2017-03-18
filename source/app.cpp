@@ -8,10 +8,9 @@
 #include "glad/glad.h"
 #include "common_scene.hpp"
 #include <SDL2/SDL_mixer.h>
-#ifdef USE_IMGUI
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl_gl3.h"
-#endif
+#include <queue>
 
 bool App::isCurrent  = false;
 bool App::should_close = false;
@@ -59,7 +58,7 @@ App::App()
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
-        SDL_Window* temp = SDL_CreateWindow("game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        SDL_Window* temp = SDL_CreateWindow("making_it_to_steam", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                             800, 600, SDL_WINDOW_OPENGL);
         if(temp == nullptr)
             throw std::runtime_error(std::string("SDL2 window creation failed: ") + SDL_GetError());
@@ -105,11 +104,8 @@ App::App()
 
     set_opengl_states();
 
-#ifdef USE_IMGUI
     wrp_imgui = std::make_unique<Wrp_ImGui>();
     ImGui_ImplSdlGL3_Init(sdl_win_handle);
-#endif
-
 }
 
 void App::run()
@@ -134,16 +130,24 @@ void App::run()
 
 void App::processInput()
 {
-    SDL_PumpEvents();
-    SDL_Event quit_event;
-    if(SDL_PeepEvents(&quit_event, 1, SDL_PEEKEVENT, SDL_QUIT, SDL_QUIT))
-        scenes.back()->on_quit_event();
-
-    scenes.back()->processInput();
-
-#ifdef USE_IMGUI
+    std::queue<SDL_Event> events;
+    bool was_quit_event = false;
+    SDL_Event event;
+    while(SDL_PollEvent(&event))
+    {
+        if(event.type == SDL_QUIT && !was_quit_event)
+        {
+            was_quit_event = true;
+            scenes.back()->on_quit_event();
+        }
+        else
+        {
+            ImGui_ImplSdlGL3_ProcessEvent(&event);
+            events.push(std::move(event));
+        }
+    }
     ImGui_ImplSdlGL3_NewFrame(sdl_win_handle);
-#endif
+    scenes.back()->processInput(events);
 }
 
 void App::update(float dt)
@@ -160,10 +164,10 @@ void App::render()
     pp_unit->set_new_size(width, height);
 
     std::deque<Scene*> scenes_to_render;
-    for(auto& scene: scenes)
+    for(auto it = scenes.rbegin(); it != scenes.rend(); ++it)
     {
-        scenes_to_render.push_front(scene.get());
-        if(scene->is_opaque)
+        scenes_to_render.push_front(it->get());
+        if((*it)->is_opaque)
             break;
     }
     for(auto& scene: scenes_to_render)
@@ -195,6 +199,15 @@ void App::manage_scenes()
 
     if(new_scene)
         scenes.push_back(std::move(new_scene));
+
+    // :)
+    for(auto& scene: scenes)
+    {
+        if(&scene == &scenes.back())
+            scene->is_top = true;
+        else
+            scene->is_top = false;
+    }
 }
 
 Wrp_sdl_lib::Wrp_sdl_lib():
@@ -213,8 +226,6 @@ Wrp_sdl_context::Wrp_sdl_context(SDL_GLContext id):
 this->id = id;
 }
 
-#ifdef USE_IMGUI
 Wrp_ImGui::Wrp_ImGui():
     Res_class([](void*){ImGui_ImplSdlGL3_Shutdown();})
 {}
-#endif

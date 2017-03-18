@@ -9,16 +9,6 @@ typedef void *SDL_GLContext;
 #include "res_class.hpp"
 #include <assert.h>
 
-// define USE_IMGUI to support ImGui
-// all you need to do in your scene class
-// is to create imgui window and call ImGui::Render()
-// also include:
-// imgui/imgui.h
-// imgui/imgui_impl_sdl_gl3.h
-// from source dir or 'common_scene.hpp'
-
-// NOTE: not all functionality is tested
-
 // wrapper calsses for SDL2
 class Wrp_sdl_lib: public Res_class<void*>
 {
@@ -55,7 +45,7 @@ public:
     ~App();
 
     template<typename T, typename ...Args>
-    void start(Args... args)
+    void start(Args&&... args)
     {
         // if should_close = true no more scenes can be added
         // to reuse this function scenes must be empty (last scene must pop itself and don't

@@ -11,7 +11,7 @@ class Text: public Render_obj_base
 public:
     friend class Renderer_2D;
 
-    Text(Font* font):
+    Text(const Font* font):
         scale(1.f),
         render_quads(false),
         font(font)
@@ -30,7 +30,7 @@ public:
     bool render_quads;
 
 private:
-    Font* font;
+    const Font* font;
 };
 
 #endif // TEXT_HPP
