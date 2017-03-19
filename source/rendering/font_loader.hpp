@@ -27,6 +27,9 @@ struct Font
 
 // no kerning support for now
 // to do: implement valve solution and better packing
+// font is looking perfect only when renderer pixel to pixel
+// sometimes you can soften it with bloom if scaled or rotated
+// (for example when implementing dynamic effects)
 class Font_loader
 {
 public:

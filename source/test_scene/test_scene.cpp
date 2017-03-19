@@ -36,6 +36,8 @@ Test_scene::Test_scene():
     isCurrent = true;
     handle = this;
 
+    SCENE_update_when_not_top = true;
+
     sound_system.play_music(music, true, 10);
 
     std::random_device rd;

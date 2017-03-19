@@ -24,15 +24,10 @@ Postprocessor::Postprocessor(int width, int height):
     assert(!isCurrent);
     isCurrent = true;
 
-    sampler_linear.set_parameter_i(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    sampler_linear.set_parameter_i(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    sampler_linear.set_parameter_i(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    sampler_linear.set_parameter_i(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    sampler_nearest.set_parameter_i(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    sampler_nearest.set_parameter_i(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    sampler_nearest.set_parameter_i(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    sampler_nearest.set_parameter_i(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    sampler.set_parameter_i(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    sampler.set_parameter_i(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    sampler.set_parameter_i(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    sampler.set_parameter_i(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     GLfloat vertices[] =
     {
@@ -119,7 +114,7 @@ void Postprocessor::endRender(int num_blurs) const
     // blur
     vao.bind();
     shader_blur.bind();
-    sampler_linear.bind();
+    sampler.bind();
 
     glViewport(0, 0, tex_pp1->getSize().x, tex_pp1->getSize().y);
     bool horizontal_pass = true, first_iter = true;
@@ -158,8 +153,7 @@ void Postprocessor::endRender(int num_blurs) const
     vao.bind();
     shader_blend.bind();
 
-    sampler_nearest.bind(0);
-    sampler_nearest.bind(1);
+    sampler.bind(1);
     tex_base->bind(0);
     tex_pp2->bind(1);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -172,7 +166,7 @@ void Postprocessor::apply_effect(const Shader& shader) const
 
     vao.bind();
     shader.bind();
-    sampler_nearest.bind();
+    sampler.bind();
 
     if(next_tex_custom_bind == 1)
     {
@@ -202,7 +196,7 @@ void Postprocessor::render(bool tone_mapping) const
         glUniform1i(shader_final.getUniLocation("is_tone_mapping"), 1);
     else
         glUniform1i(shader_final.getUniLocation("is_tone_mapping"), 0);
-    sampler_nearest.bind();
+    sampler.bind();
     if(next_tex_custom_bind == 1)
         tex_custom_1->bind();
     else

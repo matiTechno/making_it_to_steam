@@ -22,8 +22,7 @@ public:
         rotation(0.f),
         bloom(false),
         blend_sfactor(GL_SRC_ALPHA),
-        blend_dfactor(GL_ONE_MINUS_SRC_ALPHA),
-        sampl_type(Sampl_type::linear)
+        blend_dfactor(GL_ONE_MINUS_SRC_ALPHA)
     {}
 
     Render_obj_base(No_init)
@@ -37,8 +36,6 @@ public:
     float rotation;
     bool bloom;
     GLenum blend_sfactor, blend_dfactor;
-
-    Sampl_type sampl_type;
 };
 
 #endif // RENDER_OBJ_BASE_HPP

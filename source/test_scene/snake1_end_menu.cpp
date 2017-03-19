@@ -9,7 +9,7 @@ Snake1_end_menu::Snake1_end_menu(int score, Game_state state):
     spacing(10.f),
     state(state)
 {
-    is_opaque = false;
+    SCENE_is_opaque = false;
 
     Text text(&Test_scene::handle->font);
     text.color = glm::vec4(1.f, 1.f, 0.f, 1.f);
@@ -61,15 +61,15 @@ void Snake1_end_menu::processEvent(SDL_Event& event)
             {
                 if(state == Game_state::over)
                 {
-                    num_scenes_to_pop = 2;
+                    SCENE_num_scenes_to_pop = 2;
                     set_new_scene<Snake1>();
                 }
                 else
-                    num_scenes_to_pop = 1;
+                    SCENE_num_scenes_to_pop = 1;
             }
             else if(current_option == num_title_texts + 1)
             {
-                num_scenes_to_pop = 2;
+                SCENE_num_scenes_to_pop = 2;
             }
             else if(current_option == num_title_texts + 2)
                 App::should_close = true;

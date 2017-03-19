@@ -295,14 +295,10 @@ void Renderer_2D::uniform_render(const Text& text) const
     set_blend_func(text.blend_sfactor, text.blend_dfactor);
     vao.bind();
     shader_uniform.bind();
+    sampler_linear.bind();
 
     if(!text.render_quads)
     {
-        if(text.sampl_type == Sampl_type::linear)
-            sampler_linear.bind();
-        else
-            sampler_nearest.bind();
-
         text.font->atlas.bind();
         glUniform1i(shader_uniform.getUniLocation("type"), 2);
     }
@@ -317,7 +313,12 @@ void Renderer_2D::uniform_render(const Text& text) const
     auto& col = text.color;
     glUniform4f(shader_uniform.getUniLocation("spriteColor"), col.x, col.y, col.z, col.w);
 
-    glm::vec2 pen_pos = text.position;
+    glm::vec2 pen_pos;
+    if(text.rotation != 0.f || !text.snap_to_pixel_grid)
+        pen_pos = text.position;
+    else
+        // snapping to pixel grid
+        pen_pos = glm::ivec2(text.position + 0.5f);
 
     bool first_char_in_line = true;
 
@@ -393,8 +394,8 @@ void Renderer_2D::batch_render(const Sprite& sprite) const
     {
         if(sprite.blend_sfactor != b_states.back().blend_sfactor ||
                 sprite.blend_dfactor != b_states.back().blend_dfactor ||
-                (sprite.texture != b_states.back().texture && sprite.texture != nullptr) ||
-                (sprite.sampl_type != b_states.back().sampl_type && sprite.texture != nullptr))
+                ((sprite.texture != b_states.back().texture) && sprite.texture != nullptr) ||
+                ((sprite.sampl_type != b_states.back().sampl_type) && sprite.texture != nullptr))
         {
             b_states.push_back({sprite.blend_sfactor, sprite.blend_dfactor,
                                 sprite.texture, sprite.sampl_type});
@@ -449,30 +450,30 @@ void Renderer_2D::batch_render(const Sprite& sprite) const
 
 void Renderer_2D::batch_render(const Text& text) const
 {
-    const Texture* temp = nullptr;
-    if(!text.render_quads)
-        temp = &text.font->atlas;
-
     if(batches.size())
     {
         if(text.blend_sfactor != b_states.back().blend_sfactor ||
                 text.blend_dfactor != b_states.back().blend_dfactor ||
-                (&text.font->atlas != b_states.back().texture && !text.render_quads) ||
-                (text.sampl_type != b_states.back().sampl_type && !text.render_quads))
+                ((&text.font->atlas != b_states.back().texture) && !text.render_quads))
         {
             b_states.push_back({text.blend_sfactor, text.blend_dfactor,
-                                temp, text.sampl_type});
+                                &text.font->atlas, Sampl_type::linear});
             batches.emplace_back();
         }
     }
     else
     {
         b_states.push_back({text.blend_sfactor, text.blend_dfactor,
-                            temp, text.sampl_type});
+                            &text.font->atlas, Sampl_type::linear});
         batches.emplace_back();
     }
 
-    glm::vec2 pen_pos = text.position;
+    glm::vec2 pen_pos;
+    if(text.rotation != 0.f || !text.snap_to_pixel_grid)
+        pen_pos = text.position;
+    else
+        // snapping to pixel grid
+        pen_pos = glm::ivec2(text.position + 0.5f);
 
     bool first_char_in_line = true;
 

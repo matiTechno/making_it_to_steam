@@ -48,7 +48,7 @@ private:
     glm::ivec2 fbSize;
     VAO vao;
     BO vbo;
-    Sampler sampler_linear, sampler_nearest;
+    Sampler sampler;
     Shader shader_blur, shader_blend, shader_final;
     std::unique_ptr<Texture> tex_base, tex_bright, tex_pp1, tex_pp2;
     FBO fb_beg, fb_pp1, fb_pp2;

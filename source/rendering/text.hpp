@@ -6,6 +6,7 @@
 #include "render_obj_base.hpp"
 
 // no kerning support for now
+// rotation might produce artifacts
 class Text: public Render_obj_base
 {
 public:
@@ -14,6 +15,7 @@ public:
     Text(const Font* font):
         scale(1.f),
         render_quads(false),
+        snap_to_pixel_grid(true),
         font(font)
     {}
 
@@ -28,6 +30,8 @@ public:
     std::string text;
     float scale;
     bool render_quads;
+    // only when no rotation
+    bool snap_to_pixel_grid;
 
 private:
     const Font* font;

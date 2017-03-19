@@ -8,17 +8,18 @@ class Sprite: public Render_obj_base
 {
 public:
     Sprite():
-        texture(nullptr)
+        texture(nullptr),
+        sampl_type(Sampl_type::linear)
     {}
 
     Sprite(No_init):
-        Render_obj_base(No_init()),
-        texture(nullptr)
+        Render_obj_base(No_init())
     {}
 
     glm::vec2 size;
     glm::ivec4 texCoords;
     const Texture* texture;
+    Sampl_type sampl_type;
 };
 
 #endif // SPRITE_HPP

@@ -59,9 +59,9 @@ public:
 protected:
     // including this scene
     // must be in range [0, num_scenes] or assertion will fail
-    int num_scenes_to_pop = 0;
-
-    bool is_opaque = true;
+    int SCENE_num_scenes_to_pop = 0;
+    bool SCENE_is_opaque = true;
+    bool SCENE_update_when_not_top = false;
 
     template<typename T, typename ...Args>
     void set_new_scene(Args&&... args)

@@ -152,7 +152,11 @@ void App::processInput()
 
 void App::update(float dt)
 {
-    scenes.back()->update(dt);
+    for(auto& scene: scenes)
+    {
+        if(&scene == &scenes.back() || scene->SCENE_update_when_not_top)
+            scene->update(dt);
+    }
 }
 
 void App::render()
@@ -167,7 +171,7 @@ void App::render()
     for(auto it = scenes.rbegin(); it != scenes.rend(); ++it)
     {
         scenes_to_render.push_front(it->get());
-        if((*it)->is_opaque)
+        if((*it)->SCENE_is_opaque)
             break;
     }
     for(auto& scene: scenes_to_render)
@@ -189,7 +193,7 @@ void App::manage_scenes()
 {
     std::unique_ptr<Scene> new_scene = std::move(scenes.back()->new_scene);
 
-    int num = scenes.back()->num_scenes_to_pop;
+    int num = scenes.back()->SCENE_num_scenes_to_pop;
     if(num)
     {
         assert(num > 0 && num <= static_cast<int>(scenes.size()));

@@ -15,7 +15,7 @@ Snake1::Snake1():
     rn_eng(),
     was_move_key(false)
 {
-    is_opaque = false;
+    SCENE_is_opaque = false;
     assert(map_size % grid_size == 0);
     int num_grids_x = map_size / grid_size;
 
