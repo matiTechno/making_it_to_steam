@@ -12,6 +12,8 @@ public:
 
     void render() override;
 
+    void render_ImGui() override;
+
 private:
 
     Font font, font_progy;

@@ -7,12 +7,15 @@
 
 // no kerning support for now
 // rotation might produce artifacts
+// only ASCII or std::map::at will
+// throw exception in Text::getSize()
+// or Renderer_2D::render()
 class Text: public Render_obj_base
 {
 public:
     friend class Renderer_2D;
 
-    Text(const Font* font):
+    explicit Text(const Font* font):
         scale(1.f),
         render_quads(false),
         snap_to_pixel_grid(true),
@@ -20,10 +23,7 @@ public:
     {}
 
     // produces artifacts
-    void set_pixel_size(unsigned size)
-    {
-        scale = static_cast<float>(size) / static_cast<float>(font->pixel_size);
-    }
+    void set_pixel_size(unsigned size);
 
     glm::vec2 getSize() const;
 

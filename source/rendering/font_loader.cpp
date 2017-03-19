@@ -49,6 +49,12 @@ Font Font_loader::loadFont(const std::string& filename, unsigned size) const
     FT_GlyphSlot slot = face->glyph;
     int line_space = static_cast<int>(face->size->metrics.height >> 6);
 
+    // find max width
+    // find max_bearing_y
+    // find places when row is breaking
+    // find
+    // set chars and coords
+
     unsigned max_height = 0, summ_x = 0;
     int max_bearing_y = 0;
 
@@ -64,6 +70,8 @@ Font Font_loader::loadFont(const std::string& filename, unsigned size) const
             max_bearing_y = slot->bitmap_top;
     }
 
+    // * create texture
+    // * move bitmaps to it
     GLint unpack_alignment;
     glGetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

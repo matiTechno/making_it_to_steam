@@ -163,6 +163,7 @@ void App::render()
         if(!pp_unit->has_finished())
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+    scenes.back()->render_ImGui();
 
     SDL_GL_SwapWindow(sdl_win_handle);
 }

@@ -41,3 +41,6 @@ void Scene::on_quit_event()
 {
     App::should_close = true;
 }
+
+void Scene::render_ImGui()
+{}

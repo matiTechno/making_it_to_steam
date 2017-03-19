@@ -261,7 +261,6 @@ void Test_scene::render()
         pp_unit.apply_effect(red_effect);
         pp_unit.render();
     }
-
     {
         renderer.beg_batching();
         Text text(&font);
@@ -281,18 +280,18 @@ void Test_scene::render()
         renderer.render(text);
         renderer.end_batching();
     }
+}
 
-    if(is_on_top())
-    {
-        ImGui::SetNextWindowPos(ImVec2(150.f, 450.f), ImGuiSetCond_::ImGuiSetCond_Once);
-        ImGui::ShowTestWindow();
-        ImGui::SetNextWindowPos(ImVec2(250.f, 300.f), ImGuiSetCond_::ImGuiSetCond_Once);
-        ImGui::Begin("demo snake game");
-        if(ImGui::Button("start game"))
-            set_new_scene<Snake1>();
-        ImGui::End();
-        ImGui::Render();
-    }
+void Test_scene::render_ImGui()
+{
+    ImGui::SetNextWindowPos(ImVec2(150.f, 450.f), ImGuiSetCond_::ImGuiSetCond_Once);
+    ImGui::ShowTestWindow();
+    ImGui::SetNextWindowPos(ImVec2(250.f, 300.f), ImGuiSetCond_::ImGuiSetCond_Once);
+    ImGui::Begin("demo snake game");
+    if(ImGui::Button("start game"))
+        set_new_scene<Snake1>();
+    ImGui::End();
+    ImGui::Render();
 }
 
 void Test_scene::processEvent(SDL_Event& event)

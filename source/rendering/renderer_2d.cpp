@@ -317,8 +317,6 @@ void Renderer_2D::uniform_render(const Text& text) const
             continue;
         }
 
-        assert(c >= 32 && c < 127);
-
         auto& this_char = text.font->chars.at(c);
 
         // texture coordinates
@@ -471,8 +469,6 @@ void Renderer_2D::batch_render(const Text& text) const
             first_char_in_line = true;
             continue;
         }
-
-        assert(c >= 32 && c < 127);
 
         batches.back().emplace_back();
         Vbo_instance& instance = batches.back().back();

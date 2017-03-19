@@ -19,12 +19,14 @@ struct SDL_Window;
 // objects must be local to your scenes (non-static)
 
 // to use ImGui:
+// in function render_ImGui:
 // * create ImGui windows
 // * call ImGui::Render()
 // ...
 // input processing is already done in App class
-// you shouldn't use ImGui when your scene is not on top
-// (check it with is_on_top())
+// this function will be called only for top most scene
+// (this is how ImGui works)
+// don't implement ImGui rendering in normal render function
 
 class Scene
 {
@@ -53,6 +55,8 @@ public:
     virtual void update(float dt);
 
     virtual void render();
+
+    virtual void render_ImGui();
 
     virtual void on_quit_event();
 

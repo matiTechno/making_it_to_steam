@@ -30,6 +30,7 @@ struct Font
 // font is looking perfect only when renderer pixel to pixel
 // sometimes you can soften it with bloom if scaled or rotated
 // (for example when implementing dynamic effects)
+// for devs: if atlas row is > 900 new row is started
 class Font_loader
 {
 public:

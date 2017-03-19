@@ -3,6 +3,11 @@
 #include <algorithm>
 #include <assert.h>
 
+void Text::set_pixel_size(unsigned size)
+{
+    scale = static_cast<float>(size) / static_cast<float>(font->pixel_size);
+}
+
 glm::vec2 Text::getSize() const
 {
     std::size_t num_lines = static_cast<std::size_t>(std::count(text.begin(), text.end(), '\n')) + 1;
@@ -20,8 +25,6 @@ glm::vec2 Text::getSize() const
         }
         else
         {
-            assert(*c >= 32 && *c < 127);
-
             auto& this_char = font->chars.at(*c);
 
             if(*(c + 1) == '\n' || (c + 1) == text.end())
