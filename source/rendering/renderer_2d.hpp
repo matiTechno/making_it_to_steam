@@ -39,8 +39,6 @@ struct P_data_tCs;
 // when not to:
 // * when rendering single sprite or when rendering sprites with diffrent textures
 
-// NOTE: do not change blend factors manually
-
 // NOTE:
 // white font on dark background looks much better than black font
 // on white background (postprocessing has some effect on this, gamma correction)
@@ -75,7 +73,6 @@ private:
     VAO vao;
     BO vbo_static;
     Sampler sampler_linear, sampler_nearest;
-    mutable GLenum blend_sfactor, blend_dfactor;
     Shader shader_uniform;
 
     // don't change the order
@@ -91,8 +88,8 @@ private:
 
     struct Batch_state
     {
-        GLenum blend_sfactor;
-        GLenum blend_dfactor;
+        GLenum src_alpha;
+        GLenum dst_alpha;
         const Texture* texture;
         Sampl_type sampl_type;
     };
@@ -106,8 +103,6 @@ private:
     // members for particle rendering
     VAO vao_p, vao_p_tCs;
     Shader shader_p, shader_p_tCs;
-
-    void set_blend_func(GLenum sfactor, GLenum dfactor) const;
 
     void uniform_render(const Sprite& sprite) const;
     void uniform_render(const Text& text) const;

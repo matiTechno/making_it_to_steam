@@ -35,16 +35,20 @@ public:
         rhs.was_moved = true;
     }
 
-    Res_class& operato(Res_class&& rhs)
-    {
-        if(this == &rhs)
-            return *this;
+    // disabled for now
+    // too risky :D
+    //    Res_class& operator=(Res_class&& rhs)
+    //    {
+    //        if(this == &rhs)
+    //            return *this;
 
-        deleter(id);
-        id = rhs.id;
-        rhs.was_moved = true;
-        return *this;
-    }
+    //        if(!was_moved)
+    //            deleter(id);
+    //        id = rhs.id;
+    //        deleter = rhs.deleter;
+    //        rhs.was_moved = true;
+    //        return *this;
+    //    }
 
 protected:
     T id;

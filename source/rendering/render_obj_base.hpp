@@ -21,8 +21,8 @@ public:
         color(1.f, 1.f, 1.f, 1.f),
         rotation(0.f),
         bloom(false),
-        blend_sfactor(GL_SRC_ALPHA),
-        blend_dfactor(GL_ONE_MINUS_SRC_ALPHA)
+        src_alpha(GL_SRC_ALPHA),
+        dst_alpha(GL_ONE_MINUS_SRC_ALPHA)
     {}
 
     Render_obj_base(No_init)
@@ -35,7 +35,8 @@ public:
     // radians
     float rotation;
     bool bloom;
-    GLenum blend_sfactor, blend_dfactor;
+    // for blending
+    GLenum src_alpha, dst_alpha;
 };
 
 #endif // RENDER_OBJ_BASE_HPP

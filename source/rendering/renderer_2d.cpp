@@ -4,13 +4,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "text.hpp"
 #include "vbo_particle.hpp"
+#include "../app.hpp"
 
 bool Renderer_2D::isCurrent = false;
 
 Renderer_2D::Renderer_2D():
     is_batching(false),
-    blend_sfactor(GL_ONE),
-    blend_dfactor(GL_ZERO),
     shader_uniform("shaders/shader_2d.vert", "shaders/shader_2d.frag", "", true, "renderer_2D"),
     shader_batching("shaders/shader_2d_batching.vert", "shaders/shader_2d_batching.frag", "", true,
                     "renderer_2D_batching"),
@@ -162,7 +161,7 @@ void Renderer_2D::end_batching() const
                 sampler_nearest.bind();
         }
 
-        set_blend_func(state_it->blend_sfactor, state_it->blend_dfactor);
+        App::handle->set_blend_func(state_it->src_alpha, state_it->dst_alpha);
 
         ++state_it;
 
@@ -211,34 +210,20 @@ void Renderer_2D::load_proj_impl(const glm::mat4& matrix) const
 {
     shader_uniform.bind();
     glUniformMatrix4fv(shader_uniform.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
-    glUniformMatrix4fv(shader_uniform.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
 
     shader_batching.bind();
-    glUniformMatrix4fv(shader_batching.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
     glUniformMatrix4fv(shader_batching.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
 
     shader_p.bind();
     glUniformMatrix4fv(shader_p.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
-    glUniformMatrix4fv(shader_p.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
 
     shader_p_tCs.bind();
     glUniformMatrix4fv(shader_p_tCs.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
-    glUniformMatrix4fv(shader_p_tCs.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
-}
-
-void Renderer_2D::set_blend_func(GLenum sfactor, GLenum dfactor) const
-{
-    if(blend_sfactor != sfactor || blend_dfactor != dfactor)
-    {
-        blend_sfactor = sfactor;
-        blend_dfactor = dfactor;
-        glBlendFunc(blend_sfactor, blend_dfactor);
-    }
 }
 
 void Renderer_2D::uniform_render(const Sprite& sprite) const
 {
-    set_blend_func(sprite.blend_sfactor, sprite.blend_dfactor);
+    App::handle->set_blend_func(sprite.src_alpha, sprite.dst_alpha);
     vao.bind();
     shader_uniform.bind();
 
@@ -292,7 +277,7 @@ void Renderer_2D::uniform_render(const Sprite& sprite) const
 
 void Renderer_2D::uniform_render(const Text& text) const
 {
-    set_blend_func(text.blend_sfactor, text.blend_dfactor);
+    App::handle->set_blend_func(text.src_alpha, text.dst_alpha);
     vao.bind();
     shader_uniform.bind();
     sampler_linear.bind();
@@ -392,19 +377,19 @@ void Renderer_2D::batch_render(const Sprite& sprite) const
 {
     if(batches.size())
     {
-        if(sprite.blend_sfactor != b_states.back().blend_sfactor ||
-                sprite.blend_dfactor != b_states.back().blend_dfactor ||
+        if(sprite.src_alpha != b_states.back().src_alpha ||
+                sprite.dst_alpha != b_states.back().dst_alpha ||
                 ((sprite.texture != b_states.back().texture) && sprite.texture != nullptr) ||
                 ((sprite.sampl_type != b_states.back().sampl_type) && sprite.texture != nullptr))
         {
-            b_states.push_back({sprite.blend_sfactor, sprite.blend_dfactor,
+            b_states.push_back({sprite.src_alpha, sprite.dst_alpha,
                                 sprite.texture, sprite.sampl_type});
             batches.emplace_back();
         }
     }
     else
     {
-        b_states.push_back({sprite.blend_sfactor, sprite.blend_dfactor,
+        b_states.push_back({sprite.src_alpha, sprite.dst_alpha,
                             sprite.texture, sprite.sampl_type});
         batches.emplace_back();
     }
@@ -452,18 +437,18 @@ void Renderer_2D::batch_render(const Text& text) const
 {
     if(batches.size())
     {
-        if(text.blend_sfactor != b_states.back().blend_sfactor ||
-                text.blend_dfactor != b_states.back().blend_dfactor ||
+        if(text.src_alpha != b_states.back().src_alpha ||
+                text.dst_alpha != b_states.back().dst_alpha ||
                 ((&text.font->atlas != b_states.back().texture) && !text.render_quads))
         {
-            b_states.push_back({text.blend_sfactor, text.blend_dfactor,
+            b_states.push_back({text.src_alpha, text.dst_alpha,
                                 &text.font->atlas, Sampl_type::linear});
             batches.emplace_back();
         }
     }
     else
     {
-        b_states.push_back({text.blend_sfactor, text.blend_dfactor,
+        b_states.push_back({text.src_alpha, text.dst_alpha,
                             &text.font->atlas, Sampl_type::linear});
         batches.emplace_back();
     }
@@ -563,7 +548,7 @@ void Renderer_2D::rend_particles(const P_data& p_data) const
 
     shader_p.bind();
 
-    set_blend_func(p_data.blend_sfactor, p_data.blend_dfactor);
+    App::handle->set_blend_func(p_data.src_alpha, p_data.dst_alpha);
 
     if(p_data.texture)
     {
@@ -617,7 +602,7 @@ void Renderer_2D::rend_particles(const P_data_tCs& p_data) const
 
     shader_p_tCs.bind();
 
-    set_blend_func(p_data.blend_sfactor, p_data.blend_dfactor);
+    App::handle->set_blend_func(p_data.src_alpha, p_data.dst_alpha);
 
     if(p_data.sampl_type == Sampl_type::linear)
         sampler_linear.bind();

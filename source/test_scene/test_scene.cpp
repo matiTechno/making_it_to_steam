@@ -60,7 +60,7 @@ Test_scene::Test_scene():
         p_data.vbo_data.reserve(10000);
         p_data.num_to_render = p_data.vbo_data.capacity();
         p_data.bloom = true;
-        p_data.blend_dfactor = GL_ONE;
+        p_data.dst_alpha = GL_ONE;
         glm::vec2 position(PD_X, PD_TOP_Y);
         std::uniform_real_distribution<float> x(0.f, 100.f);
         std::uniform_real_distribution<float> y(0.f, PD_SIZE_Y);
@@ -143,7 +143,7 @@ void Test_scene::render()
 {
     // I don't load projection matrix in Snake1 and Snake1_end_menu
     // classes because:
-    // * they are not opaque so they should play on parent Scene projection rules
+    // * they are not opaque so they should play on parent Scene projection rules = not true soon
     // * this code still runs when they are on top (useful when window is resized)
     int width, height;
     SDL_GL_GetDrawableSize(sdl_win_handle, &width, &height);
@@ -209,7 +209,7 @@ void Test_scene::render()
             sprite.bloom = true;
             renderer.render(sprite);
             sprite.bloom = false;
-            sprite.blend_dfactor = GL_ONE;
+            sprite.dst_alpha = GL_ONE;
             sprite.position = glm::vec2(60.f, 450.f);
             renderer.render(sprite);
         }
@@ -259,7 +259,7 @@ void Test_scene::render()
         pp_unit.endRender(2);
         pp_unit.apply_effect(red_effect);
         pp_unit.apply_effect(red_effect);
-        pp_unit.render(false);
+        pp_unit.render();
     }
 
     {

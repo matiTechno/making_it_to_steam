@@ -22,17 +22,21 @@ struct Vbo_p_tCs: public Vbo_p
 {
     // float not int for shader possible optimization
     glm::vec4 texCoords;
-    bool bloom;
+    // glsl does not support bool attributes
+    int bloom;
 };
 
 struct P_data_base
 {
     Texture* texture = nullptr;
-    GLenum blend_sfactor = GL_SRC_ALPHA, blend_dfactor = GL_ONE_MINUS_SRC_ALPHA;
+    // for blending
+    GLenum src_alpha = GL_SRC_ALPHA, dst_alpha = GL_ONE_MINUS_SRC_ALPHA;
     Sampl_type sampl_type = Sampl_type::linear;
     std::size_t num_to_render;
 };
 
+// final structures
+// use these in your classes
 struct P_data: public P_data_base
 {
     glm::ivec4 texCoords;

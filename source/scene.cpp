@@ -3,11 +3,11 @@
 #include <SDL2/SDL_events.h>
 
 Scene::Scene():
-    sdl_win_handle(App::sdl_win_handle),
-    sound_system(*App::sound_system),
-    renderer(*App::renderer),
-    font_loader(*App::font_loader),
-    pp_unit(*App::pp_unit),
+    sdl_win_handle(App::handle->sdl_win_handle),
+    sound_system(*App::handle->sound_system),
+    renderer(*App::handle->renderer),
+    font_loader(*App::handle->font_loader),
+    pp_unit(*App::handle->pp_unit),
     is_top(true)
 {}
 

@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include <string>
 #include <deque>
-#include "glad/glad.h"
 #include "common_scene.hpp"
 #include <SDL2/SDL_mixer.h>
 #include "imgui/imgui.h"
@@ -14,28 +13,16 @@
 
 bool App::isCurrent  = false;
 bool App::should_close = false;
-SDL_Window* App::sdl_win_handle;
-std::unique_ptr<Sound_system> App::sound_system;
-std::unique_ptr<Renderer_2D> App::renderer;
-std::unique_ptr<Font_loader> App::font_loader;
-std::unique_ptr<Postprocessor> App::pp_unit;
+const App* App::handle;
 
-App::~App()
-{
-    // Sample and Music objects must be freed
-    // before sound_system
-    scenes.clear();
-
-    pp_unit.reset();
-    font_loader.reset();
-    renderer.reset();
-    sound_system.reset();
-}
+App::~App() = default;
 
 App::App()
 {
     assert(!isCurrent);
     isCurrent = true;
+
+    handle = this;
 
     SDL_version ver_compiled, ver_linked;
     SDL_VERSION(&ver_compiled);
@@ -59,7 +46,7 @@ App::App()
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
         SDL_Window* temp = SDL_CreateWindow("making_it_to_steam", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                            800, 600, SDL_WINDOW_OPENGL);
+                                            800, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_RESIZABLE*/);
         if(temp == nullptr)
             throw std::runtime_error(std::string("SDL2 window creation failed: ") + SDL_GetError());
 
@@ -90,19 +77,16 @@ App::App()
     // v_sync
     SDL_GL_SetSwapInterval(1);
 
-    // rest...
+    // sound
     sound_system = std::make_unique<Sound_system>(MIX_INIT_OGG);
 
+    // gl states
+    set_opengl_states();
+
+    // gl units
     renderer = std::make_unique<Renderer_2D>();
     font_loader = std::make_unique<Font_loader>();
-
-    {
-        int width, height;
-        SDL_GL_GetDrawableSize(sdl_win_handle, &width, &height);
-        pp_unit = std::make_unique<Postprocessor>(width, height);
-    }
-
-    set_opengl_states();
+    pp_unit = std::make_unique<Postprocessor>(fb_width, fb_height);
 
     wrp_imgui = std::make_unique<Wrp_ImGui>();
     ImGui_ImplSdlGL3_Init(sdl_win_handle);
@@ -162,10 +146,9 @@ void App::update(float dt)
 void App::render()
 {
     glClear(GL_COLOR_BUFFER_BIT);
-    int width, height;
-    SDL_GL_GetDrawableSize(sdl_win_handle, &width, &height);
-    glViewport(0, 0, width, height);
-    pp_unit->set_new_size(width, height);
+    SDL_GL_GetDrawableSize(sdl_win_handle, &fb_width, &fb_height);
+    glViewport(0, 0, fb_width, fb_height);
+    pp_unit->set_new_size(fb_width, fb_height);
 
     std::deque<Scene*> scenes_to_render;
     for(auto it = scenes.rbegin(); it != scenes.rend(); ++it)
@@ -187,6 +170,12 @@ void App::render()
 void App::set_opengl_states()
 {
     glEnable(GL_BLEND);
+    GLint s, d;
+    glGetIntegerv(GL_BLEND_SRC_ALPHA, &s);
+    glGetIntegerv(GL_BLEND_SRC_ALPHA, &d);
+    src_alpha = static_cast<GLenum>(s);
+    dst_alpha = static_cast<GLenum>(d);
+    SDL_GL_GetDrawableSize(sdl_win_handle, &fb_width, &fb_height);
 }
 
 void App::manage_scenes()
@@ -211,6 +200,16 @@ void App::manage_scenes()
             scene->is_top = true;
         else
             scene->is_top = false;
+    }
+}
+
+void App::set_blend_func(GLenum s, GLenum d) const
+{
+    if(src_alpha != s || dst_alpha != d)
+    {
+        src_alpha = s;
+        dst_alpha = d;
+        glBlendFunc(src_alpha, dst_alpha);
     }
 }
 

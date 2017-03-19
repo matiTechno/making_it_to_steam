@@ -15,8 +15,7 @@
 // endRender()
 // ...
 // now apply as many effects as you want with apply_effect()
-// texture format is 'GL_R11F_G11F_B10F' and color space is linear
-// (if you correctly marked sprite textures as sRGB)
+// color space is linear (if you correctly marked sprite textures as sRGB)
 // ...
 // render the final texture to default framebuffer with render()
 // ...
@@ -28,6 +27,8 @@ public:
     Postprocessor(int width, int height);
     Postprocessor(const Postprocessor&) = delete;
 
+    // you can call it every frame
+    // if size is the same returns
     void set_new_size(int width, int height);
 
     void begRender() const;
@@ -35,10 +36,11 @@ public:
 
     void apply_effect(const Shader& shader) const;
 
-    void render(bool tone_maping) const;
+    void render() const;
 
     // used by App
-    bool has_finished() const
+    // no need to expose this to Scene
+    bool has_finished()
     {return finished;}
 
 private:

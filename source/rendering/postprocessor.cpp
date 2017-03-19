@@ -70,33 +70,36 @@ void Postprocessor::set_new_size(int width, int height)
         return;
 
     fbSize = glm::ivec2(width, height);
+    int tex_type = GL_RGBA8;
 
     fb_beg.bind();
-    tex_base = std::make_unique<Texture>(GL_R11F_G11F_B10F, width, height);
-    tex_bright = std::make_unique<Texture>(GL_R11F_G11F_B10F, width, height);
+    tex_base = std::make_unique<Texture>(tex_type, width, height);
+    tex_bright = std::make_unique<Texture>(tex_type, width, height);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_base->get_id(), 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, tex_bright->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
     fb_pp1.bind();
-    tex_pp1 = std::make_unique<Texture>(GL_R11F_G11F_B10F, width / 2, height / 2);
+    tex_pp1 = std::make_unique<Texture>(tex_type, width / 2, height / 2);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_pp1->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
     fb_pp2.bind();
-    tex_pp2 = std::make_unique<Texture>(GL_R11F_G11F_B10F, width / 2, height / 2);
+    tex_pp2 = std::make_unique<Texture>(tex_type, width / 2, height / 2);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_pp2->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
     fb_custom_1.bind();
-    tex_custom_1 = std::make_unique<Texture>(GL_R11F_G11F_B10F, width, height);
+    tex_custom_1 = std::make_unique<Texture>(tex_type, width, height);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_custom_1->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
     fb_custom_2.bind();
-    tex_custom_2 = std::make_unique<Texture>(GL_R11F_G11F_B10F, width, height);
+    tex_custom_2 = std::make_unique<Texture>(tex_type, width, height);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_custom_2->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Postprocessor::begRender() const
@@ -183,7 +186,7 @@ void Postprocessor::apply_effect(const Shader& shader) const
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void Postprocessor::render(bool tone_mapping) const
+void Postprocessor::render() const
 {
     Wrp_blend wrp_blend;
     (void)wrp_blend;
@@ -192,15 +195,13 @@ void Postprocessor::render(bool tone_mapping) const
 
     vao.bind();
     shader_final.bind();
-    if(tone_mapping)
-        glUniform1i(shader_final.getUniLocation("is_tone_mapping"), 1);
-    else
-        glUniform1i(shader_final.getUniLocation("is_tone_mapping"), 0);
     sampler.bind();
+
     if(next_tex_custom_bind == 1)
         tex_custom_1->bind();
     else
         tex_custom_2->bind();
+
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     finished = true;
