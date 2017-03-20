@@ -20,7 +20,7 @@ class Snake1_end_menu: public Scene
 public:
     Snake1_end_menu(int score, Game_state state);
 
-    void processEvent(SDL_Event& event) override;
+    void processEvent(const SDL_Event& event) override;
 
     void render() override;
 

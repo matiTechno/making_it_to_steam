@@ -9,6 +9,7 @@ typedef void *SDL_GLContext;
 #include "res_class.hpp"
 #include <assert.h>
 #include "glad/glad.h"
+#include <glm/vec2.hpp>
 
 // wrapper calsses for SDL2
 class Wrp_sdl_lib: public Res_class<void*>
@@ -55,6 +56,8 @@ public:
     }
 
     static bool should_close;
+    static glm::ivec2 get_fb_size()
+    {return fbSize;}
 
 private:
     // don't change the order
@@ -81,13 +84,9 @@ private:
     // resource class pattern again
     // I need to patent this :D
     friend class Scene;
-    friend class Renderer_2D;
     static const App* handle;
 
-    mutable GLenum src_alpha, dst_alpha;
-    int fb_width, fb_height;
-
-    void set_blend_func(GLenum s, GLenum d) const;
+    static glm::ivec2 fbSize;
 };
 
 #endif // APP_HPP

@@ -7,6 +7,7 @@
 #include "../rendering/render_obj_base.hpp"
 class Texture;
 
+// don't change the order of data
 // tCs = texCoords
 
 struct Vbo_p

@@ -12,7 +12,7 @@ public:
 
     void update(float dt) override;
 
-    void processEvent(SDL_Event& event) override;
+    void processEvent(const SDL_Event& event) override;
 
     void render() override;
 

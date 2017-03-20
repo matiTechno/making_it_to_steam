@@ -36,7 +36,7 @@ Test_scene::Test_scene():
     isCurrent = true;
     handle = this;
 
-    SCENE_update_when_not_top = true;
+    update_when_not_top = true;
 
     sound_system.play_music(music, true, 10);
 
@@ -145,11 +145,12 @@ void Test_scene::render()
     // classes because:
     // * they are not opaque so they should play on parent Scene projection rules = not true soon
     // * this code still runs when they are on top (useful when window is resized)
-    int width, height;
-    SDL_GL_GetDrawableSize(sdl_win_handle, &width, &height);
-    glm::mat4 proj = glm::ortho(0.f, static_cast<float>(width),
-                                static_cast<float>(height), 0.f);
-    renderer.load_projection(proj);
+//    int width, height;
+//    SDL_GL_GetDrawableSize(sdl_win_handle, &width, &height);
+//    glm::mat4 proj = glm::ortho(0.f, static_cast<float>(width),
+//                                static_cast<float>(height), 0.f);
+//    renderer.load_projection(proj);
+    renderer.load_projection(coords);
 
     if(is_pp)
         pp_unit.begRender();
@@ -259,7 +260,7 @@ void Test_scene::render()
         pp_unit.endRender(2);
         pp_unit.apply_effect(red_effect);
         pp_unit.apply_effect(red_effect);
-        pp_unit.render();
+
     }
     {
         renderer.beg_batching();
@@ -280,6 +281,8 @@ void Test_scene::render()
         renderer.render(text);
         renderer.end_batching();
     }
+    if(is_pp)
+        pp_unit.render();
 }
 
 void Test_scene::render_ImGui()
@@ -294,7 +297,7 @@ void Test_scene::render_ImGui()
     ImGui::Render();
 }
 
-void Test_scene::processEvent(SDL_Event& event)
+void Test_scene::processEvent(const SDL_Event& event)
 {
     if(event.type == SDL_KEYDOWN && !event.key.repeat)
     {

@@ -11,5 +11,5 @@ uniform bool is_tone_mapping;
 
 void main()
 {
-    color = vec4(texture(base, texCoord).rgb + texture(blur, texCoord).rgb, 1);
+    color = texture(base, texCoord) + texture(blur, texCoord);
 }

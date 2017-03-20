@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "text.hpp"
 #include "vbo_particle.hpp"
-#include "../app.hpp"
+#include "../opengl/other.hpp"
 
 bool Renderer_2D::isCurrent = false;
 
@@ -161,7 +161,7 @@ void Renderer_2D::end_batching() const
                 sampler_nearest.bind();
         }
 
-        App::handle->set_blend_func(state_it->src_alpha, state_it->dst_alpha);
+        Blend_alpha::set(state_it->src_alpha, state_it->dst_alpha);
 
         ++state_it;
 
@@ -193,11 +193,10 @@ void Renderer_2D::render(const Text& text) const
         uniform_render(text);
 }
 
-void Renderer_2D::load_projection(float left, float right, float top, float bottom) const
+void Renderer_2D::load_projection(const glm::vec4& coords) const
 {
-    assert(left < right);
-    assert(top < bottom);
-    glm::mat4 matrix = glm::ortho(left, right, bottom, top);
+    glm::mat4 matrix = glm::ortho(coords.x, coords.x + coords.z,
+                                  coords.y + coords.w, coords.y);
     load_proj_impl(matrix);
 }
 
@@ -223,7 +222,7 @@ void Renderer_2D::load_proj_impl(const glm::mat4& matrix) const
 
 void Renderer_2D::uniform_render(const Sprite& sprite) const
 {
-    App::handle->set_blend_func(sprite.src_alpha, sprite.dst_alpha);
+    Blend_alpha::set(sprite.src_alpha, sprite.dst_alpha);
     vao.bind();
     shader_uniform.bind();
 
@@ -277,7 +276,7 @@ void Renderer_2D::uniform_render(const Sprite& sprite) const
 
 void Renderer_2D::uniform_render(const Text& text) const
 {
-    App::handle->set_blend_func(text.src_alpha, text.dst_alpha);
+    Blend_alpha::set(text.src_alpha, text.dst_alpha);
     vao.bind();
     shader_uniform.bind();
     sampler_linear.bind();
@@ -299,7 +298,7 @@ void Renderer_2D::uniform_render(const Text& text) const
     glUniform4f(shader_uniform.getUniLocation("spriteColor"), col.x, col.y, col.z, col.w);
 
     glm::vec2 pen_pos;
-    if(text.rotation != 0.f || !text.snap_to_pixel_grid)
+    if(text.rotation != 0.f || text.scale != 1.f || !text.snap_to_pixel_grid)
         pen_pos = text.position;
     else
         // snapping to pixel grid
@@ -452,7 +451,7 @@ void Renderer_2D::batch_render(const Text& text) const
     }
 
     glm::vec2 pen_pos;
-    if(text.rotation != 0.f || !text.snap_to_pixel_grid)
+    if(text.rotation != 0.f || text.scale != 1.f || !text.snap_to_pixel_grid)
         pen_pos = text.position;
     else
         // snapping to pixel grid
@@ -544,7 +543,7 @@ void Renderer_2D::rend_particles(const P_data& p_data) const
 
     shader_p.bind();
 
-    App::handle->set_blend_func(p_data.src_alpha, p_data.dst_alpha);
+    Blend_alpha::set(p_data.src_alpha, p_data.dst_alpha);
 
     if(p_data.texture)
     {
@@ -598,7 +597,7 @@ void Renderer_2D::rend_particles(const P_data_tCs& p_data) const
 
     shader_p_tCs.bind();
 
-    App::handle->set_blend_func(p_data.src_alpha, p_data.dst_alpha);
+    Blend_alpha::set(p_data.src_alpha, p_data.dst_alpha);
 
     if(p_data.sampl_type == Sampl_type::linear)
         sampler_linear.bind();

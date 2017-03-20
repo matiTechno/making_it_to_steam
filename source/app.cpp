@@ -6,14 +6,14 @@
 #include <string>
 #include <deque>
 #include "common_scene.hpp"
-#include <SDL2/SDL_mixer.h>
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl_gl3.h"
-#include <queue>
+#include "opengl/other.hpp"
 
 bool App::isCurrent  = false;
 bool App::should_close = false;
 const App* App::handle;
+glm::ivec2 App::fbSize;
 
 App::~App() = default;
 
@@ -46,7 +46,7 @@ App::App()
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
         SDL_Window* temp = SDL_CreateWindow("making_it_to_steam", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                            800, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_RESIZABLE*/);
+                                            800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
         if(temp == nullptr)
             throw std::runtime_error(std::string("SDL2 window creation failed: ") + SDL_GetError());
 
@@ -74,6 +74,7 @@ App::App()
     if(!GLAD_GL_ARB_texture_storage)
         throw std::runtime_error("ARB_texture_storage not available");
 
+
     // v_sync
     SDL_GL_SetSwapInterval(1);
 
@@ -84,9 +85,10 @@ App::App()
     set_opengl_states();
 
     // gl units
+    SDL_GL_GetDrawableSize(sdl_win_handle, &fbSize.x, &fbSize.y);
     renderer = std::make_unique<Renderer_2D>();
     font_loader = std::make_unique<Font_loader>();
-    pp_unit = std::make_unique<Postprocessor>(fb_width, fb_height);
+    pp_unit = std::make_unique<Postprocessor>(fbSize);
 
     wrp_imgui = std::make_unique<Wrp_ImGui>();
     ImGui_ImplSdlGL3_Init(sdl_win_handle);
@@ -114,7 +116,7 @@ void App::run()
 
 void App::processInput()
 {
-    std::queue<SDL_Event> events;
+    std::vector<SDL_Event> events;
     bool was_quit_event = false;
     SDL_Event event;
     while(SDL_PollEvent(&event))
@@ -127,41 +129,47 @@ void App::processInput()
         else
         {
             ImGui_ImplSdlGL3_ProcessEvent(&event);
-            events.push(std::move(event));
+            events.push_back(std::move(event));
         }
     }
     ImGui_ImplSdlGL3_NewFrame(sdl_win_handle);
-    scenes.back()->processInput(events);
+
+    for(auto& scene: scenes)
+    {
+        if(&scene == &scenes.back() || scene->processInput_when_not_top)
+            scene->processInput(events);
+    }
 }
 
 void App::update(float dt)
 {
     for(auto& scene: scenes)
     {
-        if(&scene == &scenes.back() || scene->SCENE_update_when_not_top)
+        if(&scene == &scenes.back() || scene->update_when_not_top)
             scene->update(dt);
     }
 }
 
 void App::render()
 {
+    SDL_GL_GetDrawableSize(sdl_win_handle, &fbSize.x, &fbSize.y);
+    Scissor::set(0, 0, fbSize.x, fbSize.y);
     glClear(GL_COLOR_BUFFER_BIT);
-    SDL_GL_GetDrawableSize(sdl_win_handle, &fb_width, &fb_height);
-    glViewport(0, 0, fb_width, fb_height);
-    pp_unit->set_new_size(fb_width, fb_height);
+    pp_unit->set_new_size(fbSize);
 
     std::deque<Scene*> scenes_to_render;
     for(auto it = scenes.rbegin(); it != scenes.rend(); ++it)
     {
         scenes_to_render.push_front(it->get());
-        if((*it)->SCENE_is_opaque)
+        if((*it)->is_opaque)
             break;
     }
     for(auto& scene: scenes_to_render)
     {
+        Viewport::set(scene->coords);
+        pp_unit->set_new_scene(scene->coords);
         scene->render();
-        if(!pp_unit->has_finished())
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        assert(pp_unit->has_finished());
     }
     scenes.back()->render_ImGui();
 
@@ -170,20 +178,17 @@ void App::render()
 
 void App::set_opengl_states()
 {
+    glEnable(GL_SCISSOR_TEST);
     glEnable(GL_BLEND);
-    GLint s, d;
-    glGetIntegerv(GL_BLEND_SRC_ALPHA, &s);
-    glGetIntegerv(GL_BLEND_SRC_ALPHA, &d);
-    src_alpha = static_cast<GLenum>(s);
-    dst_alpha = static_cast<GLenum>(d);
-    SDL_GL_GetDrawableSize(sdl_win_handle, &fb_width, &fb_height);
+    // don't override it
+    Blend_alpha::set(GL_ZERO, GL_ZERO, 1);
 }
 
 void App::manage_scenes()
 {
     std::unique_ptr<Scene> new_scene = std::move(scenes.back()->new_scene);
 
-    int num = scenes.back()->SCENE_num_scenes_to_pop;
+    int num = scenes.back()->num_scenes_to_pop;
     if(num)
     {
         assert(num > 0 && num <= static_cast<int>(scenes.size()));
@@ -201,16 +206,6 @@ void App::manage_scenes()
             scene->is_top = true;
         else
             scene->is_top = false;
-    }
-}
-
-void App::set_blend_func(GLenum s, GLenum d) const
-{
-    if(src_alpha != s || dst_alpha != d)
-    {
-        src_alpha = s;
-        dst_alpha = d;
-        glBlendFunc(src_alpha, dst_alpha);
     }
 }
 

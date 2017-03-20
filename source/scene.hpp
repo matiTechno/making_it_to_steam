@@ -2,17 +2,22 @@
 #define SCENE_HPP
 
 #include <memory>
-#include <queue>
+#include <vector>
 class Sound_system;
 class Renderer_2D;
 class Font_loader;
 class Postprocessor;
 union SDL_Event;
 struct SDL_Window;
+#include <glm/vec4.hpp>
+// position + size
+typedef glm::ivec4 Scene_coords;
 
 // num_scenes_to_pop && new_scene
 // requests are executed at the end of frame
 // only for top scene
+// if num_scenes_to_pop = 1 current scene will be popped
+// num_scenes_to_pop must be in range [0, num_scenes] or assertion will fail
 // by default Scene is opaque
 
 // Sample / Music / Texture / Font and possibly other
@@ -23,10 +28,11 @@ struct SDL_Window;
 // * create ImGui windows
 // * call ImGui::Render()
 // ...
-// input processing is already done in App class
-// this function will be called only for top most scene
-// (this is how ImGui works)
-// don't implement ImGui rendering in normal render function
+// it is called only for top most scene
+// by default scene is positioned to fit fb size
+
+class Full_window
+{};
 
 class Scene
 {
@@ -46,11 +52,12 @@ public:
     // * processEvent(SDL_Event& event)
     // * end_events()
     // ...
-    // how to std::queue:
-    // while(size())
-    // front()
-    // pop()
-    virtual void processInput(std::queue<SDL_Event>& events);
+    // how to iterate (right event order)
+    // for(auto& event: events)
+    // processEvent(event);
+    // ...
+    //
+    virtual void processInput(const std::vector<SDL_Event>& events);
 
     virtual void update(float dt);
 
@@ -61,11 +68,12 @@ public:
     virtual void on_quit_event();
 
 protected:
-    // including this scene
-    // must be in range [0, num_scenes] or assertion will fail
-    int SCENE_num_scenes_to_pop = 0;
-    bool SCENE_is_opaque = true;
-    bool SCENE_update_when_not_top = false;
+    int num_scenes_to_pop = 0;
+    bool is_opaque = true;
+    bool update_when_not_top = false;
+    bool processInput_when_not_top = false;
+
+    Scene_coords coords;
 
     template<typename T, typename ...Args>
     void set_new_scene(Args&&... args)
@@ -89,7 +97,7 @@ private:
     bool is_top;
 
     virtual void beg_events();
-    virtual void processEvent(SDL_Event& event);
+    virtual void processEvent(const SDL_Event& event);
     virtual void end_events();
 };
 

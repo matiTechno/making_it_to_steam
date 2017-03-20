@@ -15,7 +15,10 @@ Snake1::Snake1():
     rn_eng(),
     was_move_key(false)
 {
-    SCENE_is_opaque = false;
+    is_opaque = false;
+
+    coords = glm::ivec4(100.f, 100.f, 300.f, 300.f);
+
     assert(map_size % grid_size == 0);
     int num_grids_x = map_size / grid_size;
 
@@ -55,7 +58,7 @@ Snake1::Snake1():
     food.color = glm::vec4(1.f, 0.f, 0.f, 0.8f);
 }
 
-void Snake1::processEvent(SDL_Event& event)
+void Snake1::processEvent(const SDL_Event& event)
 {
     if(event.type == SDL_KEYDOWN)
     {
@@ -105,23 +108,32 @@ void Snake1::render()
 {
     renderer.beg_batching();
     {
-        float border = 10.f;
-        Sprite sprite;
-        sprite.position = map_pos - border;
-        sprite.size = glm::vec2(map_size + border * 2.f);
-        sprite.color = glm::vec4(0.f, 0.f, 0.2f, 0.9f);
-        renderer.render(sprite);
+//        float border = 10.f;
+//        Sprite sprite;
+//        sprite.position = map_pos - border;
+//        sprite.size = glm::vec2(map_size + border * 2.f);
+//        sprite.color = glm::vec4(0.f, 0.f, 0.2f, 0.9f);
+//        renderer.render(sprite);
 
-        for(auto& grid: grids)
-            renderer.render(grid);
+//        for(auto& grid: grids)
+//            renderer.render(grid);
 
-        renderer.render(food);
+//        renderer.render(food);
 
-        for(auto& part: waiting_parts)
-            renderer.render(part.first);
+//        for(auto& part: waiting_parts)
+//            renderer.render(part.first);
 
-        for(auto& part: snake_parts)
-            renderer.render(part);
+//        for(auto& part: snake_parts)
+//            renderer.render(part);
+
+        {
+            renderer.load_projection(coords);
+            Sprite sprite;
+            sprite.position = glm::vec2(coords.x, coords.y);
+            sprite.size = glm::vec2(coords.z, coords.w);
+            sprite.color.a = 0.5f;
+            renderer.render(sprite);
+        }
     }
     renderer.end_batching();
 }

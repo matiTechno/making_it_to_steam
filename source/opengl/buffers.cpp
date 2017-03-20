@@ -5,7 +5,7 @@ GLuint VAO::bound_id = 0;
 VAO::VAO():
     GL_Base([](GLuint id){glDeleteVertexArrays(1, &id);})
 {
-    glGenVertexArrays(1, &id);
+glGenVertexArrays(1, &id);
 }
 
 void VAO::bind() const
@@ -20,7 +20,7 @@ void VAO::bind() const
 BO::BO():
     GL_Base([](GLuint id){glDeleteBuffers(1, &id);})
 {
-    glGenBuffers(1, &id);
+glGenBuffers(1, &id);
 }
 
 void BO::bind(GLenum target) const
@@ -31,7 +31,7 @@ void BO::bind(GLenum target) const
 FBO::FBO():
     GL_Base([](GLuint id){glDeleteFramebuffers(1, &id);})
 {
-    glGenFramebuffers(1, &id);
+glGenFramebuffers(1, &id);
 }
 
 void FBO::bind(GLenum target) const
@@ -42,7 +42,7 @@ void FBO::bind(GLenum target) const
 RBO::RBO():
     GL_Base([](GLuint id){glDeleteRenderbuffers(1, &id);})
 {
-    glGenRenderbuffers(1, &id);
+glGenRenderbuffers(1, &id);
 }
 
 void RBO::bind() const

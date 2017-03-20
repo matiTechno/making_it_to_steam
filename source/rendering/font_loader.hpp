@@ -22,28 +22,32 @@ struct Font
     std::unordered_map<char, Char> chars;
     int line_space;
     int max_bearing_y;
-    unsigned pixel_size;
+    int pixel_size;
 };
 
 // no kerning support for now
 // to do: implement valve solution and better packing
-// font is looking perfect only when renderer pixel to pixel
+// font is looking perfectly only when rendered pixel to pixel
 // sometimes you can soften it with bloom if scaled or rotated
 // (for example when implementing dynamic effects)
-// for devs: if atlas row is > 900 new row is started
+// only ASCII chars are loaded
+// max_tex_size is temporary (proper packing needs to be implemented)
+// if texture size needed to contain font bitmaps will be bigger
+// than max_tex_size exception will be thrown
 class Font_loader
 {
 public:
-    Font_loader();
+    Font_loader(int max_tex_size = 1024);
     ~Font_loader();
     Font_loader(const Font_loader&) = delete;
 
-    Font loadFont(const std::string& filename, unsigned size) const;
+    Font loadFont(const std::string& filename, int size) const;
 
 private:
     static bool isCurrent;
 
     FT_Library ftLib;
+    const int max_tex_size;
 };
 
 #endif // FONT_LOADER_HPP

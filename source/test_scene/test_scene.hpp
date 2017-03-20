@@ -38,7 +38,7 @@ private:
 
     static bool isCurrent;
 
-    void processEvent(SDL_Event& event) override;
+    void processEvent(const SDL_Event& event) override;
 };
 
 #endif // TEST_SCENE_HPP

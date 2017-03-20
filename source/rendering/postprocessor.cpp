@@ -1,5 +1,7 @@
 #include "postprocessor.hpp"
 #include <assert.h>
+#include "../app.hpp"
+#include "../opengl/other.hpp"
 
 class Wrp_blend
 {
@@ -14,9 +16,10 @@ public:
 
 bool Postprocessor::isCurrent = false;
 
-Postprocessor::Postprocessor(int width, int height):
+Postprocessor::Postprocessor(const glm::ivec2& fbSize):
     finished(true),
     fbSize(0, 0),
+    tex_type(GL_RGBA8),
     shader_blur("shaders/shader_fb.vert", "shaders/shader_fb_blur.frag", "", true, "fb_blur"),
     shader_blend("shaders/shader_fb.vert", "shaders/shader_fb_blend.frag", "", true, "fb_blend"),
     shader_final("shaders/shader_fb.vert", "shaders/shader_fb_final.frag", "", true, "fb_final")
@@ -59,54 +62,65 @@ Postprocessor::Postprocessor(int width, int height):
     glUniform1i(shader_blend.getUniLocation("base"), 0);
     glUniform1i(shader_blend.getUniLocation("blur"), 1);
 
-    set_new_size(width, height);
+    set_new_size(fbSize);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Postprocessor::set_new_size(int width, int height)
+void Postprocessor::set_new_size(const glm::ivec2& fbSize)
 {
-    if(fbSize.x == width && fbSize.y == height)
+    if(this->fbSize == fbSize)
         return;
 
-    fbSize = glm::ivec2(width, height);
-    int tex_type = GL_RGBA8;
+    this->fbSize = fbSize;
 
     fb_beg.bind();
-    tex_base = std::make_unique<Texture>(tex_type, width, height);
-    tex_bright = std::make_unique<Texture>(tex_type, width, height);
+    tex_base = std::make_unique<Texture>(tex_type, fbSize.x, fbSize.y);
+    tex_bright = std::make_unique<Texture>(tex_type, fbSize.x, fbSize.y);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_base->get_id(), 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, tex_bright->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
     fb_pp1.bind();
-    tex_pp1 = std::make_unique<Texture>(tex_type, width / 2, height / 2);
+    tex_pp1 = std::make_unique<Texture>(tex_type, fbSize.x / 2, fbSize.y / 2);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_pp1->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
     fb_pp2.bind();
-    tex_pp2 = std::make_unique<Texture>(tex_type, width / 2, height / 2);
+    tex_pp2 = std::make_unique<Texture>(tex_type, fbSize.x / 2, fbSize.y / 2);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_pp2->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
     fb_custom_1.bind();
-    tex_custom_1 = std::make_unique<Texture>(tex_type, width, height);
+    tex_custom_1 = std::make_unique<Texture>(tex_type, fbSize.x, fbSize.y);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_custom_1->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
     fb_custom_2.bind();
-    tex_custom_2 = std::make_unique<Texture>(tex_type, width, height);
+    tex_custom_2 = std::make_unique<Texture>(tex_type, fbSize.x, fbSize.y);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_custom_2->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void Postprocessor::set_new_scene(const Scene_coords& coords)
+{this->scene_coords = coords;}
+
 void Postprocessor::begRender() const
 {
+    finished = false;
+
+    fb_pp1.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    fb_pp2.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    fb_custom_1.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    fb_custom_2.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
     fb_beg.bind();
     glClear(GL_COLOR_BUFFER_BIT);
-    finished = false;
 }
 
 void Postprocessor::endRender(int num_blurs) const
@@ -115,11 +129,13 @@ void Postprocessor::endRender(int num_blurs) const
     (void)wrp_blend;
 
     // blur
+    Scissor::set_scaled(scene_coords, fbSize, tex_pp1->getSize());
+    Viewport::set(0, 0, tex_pp1->getSize().x, tex_pp1->getSize().y);
+
     vao.bind();
     shader_blur.bind();
     sampler.bind();
 
-    glViewport(0, 0, tex_pp1->getSize().x, tex_pp1->getSize().y);
     bool horizontal_pass = true, first_iter = true;
 
     for(int i = 0; i < num_blurs * 2; ++i)
@@ -147,25 +163,28 @@ void Postprocessor::endRender(int num_blurs) const
         horizontal_pass = !horizontal_pass;
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
-    glViewport(0, 0, fbSize.x, fbSize.y);
 
     // blend
+    Scissor::set(scene_coords);
+    Viewport::set(0, 0, tex_custom_1->getSize().x, tex_custom_1->getSize().y);
+
     fb_custom_1.bind();
     next_tex_custom_bind = 1;
-
-    vao.bind();
     shader_blend.bind();
-
     sampler.bind(1);
     tex_base->bind(0);
     tex_pp2->bind(1);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    Viewport::set(scene_coords);
 }
 
 void Postprocessor::apply_effect(const Shader& shader) const
 {
     Wrp_blend wrp_blend;
     (void)wrp_blend;
+
+    Viewport::set(0, 0, tex_custom_1->getSize().x, tex_custom_1->getSize().y);
 
     vao.bind();
     shader.bind();
@@ -184,14 +203,14 @@ void Postprocessor::apply_effect(const Shader& shader) const
         next_tex_custom_bind = 1;
     }
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    Viewport::set(scene_coords);
 }
 
 void Postprocessor::render() const
 {
-    Wrp_blend wrp_blend;
-    (void)wrp_blend;
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    Viewport::set(0, 0, fbSize.x, fbSize.y);
+    Blend_alpha::set(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     vao.bind();
     shader_final.bind();
@@ -201,6 +220,8 @@ void Postprocessor::render() const
         tex_custom_1->bind();
     else
         tex_custom_2->bind();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 

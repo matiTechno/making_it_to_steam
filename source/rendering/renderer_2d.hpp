@@ -37,12 +37,7 @@ struct P_data_tCs;
 // * when rendering sprites with common texture && blending && sampling
 // ...
 // when not to:
-// * when rendering single sprite or when rendering sprites with diffrent textures
-
-// NOTE:
-// white font on dark background looks much better than black font
-// on white background (postprocessing has some effect on this, gamma correction)
-// in future i will build much more capable font rendering pipeline
+// * I don't know
 
 class Renderer_2D
 {
@@ -59,10 +54,8 @@ public:
     void rend_particles(const P_data& p_data) const;
     void rend_particles(const P_data_tCs& p_data) const;
 
-    // assertions:
-    // * left < right
-    // * top < bottom
-    void load_projection(float left, float right, float top, float bottom) const;
+    // pos + size
+    void load_projection(const glm::vec4& coords) const;
     void load_projection(const glm::mat4& matrix) const;
 
 private:

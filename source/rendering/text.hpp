@@ -7,7 +7,7 @@
 
 // no kerning support for now
 // rotation might produce artifacts
-// only ASCII or std::map::at will
+// only ASCII + '\n' or std::map::at will
 // throw exception in Text::getSize()
 // or Renderer_2D::render()
 class Text: public Render_obj_base
@@ -31,6 +31,7 @@ public:
     float scale;
     bool render_quads;
     // only when no rotation
+    // and scale == 1.f
     bool snap_to_pixel_grid;
 
 private:

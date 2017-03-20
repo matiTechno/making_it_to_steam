@@ -16,24 +16,22 @@ void main()
 {
     vec2 texel_size = 1.0 / textureSize(sampl, 0);
 
-    vec3 result = texture(sampl, texCoord).rgb * weights[0];
+    color = texture(sampl, texCoord) * weights[0];
 
     if(horizontal)
     {
         for(int i = 1; i < kernel_size; ++i)
         {
-            result += texture(sampl, texCoord + vec2(i * texel_size.x, 0)).rgb * weights[i];
-            result += texture(sampl, texCoord - vec2(i * texel_size.x, 0)).rgb * weights[i];
+            color.rgb += texture(sampl, texCoord + vec2(i * texel_size.x, 0)).rgb * weights[i];
+            color.rgb += texture(sampl, texCoord - vec2(i * texel_size.x, 0)).rgb * weights[i];
         }
     }
     else
     {
         for(int i = 1; i < kernel_size; ++i)
         {
-            result += texture(sampl, texCoord + vec2(0, i * texel_size.y)).rgb * weights[i];
-            result += texture(sampl, texCoord - vec2(0, i * texel_size.y)).rgb * weights[i];
+            color.rgb += texture(sampl, texCoord + vec2(0, i * texel_size.y)).rgb * weights[i];
+            color.rgb += texture(sampl, texCoord - vec2(0, i * texel_size.y)).rgb * weights[i];
         }
     }
-
-    color = vec4(result, 1);
 }
