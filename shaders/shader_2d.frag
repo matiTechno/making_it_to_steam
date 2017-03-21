@@ -34,5 +34,5 @@ void main()
         color_bloom = color;
     }
     else
-        color_bloom = vec4(0, 0, 0, 0);
+        color_bloom = vec4(0, 0, 0, color.a);
 }

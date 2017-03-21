@@ -26,9 +26,11 @@ typedef glm::ivec4 Scene_coords;
 // to use ImGui:
 // in function render_ImGui:
 // * create ImGui windows
-// * call ImGui::Render()
+// !!! don't call ImGui::Render()
 // ...
-// it is called only for top most scene
+// render_ImGui is called only for top most scene or if
+// render_ImGui_when_not_top = true
+// input is captured by all ImGui windows
 // by default scene is positioned to fit fb size
 
 class Full_window
@@ -70,9 +72,16 @@ public:
 protected:
     int num_scenes_to_pop = 0;
     bool is_opaque = true;
+    // these are some hacks
+    // will be replaced with recursive scenes
     bool update_when_not_top = false;
     bool processInput_when_not_top = false;
+    bool render_ImGui_when_not_top = false;
 
+    // easy projection set up to use renderer
+    // load_projection(glm::vec4(0.f, 0.f, coords.z, coords.w)
+    // (0.f, 0.f) - camera position
+    // (coords.z, coords.w) - view range
     Scene_coords coords;
 
     template<typename T, typename ...Args>

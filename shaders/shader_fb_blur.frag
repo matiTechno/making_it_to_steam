@@ -16,7 +16,8 @@ void main()
 {
     vec2 texel_size = 1.0 / textureSize(sampl, 0);
 
-    color = texture(sampl, texCoord) * weights[0];
+    color = texture(sampl, texCoord);
+    color.rgb * weights[0];
 
     if(horizontal)
     {

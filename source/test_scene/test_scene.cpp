@@ -21,12 +21,13 @@ const Test_scene* Test_scene::handle;
 Test_scene::Test_scene():
     font(font_loader.loadFont(res_path + "DejaVuSans.ttf", 30)),
     font_progy(font_loader.loadFont(res_path + "ProggyClean.ttf", 20)),
-    tex_sprite(res_path + "Candies_Jerom_CCBYSA3.png", true),
-    tex_tC_parti(res_path + "explo.png", true),
+    // change later to sRGB
+    tex_sprite(res_path + "Candies_Jerom_CCBYSA3.png", false),
+    tex_tC_parti(res_path + "explo.png", false),
     music(res_path + "Path to Lake Land.ogg"),
     sample(res_path + "sfx_exp_cluster1.wav"),
     v_sync(SDL_GL_GetSwapInterval()),
-    is_pp(true),
+    is_pp(false),
     num_frames(0),
     acc_time(0),
     red_effect("shaders/shader_fb.vert", "shaders/shader_fb_test_red.frag", std::string(),
@@ -118,7 +119,6 @@ void Test_scene::update(float dt)
         num_frames = 0;
         acc_time = 0;
     }
-
     for(auto& sp: vec_sprites)
     {
         sp.position.y -= 20.f * dt;
@@ -141,23 +141,13 @@ void Test_scene::update(float dt)
 
 void Test_scene::render()
 {
-    // I don't load projection matrix in Snake1 and Snake1_end_menu
-    // classes because:
-    // * they are not opaque so they should play on parent Scene projection rules = not true soon
-    // * this code still runs when they are on top (useful when window is resized)
-//    int width, height;
-//    SDL_GL_GetDrawableSize(sdl_win_handle, &width, &height);
-//    glm::mat4 proj = glm::ortho(0.f, static_cast<float>(width),
-//                                static_cast<float>(height), 0.f);
-//    renderer.load_projection(proj);
-    renderer.load_projection(coords);
-
     if(is_pp)
         pp_unit.begRender();
+    renderer.load_projection(coords);
     renderer.beg_batching();
     {
         {
-            Text text(&font);
+            Text text(font);
             text.bloom = true;
             text.text = "rotation for Text class supported :)";
             text.rotation = -glm::pi<float>() / 4.f;
@@ -174,7 +164,7 @@ void Test_scene::render()
             renderer.render(text);
         }
         {
-            Text text(&font_progy);
+            Text text(font_progy);
             text.text = "press:\n"
                         "* 1 to switch v_sync\n"
                         "* 2 to play sample\n"
@@ -190,7 +180,7 @@ void Test_scene::render()
             renderer.render(text);
         }
         {
-            Text text(&font_progy);
+            Text text(font_progy);
             text.text = "fjefpekfpmvapqr\n"
                         "j3288402nld felwf";
             text.position = glm::vec2(10.f, 130.f);
@@ -201,6 +191,7 @@ void Test_scene::render()
         }
         {
             Sprite sprite;
+            sprite.color.a = 0.8f;
             sprite.texture = &tex_sprite;
             sprite.texCoords = glm::ivec4(0.f, 0.f, sprite.texture->getSize());
             sprite.position = glm::vec2(10.f, 300.f);
@@ -219,7 +210,7 @@ void Test_scene::render()
         renderer.rend_particles(p_data);
         renderer.rend_particles(p_data_tcs);
         {
-            Text text(&font_progy);
+            Text text(font_progy);
             text.position = glm::vec2(SP_X, SP_TOP_Y + SP_SIZE_Y + 5.f);
             text.text = "normal sprites\n"
                         "with mat4x4 model matrix";
@@ -231,7 +222,19 @@ void Test_scene::render()
             renderer.render(text);
         }
         {
-            Text text(&font_progy);
+            Text text(font);
+            text.position = glm::vec2(250.f, 380.f);
+            text.text = "press ENTER to play";
+            text.color = glm::vec4(0.f, 0.5f, 0.5f, 1.f);
+            Sprite sprite;
+            sprite.color = glm::vec4(0.f, 0.f, 0.f, 0.9f);
+            sprite.position = text.position;
+            sprite.size = text.getSize() + glm::vec2(10.f, 10.f);
+            renderer.render(sprite);
+            renderer.render(text);
+        }
+        {
+            Text text(font_progy);
             text.position = glm::vec2(PD_X, PD_TOP_Y - 20.f);
             text.text = "10k P_data particles";
             Sprite sprite;
@@ -242,7 +245,7 @@ void Test_scene::render()
             renderer.render(text);
         }
         {
-            Text text(&font_progy);
+            Text text(font_progy);
             text.position = glm::vec2(PDT_X - 50.f, PDT_TOP_Y + 100.f);
             text.text = "P_data_tCs particles\n"
                         "(multiple texCoords vecs)";
@@ -258,13 +261,13 @@ void Test_scene::render()
     if(is_pp)
     {
         pp_unit.endRender(2);
-        pp_unit.apply_effect(red_effect);
-        pp_unit.apply_effect(red_effect);
-
+        //pp_unit.apply_effect(red_effect);
+        //pp_unit.apply_effect(red_effect);
+        pp_unit.render();
     }
+    renderer.beg_batching();
     {
-        renderer.beg_batching();
-        Text text(&font);
+        Text text(font);
         text.text = "frametime = " + std::to_string(frametime)
                 + " v_sync:";
         if(v_sync)
@@ -279,10 +282,8 @@ void Test_scene::render()
         sprite.size = text.getSize();
         renderer.render(sprite);
         renderer.render(text);
-        renderer.end_batching();
     }
-    if(is_pp)
-        pp_unit.render();
+    renderer.end_batching();
 }
 
 void Test_scene::render_ImGui()
@@ -294,7 +295,6 @@ void Test_scene::render_ImGui()
     if(ImGui::Button("start game"))
         set_new_scene<Snake1>();
     ImGui::End();
-    ImGui::Render();
 }
 
 void Test_scene::processEvent(const SDL_Event& event)
@@ -310,6 +310,8 @@ void Test_scene::processEvent(const SDL_Event& event)
             is_pp = !is_pp;
         else if(event.key.keysym.sym == SDLK_2)
             sound_system.play_sample(sample, 10);
+        else if(event.key.keysym.sym == SDLK_RETURN)
+            set_new_scene<Snake1>();
         else if(event.key.keysym.sym == SDLK_ESCAPE)
             App::should_close = true;
     }

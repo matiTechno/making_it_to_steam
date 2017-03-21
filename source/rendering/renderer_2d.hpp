@@ -54,8 +54,9 @@ public:
     void rend_particles(const P_data& p_data) const;
     void rend_particles(const P_data_tCs& p_data) const;
 
-    // pos + size
+    // camera position + view range
     void load_projection(const glm::vec4& coords) const;
+    // if you want to calculate projection matrix yourself
     void load_projection(const glm::mat4& matrix) const;
 
 private:

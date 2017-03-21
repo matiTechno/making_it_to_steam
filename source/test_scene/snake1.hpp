@@ -18,24 +18,32 @@ public:
 
 private:
     int score;
-    glm::vec2 map_pos;
+    // map
+    glm::ivec2 map_pos;
     int map_size;
     int grid_size;
-    std::vector<Sprite> snake_parts;
-    std::vector<Sprite> grids;
     Texture tex_grid;
-    float grid_time;
-    glm::ivec2 vel_dir;
-    float food_spawn_time;
+    std::vector<Sprite> grids;
+    // time
+    float step_time;
+    float spawn_time;
     float next_spawn;
     float accumulator;
-    Sprite food;
-    std::mt19937 rn_eng;
-    // int = rounds to wait
+    // entities
+    std::vector<Sprite> snake_parts;
+    // int = moves to wait
     std::list<std::pair<Sprite, int>> waiting_parts;
+    Sprite food;
+    // other
+    glm::ivec2 vel_dir;
+    std::mt19937 rn_eng;
     bool was_move_key;
+    glm::vec4 camera;
+    Sample sample;
 
-    void update_logic();
+    void spawn_food();
+    void init_map();
+    void move_snake();
 };
 
 #endif // SNAKE1_HPP

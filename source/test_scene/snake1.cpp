@@ -1,61 +1,134 @@
 #include "snake1.hpp"
 #include "snake1_end_menu.hpp"
+#include "test_scene.hpp"
 
 Snake1::Snake1():
     score(0),
-    map_pos(80.f, 100.f),
+    map_pos(0, 0),
     map_size(400),
     grid_size(20),
     tex_grid("source/test_scene/res/tile.png", true),
-    grid_time(0.2f),
-    vel_dir(0, -1),
-    food_spawn_time(6.f),
-    next_spawn(food_spawn_time),
+    step_time(0.2f),
+    spawn_time(6.f),
     accumulator(0.f),
-    rn_eng(),
-    was_move_key(false)
+    vel_dir(0, -1),
+    was_move_key(false),
+    sample("source/test_scene/res/sfx_sounds_powerup6.wav")
 {
-    is_opaque = false;
-
-    coords = glm::ivec4(100.f, 100.f, 300.f, 300.f);
-
     assert(map_size % grid_size == 0);
-    int num_grids_x = map_size / grid_size;
 
-    for(int i = 0; i < num_grids_x; ++i)
-    {
-        for(int j = 0; j < num_grids_x; ++j)
-        {
-            Sprite grid;
-            grid.position.x = map_pos.x + i * grid_size;
-            grid.position.y = map_pos.y + j * grid_size;
-            grid.size = glm::vec2(grid_size);
-            grid.texture = &tex_grid;
-            grid.texCoords = glm::ivec4(0, 0, tex_grid.getSize());
-            grid.color.a = 0.2f;
-            grids.push_back(std::move(grid));
-        }
-    }
+    is_opaque = false;
+    coords = glm::ivec4(60, 60, map_size, map_size);
+    camera = glm::vec4(map_pos, map_size, map_size);
 
     std::random_device rd;
     rn_eng.seed(rd());
-    std::uniform_int_distribution<int> uni(0, grids.size());
 
-    Sprite sprite;
-    sprite.position = grids[uni(rn_eng)].position;
-    sprite.color = glm::vec4(0.f, 1.f, 0.f, 0.5f);
-    snake_parts.push_back(std::move(sprite));
+    glm::ivec2 vec_gird_size(grid_size);
+    snake_parts.emplace_back();
+    snake_parts.back().position = map_pos + glm::ivec2(map_size / 2);
+    snake_parts.back().size = vec_gird_size;
+    snake_parts.back().color = glm::vec4(1.f, 0.3f, 0.f, 0.8f);
+    food.size = vec_gird_size;
+    food.color = glm::vec4(1.f, 0.f, 0.f, 0.9f);
 
+    init_map();
+    spawn_food();
+}
+
+void Snake1::update(float dt)
+{
+    next_spawn -= dt;
+    if(next_spawn <= 0.f)
+        spawn_food();
+
+    accumulator += dt;
+    while(accumulator >= step_time)
+    {
+        for(auto& part: waiting_parts)
+        {
+            --part.second;
+            if(part.second == 1)
+                part.first.color = glm::vec4(0.f, 1.f, 0.f, 0.7f);
+        }
+        if(waiting_parts.size() && waiting_parts.back().second == 0)
+        {
+            snake_parts.push_back(waiting_parts.back().first);
+            waiting_parts.erase(--waiting_parts.end());
+        }
+        move_snake();
+        accumulator -= step_time;
+    }
+}
+
+void Snake1::move_snake()
+{
+    was_move_key = false;
+
+    for(auto it = snake_parts.rbegin(); it != snake_parts.rend() - 1; ++it)
+        it->position = (it + 1)->position;
+
+    Sprite& head = snake_parts.front();
+    head.position += vel_dir * grid_size;
+    if(head.position.x < grids.front().position.x)
+        head.position.x = grids.back().position.x;
+    else if(head.position.y < grids.front().position.y)
+        head.position.y = grids.back().position.y;
+    else if(head.position.x > grids.back().position.x)
+        head.position.x = grids.front().position.x;
+    else if(head.position.y > grids.back().position.y)
+        head.position.y = grids.front().position.y;
+
+    for(auto& part: snake_parts)
+    {
+        if(&part != &head && part.position == head.position)
+            set_new_scene<Snake1_end_menu>(score, Game_state::over);
+    }
+    if(head.position == food.position)
+    {
+        sound_system.play_sample(sample, 10);
+        ++score;
+        waiting_parts.emplace_front(food, snake_parts.size() + 1);
+        spawn_food();
+    }
+}
+
+void Snake1::spawn_food()
+{
+    next_spawn = spawn_time;
+    std::uniform_int_distribution<std::size_t> dis(0, grids.size() - 1);
     while(true)
     {
-        food.position = grids[uni(rn_eng)].position;
-        if(food.position == snake_parts[0].position)
-            continue;
+        food.position = grids[dis(rn_eng)].position;
+        for(auto part: snake_parts)
+        {
+            if(glm::ivec2(food.position) == glm::ivec2(part.position))
+                continue;
+        }
+        if(waiting_parts.size() && waiting_parts.back().second == 1)
+            if(glm::ivec2(food.position) == glm::ivec2(waiting_parts.back().first.position))
+                continue;
+
         break;
     }
+}
 
-    food.size = glm::vec2(grid_size);
-    food.color = glm::vec4(1.f, 0.f, 0.f, 0.8f);
+void Snake1::init_map()
+{
+    int num_grids = map_size / grid_size;
+    for(int i = 0; i < num_grids; ++i)
+    {
+        for(int j = 0; j < num_grids; ++j)
+        {
+            Sprite sprite;
+            sprite.texture = &tex_grid;
+            sprite.texCoords = glm::ivec4(0, 0, sprite.texture->getSize());
+            sprite.color = glm::vec4(0.3f, 0.f, 1.f, 0.9f);
+            sprite.size = glm::vec2(grid_size);
+            sprite.position = glm::vec2(map_pos.x + i * grid_size, map_pos.y + j * grid_size);
+            grids.push_back(std::move(sprite));
+        }
+    }
 }
 
 void Snake1::processEvent(const SDL_Event& event)
@@ -63,29 +136,32 @@ void Snake1::processEvent(const SDL_Event& event)
     if(event.type == SDL_KEYDOWN)
     {
         if(event.key.keysym.sym == SDLK_ESCAPE)
-        {
             set_new_scene<Snake1_end_menu>(score, Game_state::paused);
-        }
+        else if(event.key.keysym.sym == SDLK_h)
+        {}
         else if(!was_move_key)
         {
-            was_move_key = true;
             if(event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w)
             {
+                was_move_key = true;
                 if(vel_dir != glm::ivec2(0, 1))
                     vel_dir = glm::ivec2(0, -1);
             }
             else if(event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s)
             {
+                was_move_key = true;
                 if(vel_dir != glm::ivec2(0, -1))
                     vel_dir = glm::ivec2(0, 1);
             }
             else if(event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_a)
             {
+                was_move_key = true;
                 if(vel_dir != glm::ivec2(1, 0))
                     vel_dir = glm::ivec2(-1, 0);
             }
             else if(event.key.keysym.sym == SDLK_RIGHT || event.key.keysym.sym == SDLK_d)
             {
+                was_move_key = true;
                 if(vel_dir != glm::ivec2(-1, 0))
                     vel_dir = glm::ivec2(1, 0);
             }
@@ -93,115 +169,27 @@ void Snake1::processEvent(const SDL_Event& event)
     }
 }
 
-void Snake1::update(float dt)
-{
-    accumulator += dt;
-    next_spawn -= dt;
-    while(accumulator >= grid_time)
-    {
-        update_logic();
-        accumulator -= grid_time;
-    }
-}
-
 void Snake1::render()
 {
+    pp_unit.begRender();
+    renderer.load_projection(camera);
     renderer.beg_batching();
     {
-//        float border = 10.f;
-//        Sprite sprite;
-//        sprite.position = map_pos - border;
-//        sprite.size = glm::vec2(map_size + border * 2.f);
-//        sprite.color = glm::vec4(0.f, 0.f, 0.2f, 0.9f);
-//        renderer.render(sprite);
-
-//        for(auto& grid: grids)
-//            renderer.render(grid);
-
-//        renderer.render(food);
-
-//        for(auto& part: waiting_parts)
-//            renderer.render(part.first);
-
-//        for(auto& part: snake_parts)
-//            renderer.render(part);
-
+        for(auto& grid: grids)
+            renderer.render(grid);
         {
-            renderer.load_projection(coords);
-            Sprite sprite;
-            sprite.position = glm::vec2(coords.x, coords.y);
-            sprite.size = glm::vec2(coords.z, coords.w);
-            sprite.color.a = 0.5f;
-            renderer.render(sprite);
+            Text text(Test_scene::handle->font_progy);
+            text.text = "press h to shrink / enlarge window";
+            text.position = map_pos + glm::ivec2(10.f, 10.f);
+            renderer.render(text);
         }
+        renderer.render(food);
+        for(auto& part: snake_parts)
+            renderer.render(part);
+        for(auto& part: waiting_parts)
+            renderer.render(part.first);
     }
     renderer.end_batching();
-}
-
-void Snake1::update_logic()
-{
-    was_move_key = false;
-
-    bool respawn = false;
-    if(next_spawn <= 0.f)
-        respawn = true;
-
-    for(auto it = snake_parts.rbegin(); it < snake_parts.rend() - 1; ++it)
-    {
-        it->position = (it + 1)->position;
-    }
-    for(auto& part: waiting_parts)
-        part.second -= 1;
-
-    if(waiting_parts.size())
-    {
-        if(waiting_parts.front().second == 0)
-        {
-            snake_parts.push_back(snake_parts[0]);
-            waiting_parts.erase(waiting_parts.begin());
-        }
-        else if(waiting_parts.front().second == 1)
-            waiting_parts.front().first.color = snake_parts[0].color;
-    }
-
-    Sprite& head = snake_parts[0];
-    head.position += vel_dir * grid_size;
-    if(head.position.x < map_pos.x)
-        head.position.x += map_size;
-    else if(head.position.x == map_pos.x + map_size)
-        head.position.x = map_pos.x;
-    else if(head.position.y < map_pos.y)
-        head.position.y += map_size;
-    else if(head.position.y == map_pos.y + map_size)
-        head.position.y = map_pos.y;
-
-    for(std::size_t i = 1; i < snake_parts.size(); ++i)
-    {
-        if(head.position == snake_parts[i].position)
-            set_new_scene<Snake1_end_menu>(score, Game_state::over);
-    }
-
-    if(head.position == food.position && !respawn)
-    {
-        respawn = true;
-        ++score;
-        Sprite sprite(food);
-        waiting_parts.emplace_back(std::move(sprite), snake_parts.size() + 1);
-    }
-
-    if(respawn)
-    {
-        next_spawn = food_spawn_time;
-        std::uniform_int_distribution<int> uni(0, grids.size());
-        while(true)
-        {
-            food.position = grids[uni(rn_eng)].position;
-            for(auto part: snake_parts)
-            {
-                if(part.position == food.position)
-                    continue;
-            }
-            break;
-        }
-    }
+    pp_unit.endRender(2);
+    pp_unit.render();
 }

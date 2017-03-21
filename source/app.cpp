@@ -74,7 +74,6 @@ App::App()
     if(!GLAD_GL_ARB_texture_storage)
         throw std::runtime_error("ARB_texture_storage not available");
 
-
     // v_sync
     SDL_GL_SetSwapInterval(1);
 
@@ -152,6 +151,10 @@ void App::update(float dt)
 
 void App::render()
 {
+    // ImGui overrides this
+    // to do: set this and maybe glBlendEquation
+    Blend_alpha::set(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, 1);
+
     SDL_GL_GetDrawableSize(sdl_win_handle, &fbSize.x, &fbSize.y);
     Scissor::set(0, 0, fbSize.x, fbSize.y);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -167,11 +170,17 @@ void App::render()
     for(auto& scene: scenes_to_render)
     {
         Viewport::set(scene->coords);
+        Scissor::set(scene->coords);
         pp_unit->set_new_scene(scene->coords);
         scene->render();
         assert(pp_unit->has_finished());
     }
-    scenes.back()->render_ImGui();
+    for(auto& scene: scenes)
+    {
+        if(&scene == &scenes.back() || scene->render_ImGui_when_not_top)
+            scene->render_ImGui();
+    }
+    ImGui::Render();
 
     SDL_GL_SwapWindow(sdl_win_handle);
 }
@@ -180,8 +189,6 @@ void App::set_opengl_states()
 {
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_BLEND);
-    // don't override it
-    Blend_alpha::set(GL_ZERO, GL_ZERO, 1);
 }
 
 void App::manage_scenes()

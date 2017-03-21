@@ -42,9 +42,12 @@ void Scissor::set_scaled(const Scene_coords& coords,
 {
     glm::vec2 scale = glm::vec2(output_tex_size) / glm::vec2(input_tex_size);
 
-    Scene_coords new_coords(static_cast<float>(coords.x) * scale.x,
-                            static_cast<float>(coords.y) * scale.y,
-                            static_cast<float>(coords.z) * scale.x + 1.f,
-                            static_cast<float>(coords.w) * scale.y + 1.f);
-    set(new_coords);
+    int flipped_y = App::get_fb_size().y - (coords.y + coords.w);
+
+    glm::ivec4 gl_coords(static_cast<float>(coords.x) * scale.x,
+                         static_cast<float>(flipped_y) * scale.y,
+                         static_cast<float>(coords.z) * scale.x + 1.f,
+                         static_cast<float>(coords.w) * scale.y + 1.f);
+
+    glScissor(gl_coords.x, gl_coords.y, gl_coords.z, gl_coords.w);
 }

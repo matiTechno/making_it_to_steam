@@ -15,11 +15,11 @@ class Text: public Render_obj_base
 public:
     friend class Renderer_2D;
 
-    explicit Text(const Font* font):
+    explicit Text(const Font& font):
         scale(1.f),
         render_quads(false),
         snap_to_pixel_grid(true),
-        font(font)
+        font(&font)
     {}
 
     // produces artifacts
