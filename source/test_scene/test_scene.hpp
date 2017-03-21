@@ -20,7 +20,7 @@ private:
     Texture tex_sprite, tex_tC_parti;
     Music music;
     Sample sample;
-    bool v_sync;
+    bool v_sync, show_ImGui;
     bool is_pp;
     int num_frames;
     float acc_time;

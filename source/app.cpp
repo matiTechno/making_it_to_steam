@@ -170,7 +170,7 @@ void App::render()
     for(auto& scene: scenes_to_render)
     {
         Viewport::set(scene->coords);
-        Scissor::set(scene->coords);
+        Scissor::set(0, 0, fbSize.x, fbSize.y);
         pp_unit->set_new_scene(scene->coords);
         scene->render();
         assert(pp_unit->has_finished());

@@ -7,15 +7,23 @@ struct Mix_Chunk;
 typedef struct _Mix_Music Mix_Music;
 
 // volume range [0, 128]
+// for samples you can set:
+// * global volume (Sample constructor)
+// * channel volume (Sound_system::play_sample())
+// ...
 // freeing any sample will halt all channels
 // in Sound_system
 // it seems weird but it simplifies things
+
 class Sample: public Res_class<Mix_Chunk*>
 {
 public:
     friend class Sound_system;
 
-    Sample(const std::string& filename);
+    Sample(const std::string& filename, int volume = 128);
+
+    int get_volume() const;
+    void set_volume(int volume);
 };
 
 class Music: public Res_class<Mix_Music*>

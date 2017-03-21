@@ -17,7 +17,7 @@ bool Music::isActive()
     return Mix_PlayingMusic();
 }
 
-Sample::Sample(const std::string& filename):
+Sample::Sample(const std::string& filename, int volume):
     Res_class([](Mix_Chunk* id){
     if(id){
         Sound_system::stop_samples();
@@ -27,6 +27,17 @@ Sample::Sample(const std::string& filename):
 id = Mix_LoadWAV(filename.c_str());
 if(!id)
 throw std::runtime_error("Mix_LoadWAV failed: " + filename + ": " + Mix_GetError());
+Mix_VolumeChunk(id, volume);
+}
+
+int Sample::get_volume() const
+{
+    return Mix_VolumeChunk(id, -1);
+}
+
+void Sample::set_volume(int volume)
+{
+    Mix_VolumeChunk(id, volume);
 }
 
 bool Sound_system::isCurrent = false;
