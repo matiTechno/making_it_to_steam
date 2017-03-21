@@ -44,6 +44,7 @@ private:
     void spawn_food();
     void init_map();
     void move_snake();
+    bool is_collision(Sprite& sprite1, Sprite& sprite2);
 };
 
 #endif // SNAKE1_HPP

@@ -28,7 +28,7 @@ Snake1::Snake1():
     snake_parts.emplace_back();
     snake_parts.back().position = map_pos + glm::ivec2(map_size / 2);
     snake_parts.back().size = vec_gird_size;
-    snake_parts.back().color = glm::vec4(1.f, 0.3f, 0.f, 0.8f);
+    snake_parts.back().color = glm::vec4(1.f, 0.3f, 0.f, 0.9f);
     food.size = vec_gird_size;
     food.color = glm::vec4(1.f, 0.f, 0.f, 0.9f);
 
@@ -39,8 +39,6 @@ Snake1::Snake1():
 void Snake1::update(float dt)
 {
     next_spawn -= dt;
-    if(next_spawn <= 0.f)
-        spawn_food();
 
     accumulator += dt;
     while(accumulator >= step_time)
@@ -57,6 +55,10 @@ void Snake1::update(float dt)
             waiting_parts.erase(--waiting_parts.end());
         }
         move_snake();
+
+        if(next_spawn <= 0.f)
+            spawn_food();
+
         accumulator -= step_time;
     }
 }
@@ -81,10 +83,10 @@ void Snake1::move_snake()
 
     for(auto& part: snake_parts)
     {
-        if(&part != &head && part.position == head.position)
+        if(&part != &head && is_collision(head, part))
             set_new_scene<Snake1_end_menu>(score, Game_state::over);
     }
-    if(head.position == food.position)
+    if(is_collision(head, food))
     {
         sound_system.play_sample(sample, 10);
         ++score;
@@ -96,20 +98,36 @@ void Snake1::move_snake()
 void Snake1::spawn_food()
 {
     next_spawn = spawn_time;
+    std::vector<std::size_t> covered_grids;
+    std::size_t rand;
     std::uniform_int_distribution<std::size_t> dis(0, grids.size() - 1);
     while(true)
     {
-        food.position = grids[dis(rn_eng)].position;
-        for(auto part: snake_parts)
-        {
-            if(glm::ivec2(food.position) == glm::ivec2(part.position))
-                continue;
-        }
-        if(waiting_parts.size() && waiting_parts.back().second == 1)
-            if(glm::ivec2(food.position) == glm::ivec2(waiting_parts.back().first.position))
-                continue;
+        rand = dis(rn_eng);
+        for(auto& i: covered_grids)
+            if(rand == i)
+                goto repeat;
 
+        food.position = grids[rand].position;
+
+        for(auto& part: snake_parts)
+        {
+            if(is_collision(part, food))
+            {
+                covered_grids.push_back(rand);
+                goto repeat;
+            }
+        }
+        for(auto& part: waiting_parts)
+        {
+            if(is_collision(part.first, food))
+            {
+                covered_grids.push_back(rand);
+                goto repeat;
+            }
+        }
         break;
+repeat:;
     }
 }
 
@@ -184,12 +202,23 @@ void Snake1::render()
             renderer.render(text);
         }
         renderer.render(food);
-        for(auto& part: snake_parts)
-            renderer.render(part);
         for(auto& part: waiting_parts)
             renderer.render(part.first);
+        for(auto& part: snake_parts)
+            renderer.render(part);
     }
     renderer.end_batching();
     pp_unit.endRender(2);
     pp_unit.render();
+}
+
+bool Snake1::is_collision(Sprite& sprite1, Sprite& sprite2)
+{
+    bool x = sprite1.position.x + sprite1.size.x > sprite2.position.x
+            && sprite2.position.x + sprite2.size.x > sprite1.position.x;
+
+    bool y = sprite1.position.y + sprite1.size.y > sprite2.position.y
+            && sprite2.position.y + sprite2.size.y > sprite1.position.y;
+
+    return x && y;
 }
