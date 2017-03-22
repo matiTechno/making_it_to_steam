@@ -1,6 +1,7 @@
 #include "snake1.hpp"
 #include "snake1_end_menu.hpp"
 #include "test_scene.hpp"
+#include <glm/exponential.hpp>
 
 Snake1::Snake1():
     score(0),
@@ -34,10 +35,16 @@ Snake1::Snake1():
 
     init_map();
     spawn_food();
+
+    // on key press slope is reversed
+    slope = times_bigger * glm::vec2(coords.z, coords.w) / target_time;
+    if(times_bigger > 1.f)
+        slope *= -1.f;
 }
 
 void Snake1::update(float dt)
 {
+    // game
     next_spawn -= dt;
 
     accumulator += dt;
@@ -60,6 +67,20 @@ void Snake1::update(float dt)
             spawn_food();
 
         accumulator -= step_time;
+    }
+    // resizing
+    if(is_resizing)
+    {
+        time += dt;
+        if(time > target_time)
+        {
+            is_resizing = false;
+            time = target_time;
+        }
+        coords.z = coords_init.z + static_cast<int>(slope.x * time);
+        coords.w = coords_init.w + static_cast<int>(slope.y * time);
+        coords.x = coords_init.x + coords_init.z / 2 - coords.z / 2;
+        coords.y = coords_init.y + coords_init.w / 2 - coords.w / 2;
     }
 }
 
@@ -155,8 +176,13 @@ void Snake1::processEvent(const SDL_Event& event)
     {
         if(event.key.keysym.sym == SDLK_ESCAPE)
             set_new_scene<Snake1_end_menu>(score, Game_state::paused);
-        else if(event.key.keysym.sym == SDLK_h)
-        {}
+        else if(event.key.keysym.sym == SDLK_h && is_resizing == false)
+        {
+            slope *= -1.f;
+            is_resizing = true;
+            time = 0.f;
+            coords_init = coords;
+        }
         else if(!was_move_key)
         {
             if(event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w)
@@ -208,7 +234,7 @@ void Snake1::render()
             renderer.render(part);
     }
     renderer.end_batching();
-    pp_unit.endRender(2);
+    pp_unit.endRender(0);
     pp_unit.render();
 }
 

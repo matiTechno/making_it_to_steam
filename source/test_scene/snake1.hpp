@@ -45,6 +45,14 @@ private:
     void init_map();
     void move_snake();
     bool is_collision(Sprite& sprite1, Sprite& sprite2);
+
+    // resizing
+    bool is_resizing = false;
+    const float times_bigger = 0.5f;
+    const float target_time = 0.3f;
+    glm::vec2 slope;
+    float time;
+    glm::ivec4 coords_init;
 };
 
 #endif // SNAKE1_HPP
