@@ -38,7 +38,7 @@ public:
     bool isActive();
 };
 
-// Sample and Music classes can be used
+// Sample and Music objects can be used
 // only between Sound_system creation and destruction
 class Sound_system
 {

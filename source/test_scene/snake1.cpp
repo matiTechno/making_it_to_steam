@@ -107,6 +107,10 @@ void Snake1::move_snake()
         if(&part != &head && is_collision(head, part))
             set_new_scene<Snake1_end_menu>(score, Game_state::over);
     }
+    if(waiting_parts.size() && waiting_parts.back().second == 1)
+        if(is_collision(head, waiting_parts.back().first))
+            set_new_scene<Snake1_end_menu>(score, Game_state::over);
+
     if(is_collision(head, food))
     {
         sound_system.play_sample(sample, 10);

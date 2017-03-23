@@ -32,6 +32,16 @@ private:
     glm::vec2 border_size;
     float spacing;
     Game_state state;
+
+    // pp
+    Shader shader_wave;
+    float wave_vel = 100.f;
+    float wave_length = 300.f;
+    float time = 0.f;
+
+    // mouse grabbing
+    bool is_l_button_pressed;
+    bool was_moved =  false;
 };
 
 #endif // SNAKE1_END_MENU_HPP

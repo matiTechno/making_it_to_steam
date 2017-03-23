@@ -76,13 +76,13 @@ private:
     void run();
     void processInput();
     void update();
+    void prepare_scene_to_render(Scene& scene);
     void render();
     void set_opengl_states();
     void manage_scenes();
 
     static bool isCurrent;
     // resource class pattern again
-    // I need to patent this :D
     friend class Scene;
     static const App* handle;
 

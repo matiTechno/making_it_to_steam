@@ -212,7 +212,9 @@ void Postprocessor::render_fb0() const
 {
     // scissor already set by endRender()
     Viewport::set(0, 0, fbSize.x, fbSize.y);
-    Blend_alpha::set(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // GL_ONE is because we don't want to blend scene twice
+    // (when rendering sprites to scene and when rendering scene to fb0)
+    Blend_alpha::set(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     vao.bind();
     shader_final.bind();
@@ -228,4 +230,7 @@ void Postprocessor::render_fb0() const
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     finished = true;
+    Viewport::set(scene_coords);
+    // set scissor as it was before begRender()
+    Scissor::set(0, 0, fbSize.x, fbSize.y);
 }

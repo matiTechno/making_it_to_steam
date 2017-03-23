@@ -165,10 +165,7 @@ void App::render()
     }
     for(auto& scene: scenes_to_render)
     {
-        scene->update_coords();
-        Viewport::set(scene->coords);
-        Scissor::set(0, 0, fbSize.x, fbSize.y);
-        pp_unit->set_new_scene(scene->coords);
+        prepare_scene_to_render(*scene);
         scene->render();
         assert(pp_unit->has_finished());
     }
@@ -211,6 +208,21 @@ void App::manage_scenes()
         else
             scene->is_top = false;
     }
+}
+
+void App::prepare_scene_to_render(Scene& scene)
+{
+    scene.update_coords();
+
+    // glViewport:
+    // GL_INVALID_VALUE is generated if either width or height is negative.
+    if(scene.coords.pos.x < 0)
+        scene.coords.pos.x = 0;
+    if(fbSize.y - (scene.coords.pos.y + scene.coords.size.y) < 0)
+        scene.coords.pos.y = fbSize.y - scene.coords.size.y;
+
+    Viewport::set(scene.coords);
+    pp_unit->set_new_scene(scene.coords);
 }
 
 Wrp_sdl_lib::Wrp_sdl_lib():

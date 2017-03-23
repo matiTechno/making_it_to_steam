@@ -11,7 +11,7 @@ uniform vec4 spriteColor;
 uniform bool isBloom;
 // 0 - sprite with texture
 // 1 - sprite without texture
-// 2 - text (font atlas)
+// 2 - font
 uniform int type;
 
 void main()

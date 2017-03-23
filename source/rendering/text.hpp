@@ -5,8 +5,7 @@
 #include <string>
 #include "render_obj_base.hpp"
 
-// no kerning support for now
-// rotation might produce artifacts
+// rotation and scaling produces artifacts
 // only ASCII + '\n' or std::map::at will
 // throw exception in Text::getSize()
 // or Renderer_2D::render()
@@ -22,7 +21,6 @@ public:
         font(&font)
     {}
 
-    // produces artifacts
     void set_pixel_size(unsigned size);
 
     glm::vec2 getSize() const;

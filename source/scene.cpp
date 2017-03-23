@@ -4,7 +4,7 @@
 
 Scene::Scene():
     coords{glm::ivec2(0, 0), App::get_fb_size()},
-    sdl_win_handle(App::handle->sdl_win_handle),
+    //sdl_win_handle(App::handle->sdl_win_handle),
     dt(App::handle->frametime),
     sound_system(*App::handle->sound_system),
     renderer(*App::handle->renderer),

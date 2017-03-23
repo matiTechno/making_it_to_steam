@@ -81,7 +81,6 @@ Font Font_loader::loadFont(const std::string& filename, int size) const
                                  " (pixel size = " + std::to_string(size) +
                                  ") exceeds Font_loader::max_tex_size = " + std::to_string(max_tex_size));
 
-    // textCoords and texture
     GLint unpack_alignment;
     glGetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_alignment);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

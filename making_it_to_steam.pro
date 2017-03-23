@@ -24,7 +24,8 @@ DISTFILES += \
     shaders/shader_2d_p.frag \
     shaders/shader_2d_p.vert \
     shaders/shader_2d_p_tCs.frag \
-    shaders/shader_2d_p_tCs.vert
+    shaders/shader_2d_p_tCs.vert \
+    shaders/shader_wave1.frag
 
 HEADERS += \
     source/app.hpp \

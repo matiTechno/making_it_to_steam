@@ -35,26 +35,25 @@ struct Scene_coords
 // render_ImGui is called only for top most scene or if
 // render_ImGui_when_not_top = true
 // input is captured by all ImGui windows
-// by default scene is positioned to fit fb size
+
+// by default scene is positioned to fit window
 
 // changing coords will affect rendering only if done
 // before render() function
 // update_coords() is called for all scenes that will
 // be renderer in the current frame
-// if you want to update your coords only if scene is on top
+// if you want to update your coords only if scene is top most
 // do it in update()
 
 // NOTE: MEMBER REFERENCE VARS
 // public functions are executed in the same order
 // as they appear in Scene definition
-// *** don't use dt member before update()
+// *** dt member is updated just before update()
 // *** use renderer and pp_unit only in render()
 // *** you can use font_loader and sound_system anytime
-// ...
-// this is not the safest design (i.e. shadowing)
-// misusing any of them will not crash program
+// ... misusing any of these won't affect other scenes
 // reason for this design is to avoid dependency injection
-// (I don't like it for this class)
+// (I don't like it for this class, want to keep it lightweight)
 
 class Full_window
 {};
@@ -76,18 +75,10 @@ public:
     // * beg_events()
     // * processEvent(SDL_Event& event)
     // * end_events()
-    // ...
-    // how to iterate (right event order)
-    // for(auto& event: events)
-    // processEvent(event);
-    // ...
-    //
     virtual void processInput(const std::vector<SDL_Event>& events);
 
     virtual void update();
 
-    // this will be replaced with some
-    // more automatic tools
     virtual void update_coords();
 
     virtual void render();
@@ -108,7 +99,7 @@ protected:
     // easy projection set up to use renderer
     // load_projection(glm::vec4(0.f, 0.f, coords.size.x, coords.size.y))
     // (0.f, 0.f) - camera position
-    // (coords.z, coords.w) - view range
+    // (coords.size.x, coords.size.y) - view range
     Scene_coords coords;
 
     template<typename T, typename ...Args>
@@ -117,8 +108,8 @@ protected:
         new_scene = std::make_unique<T>(std::forward<Args>(args)...);
     }
 
-    // use with care
-    SDL_Window* const sdl_win_handle;
+    // not useful for now
+    //SDL_Window* const sdl_win_handle;
 
     const float& dt;
     const Sound_system& sound_system;

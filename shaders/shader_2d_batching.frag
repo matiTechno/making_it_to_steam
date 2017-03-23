@@ -10,7 +10,7 @@ in vec4 spriteColor;
 flat in int isBloom;
 // 0 - sprite with texture
 // 1 - sprite without texture
-// 2 - text (font atlas)
+// 2 - font
 flat in int type;
 
 void main()

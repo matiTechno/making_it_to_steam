@@ -26,10 +26,12 @@ struct Font
 };
 
 // to do:
-// kerning ? (freetype support for kerning is not so good)
-// signed distance field rendering
+// * kerning ? (freetype support for kerning is not so good)
+// * signed distance field rendering
+// * better packing
 // ...
-// only ASCII
+// only ASCII glyphs
+// size is in pixels
 class Font_loader
 {
 public:

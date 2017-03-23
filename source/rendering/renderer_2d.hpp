@@ -22,7 +22,7 @@ struct P_data_tCs;
 // ...
 // calling rend_particles() after beg_batching
 // will:
-// * implicitly call end_batching()
+// * call end_batching()
 // * render particles
 // * call beg_batching() if batching was enabled before
 
@@ -30,7 +30,7 @@ struct P_data_tCs;
 // * no rotation needed
 // * P_data - one common 'texCoords' vec / texture might be null
 // * p_data_tCs - each particle have it's own 'texCoords' vec
-//   / texture must not be null
+// texture must not be null
 
 // WHEN to use batching?
 // * when rendering text
@@ -38,6 +38,7 @@ struct P_data_tCs;
 // ...
 // when not to:
 // * I don't know
+// don't change projection between beg_batching() - end_batching() block
 
 class Renderer_2D
 {
