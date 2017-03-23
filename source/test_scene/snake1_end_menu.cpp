@@ -21,7 +21,7 @@ Snake1_end_menu::Snake1_end_menu(int score, Game_state state):
         text.text = "game paused";
     text.text += "\n";
     vec_text.push_back(text);
-    text.color = glm::vec4(0.f, 1.f, 0.f, 1.f);
+    text.color = glm::vec4(0.2f, 1.f, 0.2f, 1.f);
     text.text = "play";
     vec_text.push_back(text);
     text.text = "go to test_scene";
@@ -36,10 +36,9 @@ Snake1_end_menu::Snake1_end_menu(int score, Game_state state):
         border_size.y += text.getSize().y;
     }
     border_size.x += 2 * spacing;
-    border_size.y += (vec_text.size() + 1) * spacing;
+    border_size.y += static_cast<float>(vec_text.size() + 1) * spacing;
 
-    coords = glm::ivec4(glm::vec2(App::get_fb_size()) / 2.f - border_size / 2.f,
-                        border_size);
+    coords.size = border_size;
 }
 
 void Snake1_end_menu::processEvent(const SDL_Event& event)
@@ -90,16 +89,20 @@ void Snake1_end_menu::processEvent(const SDL_Event& event)
     }
 }
 
+void Snake1_end_menu::update_coords()
+{
+    coords.pos = App::get_fb_size() / 2 - glm::ivec2(border_size / 2.f);
+}
+
 void Snake1_end_menu::render()
 {
-    pp_unit.begRender();
     renderer.load_projection(glm::vec4(0.f, 0.f, border_size));
     renderer.beg_batching();
     {
         Sprite sprite;
         sprite.position = glm::vec2(0.f, 0.f);
         sprite.size = border_size;
-        sprite.color = glm::vec4(0.f, 0.f, 0.f, 0.8f);
+        sprite.color = glm::vec4(0.f, 0.f, 0.f, 0.7f);
         renderer.render(sprite);
 
         float pos_y = sprite.position.y + spacing;
@@ -107,14 +110,13 @@ void Snake1_end_menu::render()
         {
             vec_text[i].position = glm::vec2(border_size.x / 2.f - vec_text[i].getSize().x / 2.f, pos_y);
             if(i == current_option)
-                vec_text[i].bloom = true;
+                vec_text[i].color.a = 1.f;
             else if(i >= num_title_texts)
-                vec_text[i].bloom = false;
+                vec_text[i].color.a = 0.2f;
+
             renderer.render(vec_text[i]);
             pos_y += spacing + vec_text[i].getSize().y;
         }
     }
     renderer.end_batching();
-    pp_unit.endRender(2);
-    pp_unit.render();
 }

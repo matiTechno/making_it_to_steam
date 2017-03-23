@@ -10,9 +10,11 @@ class Snake1: public Scene
 public:
     Snake1();
 
-    void update(float dt) override;
+    void update() override;
 
     void processEvent(const SDL_Event& event) override;
+
+    void update_coords() override;
 
     void render() override;
 
@@ -52,7 +54,7 @@ private:
     const float target_time = 0.3f;
     glm::vec2 slope;
     float time;
-    glm::ivec4 coords_init;
+    Scene_coords coords_init;
 };
 
 #endif // SNAKE1_HPP

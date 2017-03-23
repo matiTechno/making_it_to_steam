@@ -7,10 +7,9 @@
 class Blend_alpha
 {
 public:
-    static void set(GLenum src, GLenum dst, GLuint buf = 0);
+    static void set(GLenum src, GLenum dst);
 
 private:
-    // bind checking only for buf = 0
     static GLenum src, dst;
 };
 

@@ -8,7 +8,9 @@ class Test_scene: public Scene
 public:
     Test_scene();
 
-    void update(float dt) override;
+    void update() override;
+
+    void update_coords() override;
 
     void render() override;
 
@@ -20,8 +22,7 @@ private:
     Texture tex_sprite, tex_tC_parti;
     Music music;
     Sample sample;
-    bool v_sync, show_ImGui;
-    bool is_pp;
+    bool v_sync, show_ImGui, is_pp, is_red;
     int num_frames;
     float acc_time;
     float frametime;
@@ -29,6 +30,7 @@ private:
     P_data p_data;
     P_data_tCs p_data_tcs;
     std::vector<Sprite> vec_sprites;
+    glm::vec4 camera;
 
     // resource class design
     // exposed only by const

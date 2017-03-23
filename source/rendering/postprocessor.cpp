@@ -82,12 +82,12 @@ void Postprocessor::set_new_size(const glm::ivec2& fbSize)
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
     fb_pp1.bind();
-    tex_pp1 = std::make_unique<Texture>(tex_type, fbSize.x / 2, fbSize.y / 2);
+    tex_pp1 = std::make_unique<Texture>(tex_type, fbSize.x / 4, fbSize.y / 4);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_pp1->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
     fb_pp2.bind();
-    tex_pp2 = std::make_unique<Texture>(tex_type, fbSize.x / 2, fbSize.y / 2);
+    tex_pp2 = std::make_unique<Texture>(tex_type, fbSize.x / 4, fbSize.y / 4);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_pp2->get_id(), 0);
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
@@ -115,9 +115,9 @@ void Postprocessor::begRender() const
     glClear(GL_COLOR_BUFFER_BIT);
     fb_pp2.bind();
     glClear(GL_COLOR_BUFFER_BIT);
-    fb_custom_1.bind();
-    glClear(GL_COLOR_BUFFER_BIT);
     fb_custom_2.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    fb_custom_1.bind();
     glClear(GL_COLOR_BUFFER_BIT);
     fb_beg.bind();
     glClear(GL_COLOR_BUFFER_BIT);
@@ -184,6 +184,7 @@ void Postprocessor::apply_effect(const Shader& shader) const
     Wrp_blend wrp_blend;
     (void)wrp_blend;
 
+    // scissor already set by endRender()
     Viewport::set(0, 0, tex_custom_1->getSize().x, tex_custom_1->getSize().y);
 
     vao.bind();
@@ -207,8 +208,9 @@ void Postprocessor::apply_effect(const Shader& shader) const
     Viewport::set(scene_coords);
 }
 
-void Postprocessor::render() const
+void Postprocessor::render_fb0() const
 {
+    // scissor already set by endRender()
     Viewport::set(0, 0, fbSize.x, fbSize.y);
     Blend_alpha::set(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

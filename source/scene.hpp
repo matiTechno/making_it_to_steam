@@ -9,9 +9,13 @@ class Font_loader;
 class Postprocessor;
 union SDL_Event;
 struct SDL_Window;
-#include <glm/vec4.hpp>
-// position + size
-typedef glm::ivec4 Scene_coords;
+#include <glm/vec2.hpp>
+
+struct Scene_coords
+{
+    glm::ivec2 pos;
+    glm::ivec2 size;
+};
 
 // num_scenes_to_pop && new_scene
 // requests are executed at the end of frame
@@ -32,6 +36,25 @@ typedef glm::ivec4 Scene_coords;
 // render_ImGui_when_not_top = true
 // input is captured by all ImGui windows
 // by default scene is positioned to fit fb size
+
+// changing coords will affect rendering only if done
+// before render() function
+// update_coords() is called for all scenes that will
+// be renderer in the current frame
+// if you want to update your coords only if scene is on top
+// do it in update()
+
+// NOTE: MEMBER REFERENCE VARS
+// public functions are executed in the same order
+// as they appear in Scene definition
+// *** don't use dt member before update()
+// *** use renderer and pp_unit only in render()
+// *** you can use font_loader and sound_system anytime
+// ...
+// this is not the safest design (i.e. shadowing)
+// misusing any of them will not crash program
+// reason for this design is to avoid dependency injection
+// (I don't like it for this class)
 
 class Full_window
 {};
@@ -61,7 +84,11 @@ public:
     //
     virtual void processInput(const std::vector<SDL_Event>& events);
 
-    virtual void update(float dt);
+    virtual void update();
+
+    // this will be replaced with some
+    // more automatic tools
+    virtual void update_coords();
 
     virtual void render();
 
@@ -79,7 +106,7 @@ protected:
     bool render_ImGui_when_not_top = false;
 
     // easy projection set up to use renderer
-    // load_projection(glm::vec4(0.f, 0.f, coords.z, coords.w)
+    // load_projection(glm::vec4(0.f, 0.f, coords.size.x, coords.size.y))
     // (0.f, 0.f) - camera position
     // (coords.z, coords.w) - view range
     Scene_coords coords;
@@ -93,6 +120,7 @@ protected:
     // use with care
     SDL_Window* const sdl_win_handle;
 
+    const float& dt;
     const Sound_system& sound_system;
     const Renderer_2D& renderer;
     const Font_loader& font_loader;

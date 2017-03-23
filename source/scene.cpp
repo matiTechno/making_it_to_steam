@@ -3,8 +3,9 @@
 #include <SDL2/SDL_events.h>
 
 Scene::Scene():
-    coords(0, 0, App::get_fb_size()),
+    coords{glm::ivec2(0, 0), App::get_fb_size()},
     sdl_win_handle(App::handle->sdl_win_handle),
+    dt(App::handle->frametime),
     sound_system(*App::handle->sound_system),
     renderer(*App::handle->renderer),
     font_loader(*App::handle->font_loader),
@@ -29,7 +30,7 @@ void Scene::end_events()
 void Scene::processEvent(const SDL_Event& event)
 {(void)event;}
 
-void Scene::update(float dt)
+void Scene::update()
 {(void)dt;}
 
 void Scene::render()
@@ -42,3 +43,6 @@ void Scene::on_quit_event()
 
 void Scene::render_ImGui()
 {}
+
+void Scene::update_coords()
+{(void)dt;}

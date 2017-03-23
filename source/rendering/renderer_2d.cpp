@@ -334,7 +334,8 @@ void Renderer_2D::uniform_render(const Text& text) const
         }
         // model matrix
         {
-            glm::vec2 glyph_size(this_char.texCoords.z * text.scale, this_char.texCoords.w * text.scale);
+            glm::vec2 glyph_size(static_cast<float>(this_char.texCoords.z) * text.scale,
+                                 static_cast<float>(this_char.texCoords.w) * text.scale);
             glm::vec2 glyph_pos;
 
             if(first_char_in_line)
@@ -500,7 +501,8 @@ void Renderer_2D::batch_render(const Text& text) const
 
         // model matrix
         {
-            glm::vec2 glyph_size(this_char.texCoords.z * text.scale, this_char.texCoords.w * text.scale);
+            glm::vec2 glyph_size(static_cast<float>(this_char.texCoords.z) * text.scale,
+                                 static_cast<float>(this_char.texCoords.w) * text.scale);
             glm::vec2 glyph_pos;
 
             if(first_char_in_line)

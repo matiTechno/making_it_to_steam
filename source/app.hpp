@@ -75,7 +75,7 @@ private:
 
     void run();
     void processInput();
-    void update(float dt);
+    void update();
     void render();
     void set_opengl_states();
     void manage_scenes();
@@ -87,6 +87,7 @@ private:
     static const App* handle;
 
     static glm::ivec2 fbSize;
+    float frametime;
 };
 
 #endif // APP_HPP

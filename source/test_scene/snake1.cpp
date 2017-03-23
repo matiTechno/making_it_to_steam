@@ -8,7 +8,7 @@ Snake1::Snake1():
     map_pos(0, 0),
     map_size(400),
     grid_size(20),
-    tex_grid("source/test_scene/res/tile.png", true),
+    tex_grid("source/test_scene/res/tile.png"),
     step_time(0.2f),
     spawn_time(6.f),
     accumulator(0.f),
@@ -19,7 +19,7 @@ Snake1::Snake1():
     assert(map_size % grid_size == 0);
 
     is_opaque = false;
-    coords = glm::ivec4(60, 60, map_size, map_size);
+    coords.size = glm::ivec2(map_size);
     camera = glm::vec4(map_pos, map_size, map_size);
 
     std::random_device rd;
@@ -29,22 +29,21 @@ Snake1::Snake1():
     snake_parts.emplace_back();
     snake_parts.back().position = map_pos + glm::ivec2(map_size / 2);
     snake_parts.back().size = vec_gird_size;
-    snake_parts.back().color = glm::vec4(1.f, 0.3f, 0.f, 0.9f);
+    snake_parts.back().color = glm::vec4(1.f, 0.3f, 0.f, 0.8f);
     food.size = vec_gird_size;
-    food.color = glm::vec4(1.f, 0.f, 0.f, 0.9f);
+    food.color = glm::vec4(1.f, 0.f, 0.f, 0.7f);
 
     init_map();
     spawn_food();
 
     // on key press slope is reversed
-    slope = times_bigger * glm::vec2(coords.z, coords.w) / target_time;
+    slope = times_bigger * glm::vec2(coords.size) / target_time;
     if(times_bigger > 1.f)
         slope *= -1.f;
 }
 
-void Snake1::update(float dt)
+void Snake1::update()
 {
-    // game
     next_spawn -= dt;
 
     accumulator += dt;
@@ -54,7 +53,7 @@ void Snake1::update(float dt)
         {
             --part.second;
             if(part.second == 1)
-                part.first.color = glm::vec4(0.f, 1.f, 0.f, 0.7f);
+                part.first.color = glm::vec4(0.f, 1.f, 0.f, 0.5f);
         }
         if(waiting_parts.size() && waiting_parts.back().second == 0)
         {
@@ -68,7 +67,10 @@ void Snake1::update(float dt)
 
         accumulator -= step_time;
     }
-    // resizing
+}
+
+void Snake1::update_coords()
+{
     if(is_resizing)
     {
         time += dt;
@@ -77,11 +79,9 @@ void Snake1::update(float dt)
             is_resizing = false;
             time = target_time;
         }
-        coords.z = coords_init.z + static_cast<int>(slope.x * time);
-        coords.w = coords_init.w + static_cast<int>(slope.y * time);
-        coords.x = coords_init.x + coords_init.z / 2 - coords.z / 2;
-        coords.y = coords_init.y + coords_init.w / 2 - coords.w / 2;
+        coords.size = coords_init.size + glm::ivec2(slope * time);
     }
+    coords.pos = App::get_fb_size() / 2 - coords.size / 2;
 }
 
 void Snake1::move_snake()
@@ -162,8 +162,8 @@ void Snake1::init_map()
             Sprite sprite;
             sprite.texture = &tex_grid;
             sprite.texCoords = glm::ivec4(0, 0, sprite.texture->getSize());
-            sprite.color = glm::vec4(0.3f, 0.f, 1.f, 0.9f);
-            sprite.size = glm::vec2(grid_size);
+            sprite.color = glm::vec4(0.3f, 0.f, 1.f, 0.7f);
+            sprite.size = glm::vec2(static_cast<float>(grid_size));
             sprite.position = glm::vec2(map_pos.x + i * grid_size, map_pos.y + j * grid_size);
             grids.push_back(std::move(sprite));
         }
@@ -176,7 +176,7 @@ void Snake1::processEvent(const SDL_Event& event)
     {
         if(event.key.keysym.sym == SDLK_ESCAPE)
             set_new_scene<Snake1_end_menu>(score, Game_state::paused);
-        else if(event.key.keysym.sym == SDLK_h && is_resizing == false)
+        else if(event.key.keysym.sym == SDLK_1 && is_resizing == false)
         {
             slope *= -1.f;
             is_resizing = true;
@@ -215,7 +215,6 @@ void Snake1::processEvent(const SDL_Event& event)
 
 void Snake1::render()
 {
-    pp_unit.begRender();
     renderer.load_projection(camera);
     renderer.beg_batching();
     {
@@ -223,7 +222,7 @@ void Snake1::render()
             renderer.render(grid);
         {
             Text text(Test_scene::handle->font_progy);
-            text.text = "press h to shrink / enlarge window";
+            text.text = "press 1 to shrink / enlarge window";
             text.position = map_pos + glm::ivec2(10.f, 10.f);
             renderer.render(text);
         }
@@ -234,8 +233,6 @@ void Snake1::render()
             renderer.render(part);
     }
     renderer.end_batching();
-    pp_unit.endRender(0);
-    pp_unit.render();
 }
 
 bool Snake1::is_collision(Sprite& sprite1, Sprite& sprite2)

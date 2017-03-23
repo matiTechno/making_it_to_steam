@@ -31,6 +31,7 @@ public:
     glm::vec2 position;
     glm::vec4 color;
     // rotation_point is relative to sprite top-left corner
+    // you probably want to update it whenever sprite size changes
     glm::vec2 rotation_point;
     // radians
     float rotation;

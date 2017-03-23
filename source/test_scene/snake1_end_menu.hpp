@@ -22,6 +22,8 @@ public:
 
     void processEvent(const SDL_Event& event) override;
 
+    void update_coords() override;
+
     void render() override;
 
 private:

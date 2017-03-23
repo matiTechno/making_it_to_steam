@@ -3,7 +3,7 @@ CONFIG += console c++14 strict_c++
 CONFIG -= app_bundle
 CONFIG -= qt
 
-QMAKE_CXXFLAGS += -pedantic
+QMAKE_CXXFLAGS += -pedantic -Wconversion -Wextra
 
 DEFINES += GLM_FORCE_NO_CTOR_INIT
 

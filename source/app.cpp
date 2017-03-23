@@ -102,10 +102,10 @@ void App::run()
         processInput();
 
         auto new_time = std::chrono::high_resolution_clock::now();
-        auto frame_time = std::chrono::duration<float>(new_time - current_time).count();
+        frametime = std::chrono::duration<float>(new_time - current_time).count();
         current_time = new_time;
 
-        update(frame_time);
+        update();
 
         render();
 
@@ -140,21 +140,17 @@ void App::processInput()
     }
 }
 
-void App::update(float dt)
+void App::update()
 {
     for(auto& scene: scenes)
     {
         if(&scene == &scenes.back() || scene->update_when_not_top)
-            scene->update(dt);
+            scene->update();
     }
 }
 
 void App::render()
 {
-    // ImGui overrides this
-    // to do: set this and maybe glBlendEquation
-    Blend_alpha::set(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, 1);
-
     SDL_GL_GetDrawableSize(sdl_win_handle, &fbSize.x, &fbSize.y);
     Scissor::set(0, 0, fbSize.x, fbSize.y);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -169,6 +165,7 @@ void App::render()
     }
     for(auto& scene: scenes_to_render)
     {
+        scene->update_coords();
         Viewport::set(scene->coords);
         Scissor::set(0, 0, fbSize.x, fbSize.y);
         pp_unit->set_new_scene(scene->coords);

@@ -13,14 +13,14 @@
 // ...
 // render all your stuff with Renderer_2D
 // ...
-// endRender()
+// endRender() (when num_blurs != 0 Scene loses transparency)
 // ...
 // now apply as many effects as you want with apply_effect()
 // color space is linear (if you correctly marked sprite textures as sRGB)
 // ...
 // you can still render some sprites on top of effects
 // ...
-// render the final texture to default framebuffer with render()
+// render the final texture to default framebuffer with render_fb0()
 // ...
 // after that you can render rest of your stuff directly to default fb
 
@@ -30,24 +30,18 @@ public:
     Postprocessor(const glm::ivec2& fbSize);
     Postprocessor(const Postprocessor&) = delete;
 
-    // call it every frame
-    // if size is the same returns
-    void set_new_size(const glm::ivec2& fbSize);
-
-    // call before Scene::render()
-    void set_new_scene(const Scene_coords& coords);
-
     void begRender() const;
+
     void endRender(int num_blurs) const;
 
     void apply_effect(const Shader& shader) const;
 
-    void render() const;
+    void render_fb0() const;
 
-    // used by App
-    // no need to expose this to Scene (non-const)
     bool has_finished()
     {return finished;}
+    void set_new_size(const glm::ivec2& fbSize);
+    void set_new_scene(const Scene_coords& coords);
 
 private:
     static bool isCurrent;

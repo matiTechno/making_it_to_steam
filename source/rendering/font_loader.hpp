@@ -25,15 +25,11 @@ struct Font
     int pixel_size;
 };
 
-// no kerning support for now
-// to do: implement valve solution and better packing
-// font is looking perfectly only when rendered pixel to pixel
-// sometimes you can soften it with bloom if scaled or rotated
-// (for example when implementing dynamic effects)
-// only ASCII chars are loaded
-// max_tex_size is temporary (proper packing needs to be implemented)
-// if texture size needed to contain font bitmaps will be bigger
-// than max_tex_size exception will be thrown
+// to do:
+// kerning ? (freetype support for kerning is not so good)
+// signed distance field rendering
+// ...
+// only ASCII
 class Font_loader
 {
 public:
