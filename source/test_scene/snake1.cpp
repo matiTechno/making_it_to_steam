@@ -115,7 +115,7 @@ void Snake1::move_snake()
     {
         sound_system.play_sample(sample, 10);
         ++score;
-        waiting_parts.emplace_front(food, snake_parts.size() + 1);
+        waiting_parts.emplace_front(food, snake_parts.size() + waiting_parts.size() + 1);
         spawn_food();
     }
 }

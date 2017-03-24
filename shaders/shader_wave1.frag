@@ -18,5 +18,5 @@ void main()
     vec2 scene_center = scene_coords.xy + scene_coords.zw / 2.0;
     float r = length(scene_center - gl_FragCoord.xy);
     float h = sin(2.0 * Pi / wave_length * r - 2.0 * Pi * freq * time) / 2.0 + 0.5;
-    color = vec4(texture(sampl, texCoord).rgb, h);
+    color = vec4(0, 0, 0, h);
 }
