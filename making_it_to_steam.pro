@@ -3,7 +3,7 @@ CONFIG += console c++14 strict_c++
 CONFIG -= app_bundle
 CONFIG -= qt
 
-QMAKE_CXXFLAGS += -pedantic -Wconversion -Wextra
+QMAKE_CXXFLAGS += -pedantic -Wextra #-Wconversion
 
 DEFINES += GLM_FORCE_NO_CTOR_INIT
 
@@ -57,7 +57,11 @@ HEADERS += \
     source/rendering/vbo_particle.hpp \
     source/test_scene/snake1.hpp \
     source/test_scene/snake1_end_menu.hpp \
-    source/opengl/other.hpp
+    source/opengl/other.hpp \
+    game1/tools/anim_tool.hpp \
+    game1/tools/selection_rect.hpp \
+    game1/tools/anim_creator.hpp \
+    game1/tools/anim_frame.hpp
 
 SOURCES += \
     source/app.cpp \
@@ -79,4 +83,7 @@ SOURCES += \
     source/imgui/imgui_impl_sdl_gl3.cpp \
     source/test_scene/snake1.cpp \
     source/test_scene/snake1_end_menu.cpp \
-    source/opengl/other.cpp
+    source/opengl/other.cpp \
+    game1/tools/anim_tool.cpp \
+    game1/tools/anim_creator.cpp \
+    game1/tools/anim_frame.cpp

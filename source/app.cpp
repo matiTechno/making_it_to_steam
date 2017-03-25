@@ -133,6 +133,8 @@ void App::processInput()
     }
     ImGui_ImplSdlGL3_NewFrame(sdl_win_handle);
 
+    SDL_GL_GetDrawableSize(sdl_win_handle, &fbSize.x, &fbSize.y);
+
     for(auto& scene: scenes)
     {
         if(&scene == &scenes.back() || scene->processInput_when_not_top)
@@ -151,7 +153,8 @@ void App::update()
 
 void App::render()
 {
-    SDL_GL_GetDrawableSize(sdl_win_handle, &fbSize.x, &fbSize.y);
+    // moved 'SDL_GL_GetDrawableSize(sdl_win_handle, &fbSize.x, &fbSize.y);'
+    // to processInput() so new size is avaible in earlier Scene functions
     Scissor::set(0, 0, fbSize.x, fbSize.y);
     glClear(GL_COLOR_BUFFER_BIT);
     pp_unit->set_new_size(fbSize);

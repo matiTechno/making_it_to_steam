@@ -45,4 +45,4 @@ void Scene::render_ImGui()
 {}
 
 void Scene::update_coords()
-{(void)dt;}
+{}
