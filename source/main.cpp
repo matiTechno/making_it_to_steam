@@ -10,7 +10,6 @@ int main()
     {
         App app;
         //app.start<Test_scene>();
-        //app.start<Anim_tool>();
         app.start<Anim_creator>();
     }
     catch(const std::exception& e)

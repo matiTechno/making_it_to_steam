@@ -1,6 +1,19 @@
 #include "anim_creator.hpp"
 #include <glm/exponential.hpp>
 
+static void ShowHelpMarker(const char* desc)
+{
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(450.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
+
 Anim_creator::Anim_creator():
     input(100, 0)
 {set_coords();}
@@ -16,10 +29,17 @@ void Anim_creator::processEvent(const SDL_Event& event)
                 glm::vec2 size(50.f, 50.f);
                 if(frames.size())
                 {
-                    size = glm::vec2(frames.back()->getCoords().z, frames.back()->getCoords().w);
-                    frames.back()->deselect();
+                    size = glm::vec2(frames.front()->getCoords().z, frames.front()->getCoords().w);
+                    frames.front()->deselect();
                 }
-                frames.push_back(std::make_unique<Anim_frame>(glm::vec2(cursor_pos) - size / 2.f, size, frames.size()));
+                frames.push_front(std::make_unique<Anim_frame>(get_cursor_cam_pos(cursor_pos.x, cursor_pos.y, camera)
+                                                               - size / 2.f, size, id));
+                ++id;
+            }
+            else if(event.key.keysym.sym == SDLK_DELETE)
+            {
+                if(frames.size() && frames.front()->get_is_selected())
+                    frames.erase(frames.begin());
             }
         }
     }
@@ -31,8 +51,8 @@ void Anim_creator::processEvent(const SDL_Event& event)
             camera.x -= event.motion.xrel * camera_scale;
             camera.y -= event.motion.yrel * camera_scale;
         }
-        if(frames.size())
-            frames.back()->on_mouse_motion(event.motion.xrel, event.motion.yrel, camera_scale);
+        if(frames.size() && !is_rb_pressed)
+            frames.front()->on_mouse_motion(event.motion.xrel, event.motion.yrel, camera_scale);
     }
     else if(event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
         set_coords();
@@ -57,7 +77,7 @@ void Anim_creator::processEvent(const SDL_Event& event)
             is_rb_pressed = false;
         else if(event.button.button == SDL_BUTTON_LEFT)
             if(frames.size())
-                frames.back()->on_left_button_release();
+                frames.front()->on_left_button_release();
     }
     else if(event.type == SDL_MOUSEBUTTONDOWN)
     {
@@ -67,9 +87,18 @@ void Anim_creator::processEvent(const SDL_Event& event)
                 is_rb_pressed = true;
             else if(event.button.button == SDL_BUTTON_LEFT)
             {
-                if(frames.size())
-                    if(!frames.back()->on_left_button_press(event.button.x, event.button.y, camera))
-                    {}
+                for(auto it = frames.begin(); it != frames.end(); ++it)
+                {
+                    if((*it)->on_left_button_press(event.button.x, event.button.y, camera))
+                    {
+                        if(&*it != &frames.front())
+                        {
+                            frames.push_front(std::move(*it));
+                            frames.erase(it);
+                        }
+                        break;
+                    }
+                }
             }
         }
     }
@@ -97,8 +126,8 @@ void Anim_creator::render()
             tex_sprite.src_alpha = GL_SRC_ALPHA;
         renderer.render(tex_sprite);
     }
-    for(auto& frame: frames)
-        frame->render(renderer);
+    for(auto it = frames.rbegin(); it != frames.rend(); ++it)
+    {(*it)->render(renderer);}
     renderer.end_batching();
 }
 
@@ -156,10 +185,21 @@ bool Anim_creator::is_point_in_im_win(const glm::vec2& point)
 
 void Anim_creator::render_ImGui()
 {
-    ImGui::Begin("animation creator");
+    ImGui::Begin("animation creator", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     w_pos = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
     w_size = glm::vec2(ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
     {
+        ImGui::Text("Welcome to animation creator!");
+        ImGui::Text("m a t i T e c h n o\n"
+                    "note: when writing to ImGui window\n"
+                    "keep cursor in it's bounds or you will\n"
+                    "trigger some hotkeys\n"
+                    "i will find solution soon\n"
+                    "N - new frame\n"
+                    "DEL - delete selected frame\n"
+                    "LMB - operate on frames\n"
+                    "RMB - move camera\n"
+                    "scroll - zoom");
         if(ImGui::Button("load test texture"))
         {
             try
@@ -173,16 +213,75 @@ void Anim_creator::render_ImGui()
                 err_msg = e.what();
             }
         }
+        if(ImGui::InputText("filename", input.data(), input.size(), ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            try
+            {
+                texture = std::make_unique<Texture>(input.data());
+                set_sprite();
+            }
+            catch(const std::exception& e)
+            {
+                ImGui::OpenPopup("error");
+                err_msg = e.what();
+            }
+        }
         if(ImGui::Button("show / hide countures"))
             show_countures = !show_countures;
 
-        if(ImGui::BeginPopupModal("error"))
+        if(ImGui::BeginPopup("error"))
         {
             ImGui::Text("%s", err_msg.c_str());
             ImGui::Separator();
             if(ImGui::Button("OK"))
                 ImGui::CloseCurrentPopup();
             ImGui::EndPopup();
+        }
+        {
+            ImGui::InputFloat("global frametime", &ft_for_all, 0.f, 0.f, 3);
+            if(ImGui::Button("set"))
+            {
+                for(auto& frame: frames)
+                    *(frame->get_frametime_ptr()) = ft_for_all;
+            }
+            ImGui::SameLine();ShowHelpMarker("after adding new frames you probably\nwant to reuse it");
+        }
+        {
+            ImGui::Text("set global origin");
+            if(ImGui::Button("l-top"))
+            {set_origin_for_all(glm::vec2(0.f, 0.f));}
+            ImGui::SameLine(); if(ImGui::Button("mid-top"))
+            {set_origin_for_all(glm::vec2(0.5f, 0.f));}
+            ImGui::SameLine(); if(ImGui::Button("r-top"))
+            {set_origin_for_all(glm::vec2(1.f, 0.f));}
+            if(ImGui::Button("l-mid"))
+            {set_origin_for_all(glm::vec2(0.f, 0.5f));}
+            ImGui::SameLine(); if(ImGui::Button("mid"))
+            {set_origin_for_all(glm::vec2(0.5f, 0.5f));}
+            ImGui::SameLine(); if(ImGui::Button("r-mid"))
+            {set_origin_for_all(glm::vec2(1.f, 0.5f));}
+            if(ImGui::Button("l-bot"))
+            {set_origin_for_all(glm::vec2(0.f, 1.f));}
+            ImGui::SameLine(); if(ImGui::Button("mid-bot"))
+            {set_origin_for_all(glm::vec2(0.5f, 1.f));}
+            ImGui::SameLine(); if(ImGui::Button("r-bot"))
+            {set_origin_for_all(glm::vec2(1.f, 1.f));}
+        }
+        if(texture)
+        {
+            ImGui::Separator();
+            ImGui::Text("texture size: %d x %d", texture->getSize().x, texture->getSize().y);
+        }
+        if(frames.size() && frames.front()->get_is_selected())
+        {
+            Anim_frame& frame = *frames.front();
+            ImGui::Separator();
+            ImGui::Text("id: %d", frame.get_id());
+            ImGui::Text("texCoords: %d, %d, %d, %d", frame.getCoords().x, frame.getCoords().y,
+                        frame.getCoords().z, frame.getCoords().w);
+            ImGui::InputFloat("frametime", frame.get_frametime_ptr(), 0.01f, 5.f, 3);
+            ImGui::Text("origin: %.2f, %.2f", static_cast<double>(frame.get_origin().x),
+                        static_cast<double>(frame.get_origin().y));
         }
     }
     ImGui::End();
@@ -195,4 +294,10 @@ void Anim_creator::set_camera()
     camera.z = coords.size.x;
     camera.w = coords.size.y;
     camera_scale = 1.f;
+}
+
+void Anim_creator::set_origin_for_all(const glm::vec2& origin)
+{
+    for(auto& frame: frames)
+        frame->set_origin(origin);
 }

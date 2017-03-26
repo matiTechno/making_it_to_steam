@@ -3,6 +3,7 @@
 
 #include "../../source/common_scene.hpp"
 #include "anim_frame.hpp"
+#include <list>
 
 class Anim_creator: public Scene
 {
@@ -16,7 +17,7 @@ public:
     void render_ImGui() override;
 
 private:
-    std::vector<std::unique_ptr<Anim_frame>> frames;
+    std::list<std::unique_ptr<Anim_frame>> frames;
     std::unique_ptr<Texture> texture;
     Sprite tex_sprite;
     std::vector<Sprite> grids;
@@ -33,11 +34,14 @@ private:
     glm::vec2 w_size;
     glm::ivec2 cursor_pos;
     bool show_countures = false;
+    int id = 0;
+    float ft_for_all;
 
     void set_sprite();
     void set_coords();
     void set_camera();
     bool is_point_in_im_win(const glm::vec2& point);
+    void set_origin_for_all(const glm::vec2& origin);
 };
 
 #endif // ANIM_CREATOR_HPP

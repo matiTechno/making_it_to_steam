@@ -6,8 +6,8 @@ glm::vec2 get_cursor_cam_pos(int x, int y, const glm::vec4& camera)
             glm::vec2(camera.z, camera.w) / glm::vec2(App::get_fb_size()) * glm::vec2(x, y);
 }
 
-Anim_frame::Anim_frame(const glm::vec2& position, const glm::vec2& size, std::size_t index):
-    index(index),
+Anim_frame::Anim_frame(const glm::vec2& position, const glm::vec2& size, int id):
+    id(id),
     boxes(4)
 {
     main_box.pos = position;

@@ -58,8 +58,6 @@ HEADERS += \
     source/test_scene/snake1.hpp \
     source/test_scene/snake1_end_menu.hpp \
     source/opengl/other.hpp \
-    game1/tools/anim_tool.hpp \
-    game1/tools/selection_rect.hpp \
     game1/tools/anim_creator.hpp \
     game1/tools/anim_frame.hpp
 
@@ -84,6 +82,5 @@ SOURCES += \
     source/test_scene/snake1.cpp \
     source/test_scene/snake1_end_menu.cpp \
     source/opengl/other.cpp \
-    game1/tools/anim_tool.cpp \
     game1/tools/anim_creator.cpp \
     game1/tools/anim_frame.cpp
