@@ -1,7 +1,7 @@
 #include <iostream>
 #include <exception>
 #include "app.hpp"
-//#include "test_scene/test_scene.hpp"
+#include "test_scene/test_scene.hpp"
 #include "../game1/tools/anim_creator.hpp"
 
 int main()

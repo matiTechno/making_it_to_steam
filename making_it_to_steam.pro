@@ -59,7 +59,8 @@ HEADERS += \
     source/test_scene/snake1_end_menu.hpp \
     source/opengl/other.hpp \
     game1/tools/anim_creator.hpp \
-    game1/tools/anim_frame.hpp
+    game1/tools/anim_frame.hpp \
+    game1/tools/animation.hpp
 
 SOURCES += \
     source/app.cpp \
@@ -83,4 +84,5 @@ SOURCES += \
     source/test_scene/snake1_end_menu.cpp \
     source/opengl/other.cpp \
     game1/tools/anim_creator.cpp \
-    game1/tools/anim_frame.cpp
+    game1/tools/anim_frame.cpp \
+    game1/tools/animation.cpp

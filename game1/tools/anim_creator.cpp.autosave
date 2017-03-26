@@ -114,9 +114,7 @@ void Anim_creator::processEvent(const SDL_Event& event)
     }
     // advance origin setting
     if(adv_origin && event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_n)
-    {
-        adv_origin = true;
-    }
+        origin_pos = 
 }
 
 void Anim_creator::render()

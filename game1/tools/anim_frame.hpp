@@ -15,7 +15,8 @@ struct Box
 class Anim_frame
 {
 public:
-    Anim_frame(const glm::vec2& position, const glm::vec2& size, int id);
+    Anim_frame(const glm::vec2& position, const glm::vec2& size, int id, float frametime,
+               const glm::vec2& origin);
 
     void render(const Renderer_2D& renderer);
     // returns true if reselected
@@ -31,9 +32,9 @@ public:
     bool get_is_selected(){return is_selected;}
     void set_origin(const glm::vec2& origin){this->origin = origin;}
 private:
-    float frametime = 0.040f;
+    float frametime;
     int id;
-    glm::vec2 origin{0.5f, 0.5f};
+    glm::vec2 origin{0.f};
     bool is_selected = true;
     float box_width = 5.f;
     std::vector<Box> boxes;

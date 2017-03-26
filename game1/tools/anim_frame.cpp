@@ -6,8 +6,11 @@ glm::vec2 get_cursor_cam_pos(int x, int y, const glm::vec4& camera)
             glm::vec2(camera.z, camera.w) / glm::vec2(App::get_fb_size()) * glm::vec2(x, y);
 }
 
-Anim_frame::Anim_frame(const glm::vec2& position, const glm::vec2& size, int id):
+Anim_frame::Anim_frame(const glm::vec2& position, const glm::vec2& size, int id, float frametime,
+                       const glm::vec2& origin):
+    frametime(frametime),
     id(id),
+    origin(origin),
     boxes(4)
 {
     main_box.pos = position;
@@ -113,10 +116,10 @@ void Anim_frame::on_mouse_motion(int relx, int rely, float camera_scale)
     if(boxes[bottom].is_selected)
         main_box.size.y += diff.y;
 
-    if(main_box.size.x < 0.f)
-        main_box.size.x = 0.f;
-    if(main_box.size.y < 0.f)
-        main_box.size.y = 0.f;
+    if(main_box.size.x < 1.f)
+        main_box.size.x = 1.f;
+    if(main_box.size.y < 1.f)
+        main_box.size.y = 1.f;
 }
 
 void Anim_frame::update_boxes_to_main(bool snap_to_grid)
