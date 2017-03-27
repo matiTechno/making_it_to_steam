@@ -6,7 +6,7 @@ glm::vec2 get_cursor_cam_pos(int x, int y, const glm::vec4& camera)
             glm::vec2(camera.z, camera.w) / glm::vec2(App::get_fb_size()) * glm::vec2(x, y);
 }
 
-Anim_frame::Anim_frame(const glm::vec2& position, const glm::vec2& size, int id, float frametime,
+Anim_frame::Anim_frame(const glm::vec2& position, const glm::vec2& size, std::size_t id, float frametime,
                        const glm::vec2& origin):
     frametime(frametime),
     id(id),
@@ -44,7 +44,17 @@ void Anim_frame::render(const Renderer_2D& renderer)
     snap_to_grid = false;
 }
 
-bool Anim_frame::on_left_button_press(int x, int y, const glm::vec4& camera)
+Sprite Anim_frame::get_sprite()
+{
+    update_boxes_to_main(false);
+
+    Sprite sprite;
+    sprite.position = main_box.pos;
+    sprite.size = main_box.size;
+    return sprite;
+}
+
+bool Anim_frame::on_left_button_press(int x, int y, const glm::vec4& camera, bool adv_origin)
 {
     bool prev_selected = is_selected;
     is_selected = false;
@@ -55,7 +65,7 @@ bool Anim_frame::on_left_button_press(int x, int y, const glm::vec4& camera)
         is_selected = true;
         main_box.is_selected = true;
     }
-    if(prev_selected)
+    if(prev_selected && !adv_origin)
         for(auto& box: boxes)
         {
             if(is_p_in_box(cursor_cam_pos, box))
@@ -65,7 +75,7 @@ bool Anim_frame::on_left_button_press(int x, int y, const glm::vec4& camera)
             }
         }
 
-    if(!prev_selected && is_selected)
+    if(!prev_selected && is_selected && !adv_origin)
         move_lock = true;
     else if(prev_selected && is_selected)
         move_lock = false;

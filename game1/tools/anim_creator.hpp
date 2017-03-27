@@ -14,6 +14,8 @@ public:
 
     void processEvent(const SDL_Event& event) override;
 
+    void update() override;
+
     void render() override;
 
     void render_ImGui() override;
@@ -39,14 +41,13 @@ private:
     glm::vec2 w_size;
     glm::ivec2 cursor_pos;
     bool show_countures = false;
-    int id = 0;
+    std::size_t id = 0;
     float ft_for_all = 0.04f;
     float min_ft = 0.016f;
-    // advance origin setting
-    bool adv_origin = false;
-    std::unordered_map<int, glm::ivec4> saved_fr_pos;
-    glm::vec2 origin_pos;
-    float origin_border_size =  20.f;
+    bool is_adv_origin = false;
+    glm::vec2 adv_origin_pos;
+    float adv_origin_border_size =  40.f;
+    std::unordered_map<std::size_t, glm::ivec4> saved_coords;
 
     void set_sprite();
     void set_coords();
@@ -54,6 +55,7 @@ private:
     void set_origin_for_all(const glm::vec2& origin);
     void reset_camera();
     void load_texture(const std::string& filename);
+    void quit_adv_origin_setting();
 };
 
 #endif // ANIM_CREATOR_HPP

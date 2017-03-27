@@ -1,5 +1,6 @@
 #include "anim_creator.hpp"
 #include <glm/exponential.hpp>
+#include <glm/geometric.hpp>
 
 Anim_creator::Anim_creator():
     input(100, 0)
@@ -11,22 +12,36 @@ Anim_creator::Anim_creator():
 // advance origin setting:
 // * N and DEL keys disabled -- done
 // * texture rendering disabled -- done
-// * can change origin with o again
-// * saved previous frames positions
-// * if new texture is loaded quit adv origin
-// * set frames in adv origin mode:
-// - no small boxes visible and useable
-// - inactive box color is 1111
-// - active box color is the same
-// - boxes use texCoords and texture
-// - no snapping to grid
-// - new panel with boxes transparencies
-// - exit advance origin button
-// - enter origin button
+// * if new texture is loaded quit adv origin --- done
+// * saved previous frames coords --- done
+// * animating when in edit mode --- done
+// * keep order of frames after quiting preview in adv origin mode --- done
+// set frames in adv origin mode:
+// - use texture --- done
+// - no small boxes visible --- done
+// - inactive box color is 1111 --- done
+// - active box color is the same --- done
+// - no snapping to grid --- done
+// - and useable (box resizing) -- done
+// - disable move lock -- done
+// * exit advance origin button --- done
+// * enter origin button --- done
+// * make clean when texture is on and when not too many states --- done
+
+// * when origin point for frame gets updated - when pressed s on focused frame, and also when other press frame sets
+// itself to origin
+// * when preview anim show frame property, stop animation etc
+
+// * new panel with boxes transparencies
+// * in origin edit mode --- ad option to set new origin for all
+// * also reload preview on go
+// * also frame selection panel - when one frame covers other you know
+// * make diffrent functions for diffrent stages/ animation / adv origin
+// * saving to fails / warnings / etc
 
 void Anim_creator::processEvent(const SDL_Event& event)
 {
-    if(event.type == SDL_KEYDOWN && !animation && !adv_origin)
+    if(event.type == SDL_KEYDOWN && !animation && !is_adv_origin)
     {
         if(!is_point_in_im_win(cursor_pos))
         {
@@ -99,7 +114,7 @@ void Anim_creator::processEvent(const SDL_Event& event)
             {
                 for(auto it = frames.begin(); it != frames.end(); ++it)
                 {
-                    if((*it)->on_left_button_press(event.button.x, event.button.y, camera))
+                    if((*it)->on_left_button_press(event.button.x, event.button.y, camera, is_adv_origin))
                     {
                         if(&*it != &frames.front())
                         {
@@ -112,9 +127,22 @@ void Anim_creator::processEvent(const SDL_Event& event)
             }
         }
     }
-    // advance origin setting
-    if(adv_origin && event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_n)
-        origin_pos =
+    if(is_adv_origin)
+    {
+
+    }
+}
+
+void Anim_creator::update()
+{
+    if(is_adv_origin)
+    {
+        for(auto& frame: frames)
+        {
+            frame->set_origin(glm::vec2(glm::length(frame->getCoords().x - adv_origin_pos.x) / frame->getCoords().z,
+                                        glm::length(frame->getCoords().y - adv_origin_pos.y) / frame->getCoords().w));
+        }
+    }
 }
 
 void Anim_creator::render()
@@ -136,7 +164,7 @@ void Anim_creator::render()
     renderer.load_projection(camera);
     if(!animation)
     {
-        if(texture && !adv_origin)
+        if(texture && !is_adv_origin)
         {
             Sprite shadow;
             shadow.size = tex_sprite.size;
@@ -149,16 +177,37 @@ void Anim_creator::render()
                 tex_sprite.src_alpha = GL_SRC_ALPHA;
             renderer.render(tex_sprite);
         }
-        for(auto it = frames.rbegin(); it != frames.rend(); ++it)
-        {(*it)->render(renderer);}
+        if(!is_adv_origin)
+            for(auto it = frames.rbegin(); it != frames.rend(); ++it)
+            {(*it)->render(renderer);}
+        else
+            for(auto it = frames.rbegin(); it != frames.rend(); ++it)
+            {
+                Sprite sprite = (*it)->get_sprite();
+                sprite.texture = &*texture;
+                sprite.texCoords = saved_coords.at((*it)->get_id());
 
-        if(adv_origin)
+                if((*it)->get_is_selected())
+                {
+                    Sprite rect;
+                    rect.position = sprite.position;
+                    rect.size = sprite.size;
+                    rect.color = glm::vec4(0.f, 1.f, 0.f, 0.3f);
+                    renderer.render(rect);
+                }
+                renderer.render(sprite);
+            }
+        if(is_adv_origin)
         {
             Sprite sprite;
-            sprite.size = glm::vec2(origin_border_size);
-            sprite.position = origin_pos - origin_border_size / 2.f;
+            sprite.size = glm::vec2(adv_origin_border_size);
+            sprite.position = adv_origin_pos - adv_origin_border_size / 2.f;
             sprite.color = glm::vec4(1.f, 0.f, 0.f, 0.3f);
-            Sprite
+            renderer.render(sprite);
+            sprite.size = glm::vec2(1.f, 1.f);
+            sprite.position = glm::vec2(adv_origin_pos - 0.5f);
+            sprite.color.a = 1.f;
+            renderer.render(sprite);
         }
     }
     else
@@ -283,41 +332,63 @@ void Anim_creator::render_ImGui()
         {
             ImGui::Separator();
             ImGui::InputFloat("scale", &animation_scale, 0, 0, 2);
-            if(ImGui::Button("preview animation"))
+            if(ImGui::Button("preview animation") && texture && frames.size())
             {
-                if(frames.size())
+
+
+                std::vector<Frame_data> data;
+                data.reserve(frames.size());
+                frames.front()->deselect();
+                frames.sort([](const std::unique_ptr<Anim_frame>& f1, const std::unique_ptr<Anim_frame>& f2)
+                {return f1->get_id() < f2->get_id();});
+                for(auto& frame: frames)
                 {
-                    std::vector<Frame_data> data;
-                    data.reserve(frames.size());
-                    frames.front()->deselect();
-                    frames.sort([](const std::unique_ptr<Anim_frame>& f1, const std::unique_ptr<Anim_frame>& f2)
-                    {return f1->get_id() < f2->get_id();});
-                    for(auto& frame: frames)
+                    if(!is_adv_origin)
                         data.emplace_back(Frame_data{frame->getCoords(), *frame->get_frametime_ptr(), frame->get_origin()});
-
-                    glm::vec2 cam_middle(camera.x + camera.z / 2.f, camera.y + camera.w / 2.f);
-                    reset_camera();
-                    camera.x = cam_middle.x - camera.z / 2.f;
-                    camera.y = cam_middle.y - camera.w / 2.f;
-
-                    animation = std::make_unique<Animation>(data, &*texture, animation_scale,
-                                                            glm::vec2(camera.x + camera.z / 4.f, camera.y + camera.w / 4.f),
-                                                            true);
+                    else
+                        data.emplace_back(Frame_data{saved_coords.at(frame->get_id()),
+                                                     *frame->get_frametime_ptr(), frame->get_origin()});
                 }
+
+                glm::vec2 cam_middle(camera.x + camera.z / 2.f, camera.y + camera.w / 2.f);
+                reset_camera();
+                camera.x = cam_middle.x - camera.z / 2.f;
+                camera.y = cam_middle.y - camera.w / 2.f;
+
+                animation = std::make_unique<Animation>(data, &*texture, animation_scale,
+                                                        glm::vec2(camera.x + camera.z / 3.f, camera.y + camera.w / 3.f),
+                                                        true);
+
+
             }
             if(ImGui::Button("end preview"))
+            {
+                if(is_adv_origin)
+                    frames.reverse();
                 animation.reset();
+            }
         }
         if(texture)
         {
             ImGui::Separator();
             ImGui::Text("texture size: %d x %d", texture->getSize().x, texture->getSize().y);
         }
+        if(ImGui::Button("enter advanced origin setting") && texture)
+        {
+            saved_coords.clear();
+            is_adv_origin = true;
+            adv_origin_pos = glm::vec2(camera.x + camera.z / 3.f, camera.y + camera.w / 3.f);
+            for(auto& frame: frames)
+                saved_coords.emplace(frame->get_id(), frame->getCoords());
+        }
+        if(ImGui::Button("quit origin setting"))
+            quit_adv_origin_setting();
+
         if(frames.size() && frames.front()->get_is_selected())
         {
             Anim_frame& frame = *frames.front();
             ImGui::Separator();
-            ImGui::Text("id: %d", frame.get_id());
+            ImGui::Text("id: %lu", frame.get_id());
             ImGui::Text("texCoords: %d, %d, %d, %d", frame.getCoords().x, frame.getCoords().y,
                         frame.getCoords().z, frame.getCoords().w);
             ImGui::InputFloat("frametime", frame.get_frametime_ptr(), 0.01f, 0, 3);
@@ -349,6 +420,9 @@ void Anim_creator::load_texture(const std::string& filename)
     {
         if(animation)
             animation.reset();
+        if(is_adv_origin)
+            quit_adv_origin_setting();
+
         texture = std::make_unique<Texture>(filename);
         set_sprite();
     }
@@ -357,4 +431,14 @@ void Anim_creator::load_texture(const std::string& filename)
         ImGui::OpenPopup("error");
         err_msg = e.what();
     }
+}
+
+void Anim_creator::quit_adv_origin_setting()
+{
+    is_adv_origin = false;
+    for(auto& frame: frames)
+        frame->set_position(glm::vec2(saved_coords.at(frame->get_id()).x, saved_coords.at(frame->get_id()).y));
+
+    if(frames.size())
+        frames.front()->deselect();
 }

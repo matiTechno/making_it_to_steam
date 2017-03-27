@@ -15,25 +15,28 @@ struct Box
 class Anim_frame
 {
 public:
-    Anim_frame(const glm::vec2& position, const glm::vec2& size, int id, float frametime,
+    Anim_frame(const glm::vec2& position, const glm::vec2& size, std::size_t id, float frametime,
                const glm::vec2& origin);
 
     void render(const Renderer_2D& renderer);
+    // use this only when adv origin setting is on
+    Sprite get_sprite();
     // returns true if reselected
-    bool on_left_button_press(int x, int y, const glm::vec4& camera);
+    bool on_left_button_press(int x, int y, const glm::vec4& camera, bool adv_origin = false);
     void on_left_button_release();
     void on_mouse_motion(int relx, int rely, float camera_scale);
 
     glm::ivec4 getCoords(){return glm::ivec4(main_box.pos, main_box.size);}
     float* get_frametime_ptr(){return &frametime;}
     glm::vec2 get_origin(){return origin;}
-    int get_id(){return id;}
+    std::size_t get_id(){return id;}
     void deselect(){is_selected = false;}
     bool get_is_selected(){return is_selected;}
     void set_origin(const glm::vec2& origin){this->origin = origin;}
+    void set_position(const glm::vec2& pos){main_box.pos = pos;}
 private:
     float frametime;
-    int id;
+    std::size_t id;
     glm::vec2 origin{0.f};
     bool is_selected = true;
     float box_width = 5.f;
