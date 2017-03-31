@@ -1,4 +1,0 @@
-*.user
-callgrind*
-imgui.ini
-*.trace
