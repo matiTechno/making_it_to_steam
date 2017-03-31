@@ -15,4 +15,6 @@ stb_image
 glad (link with -ldl on unix)  
   
 documented in source  
-some examples of use in source/test_scene
+see examples
+
+works with cmake only on linux (most simplest CMakeLists.txt ever)
