@@ -33,7 +33,7 @@ struct P_data_base
     // for blending
     GLenum src_alpha = GL_SRC_ALPHA, dst_alpha = GL_ONE_MINUS_SRC_ALPHA;
     Sampl_type sampl_type = Sampl_type::linear;
-    std::size_t num_to_render;
+    std::size_t num_to_render = 0;
 };
 
 // final structures
