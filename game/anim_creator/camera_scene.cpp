@@ -8,14 +8,6 @@ Camera_scene::Camera_scene()
 
 void Camera_scene::processEvent(const SDL_Event& event)
 {
-    if(event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED)
-    {
-        glm::vec2 scale = glm::vec2(App::get_fb_size()) / glm::vec2(coords.size);
-        coords.size = App::get_fb_size();
-        camera.z *= scale.x;
-        camera.w *= scale.y;
-    }
-
     if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_RIGHT)
         is_rmb_pressed = true;
 
@@ -46,6 +38,16 @@ void Camera_scene::processEvent(const SDL_Event& event)
     processEvent2(event);
 }
 
+void Camera_scene::update_coords()
+{
+    glm::vec2 scale = glm::vec2(App::get_fb_size()) / glm::vec2(coords.size);
+    coords.size = App::get_fb_size();
+    camera.z *= scale.x;
+    camera.w *= scale.y;
+
+    update_coords2();
+}
+
 void Camera_scene::render()
 {
     if(ImGui_wants_input)
@@ -70,3 +72,6 @@ void Camera_scene::render2()
 
 void Camera_scene::processEvent2(const SDL_Event& event)
 {(void)event;}
+
+void Camera_scene::update_coords2()
+{}

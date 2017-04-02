@@ -10,11 +10,14 @@ public:
 
     void processEvent(const SDL_Event& event) final;
 
+    void update_coords() final;
+
     void render() final;
 
 private:
-    virtual void render2();
     virtual void processEvent2(const SDL_Event& event);
+    virtual void update_coords2();
+    virtual void render2();
 
     glm::vec4 camera;
     float camera_scale = 1.f;

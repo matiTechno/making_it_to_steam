@@ -3,6 +3,7 @@ set (anim_creator_SRCS
 anim_creator.cpp
 main.cpp
 camera_scene.cpp
+anim_rect.cpp
 )
 
 add_executable(anim_creator ${anim_creator_SRCS})

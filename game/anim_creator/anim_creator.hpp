@@ -1,6 +1,9 @@
 #pragma once
 
 #include "camera_scene.hpp"
+#include <unordered_map>
+#include "animation.hpp"
+#include <list>
 
 class Anim_creator: public Camera_scene
 {
@@ -17,12 +20,17 @@ private:
     glm::vec4 color1{0.7, 0.7, 0.7, 0.8};
     glm::vec4 color2{0.5, 0.5, 0.5, 0.8};
     glm::ivec2 max_fb_size{0, 0};
-    std::vector<char> tex_filename_input;
+    std::vector<char> tex_filename_input, anim_name_input, anim_rename_input;
     std::unique_ptr<Texture> texture;
     std::string err_msg;
     bool countures = false;
     Sprite tex_sprite;
     std::string tex_filename;
+    std::unordered_map<std::string, Animation> animations;
+    Animation* anim;
+    std::list<std::string> store_anim_names;
+    std::vector<const char*> anim_names;
+    int current_anim_name = -1;
 
     void set_grid();
     void load_texture(const std::string& filename);
