@@ -27,7 +27,10 @@ private:
 
 protected:
     void reset_camera();
-    glm::vec4 get_camera(){return camera;}
+    const glm::vec4& get_camera(){return camera;}
+    bool get_is_rmb_pressed(){return is_rmb_pressed;}
+    const glm::ivec2& get_cursor_pos(){return cursor_pos;}
+    float get_camera_scale(){return camera_scale;}
 };
 
 glm::vec2 get_cursor_cam_pos(int x, int y, const glm::vec4& camera);

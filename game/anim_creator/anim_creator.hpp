@@ -27,14 +27,19 @@ private:
     Sprite tex_sprite;
     std::string tex_filename;
     std::unordered_map<std::string, Animation> animations;
-    Animation* anim;
+    Animation* anim = nullptr;
     std::list<std::string> store_anim_names;
     std::vector<const char*> anim_names;
     int current_anim_name = -1;
+    float preview_scale = 1.f;
+    int first_frame = 1, first_frame_to_compare = 1;
+    int anim_to_compare = 0;
 
     void set_grid();
     void load_texture(const std::string& filename);
     void set_sprite();
+    void clear();
+    void set_origin_for_all(const glm::vec2& origin);
 
     void processEvent2(const SDL_Event& event) override;
     void render2() override;

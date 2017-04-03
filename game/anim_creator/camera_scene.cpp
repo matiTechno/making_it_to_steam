@@ -14,7 +14,7 @@ void Camera_scene::processEvent(const SDL_Event& event)
     else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_RIGHT)
         is_rmb_pressed = false;
 
-    else if(event.type == SDL_MOUSEMOTION && is_rmb_pressed)
+    else if(event.type == SDL_MOUSEMOTION)
     {
         cursor_pos = glm::ivec2(event.motion.x, event.motion.y);
         if(is_rmb_pressed)

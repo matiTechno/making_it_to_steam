@@ -1,4 +1,5 @@
 #include "anim_creator.hpp"
+#include "preview.hpp"
 
 Anim_creator::Anim_creator():
     tex_filename_input(100, 0),
@@ -12,13 +13,62 @@ void Anim_creator::on_quit_event()
 }
 
 void Anim_creator::processEvent2(const SDL_Event& event)
-{(void)event;}
+{
+    if(!anim)
+        return;
+
+    if(event.type == SDL_KEYDOWN && !event.key.repeat)
+    {
+        if(event.key.keysym.sym == SDLK_n)
+        {
+            if(anim->frames.size())
+            {
+                anim->new_frame_size = glm::ivec2(anim->frames.front().get_coords().z, anim->frames.front().get_coords().w);
+                anim->frames.front().is_selected = false;
+            }
+            anim->frames.emplace_front(anim->id, get_cursor_cam_pos(get_cursor_pos().x, get_cursor_pos().y, get_camera())
+                                       - glm::vec2(anim->new_frame_size) / 2.f,
+                                       anim->new_frame_size, anim->global_frametime, anim->global_origin);
+            ++anim->id;
+        }
+        else if(event.key.keysym.sym == SDLK_r && anim->frames.size() && anim->frames.front().is_selected)
+            anim->frames.erase(anim->frames.begin());
+    }
+    else if(event.type == SDL_MOUSEMOTION && anim->frames.size() && !get_is_rmb_pressed())
+    {
+        if(anim->frames.front().is_selected)
+            anim->frames.front().on_mouse_motion(event.motion.xrel, event.motion.yrel, get_camera_scale());
+    }
+    else if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
+        for(auto it = anim->frames.begin(); it != anim->frames.end(); ++it)
+        {
+            if(it->on_left_button_press(event.button.x, event.button.y, get_camera(), false))
+            {
+                if(&*it != &anim->frames.front())
+                {
+                    anim->frames.push_front(std::move(*it));
+                    anim->frames.erase(it);
+                }
+                break;
+            }
+        }
+
+    else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT && anim->frames.size())
+        anim->frames.front().on_left_button_release();
+}
 
 void Anim_creator::render2()
 {
+    if(ImGui_wants_input && anim && anim->frames.size())
+        anim->frames.front().on_left_button_release();
+
     set_grid();
     renderer.load_projection(glm::vec4(0, 0, coords.size));
     renderer.rend_particles(grids);
+
+    if(!is_on_top())
+        return;
+
     if(texture)
     {
         renderer.load_projection(get_camera());
@@ -35,6 +85,9 @@ void Anim_creator::render2()
             tex_sprite.src_alpha = GL_SRC_ALPHA;
         renderer.render(tex_sprite);
     }
+    if(anim)
+        for(auto it = anim->frames.rbegin(); it != anim->frames.rend(); ++it)
+            it->render(renderer);
 }
 
 void Anim_creator::render_ImGui()
@@ -42,6 +95,7 @@ void Anim_creator::render_ImGui()
     ImGui::ShowTestWindow();
 
     ImGui::Begin("animation creator", nullptr);
+    ImGui::PushItemWidth(200);
     {
         ImGui::Text("Welcome to animation creator!\nm a t i T e c h n o");
         ImGui::Spacing();
@@ -96,7 +150,7 @@ out1:
         if(current_anim_name != -1)
             anim = &animations.at(anim_names[static_cast<std::size_t>(current_anim_name)]);
         else
-            goto anim_error;
+            goto end;
 
         if(ImGui::Button("delete"))
         {
@@ -111,6 +165,8 @@ out1:
                 anim_names.erase(it);
             }
             current_anim_name = -1;
+            anim = nullptr;
+            goto end;
         }
         ImGui::SameLine();
         if(ImGui::InputText("rename", anim_rename_input.data(), anim_rename_input.size(),
@@ -143,7 +199,97 @@ out1:
             anim_rename_input.front() = 0;
         }
 out2:
-anim_error:
+        ImGui::Separator();
+        ImGui::Spacing();
+        if(ImGui::InputFloat("global frametime", &anim->global_frametime, 0.01f, 0, 3))
+        {
+            if(anim->global_frametime < 0.016f)
+                anim->global_frametime = 0.016f;
+
+            for(auto& frame: anim->frames)
+                frame.frametime = anim->global_frametime;
+        }
+        ImGui::Spacing();
+        ImGui::Text("global origin");
+        if(ImGui::Button("l-t"))
+        {set_origin_for_all(glm::vec2(0.f, 0.f));}
+        ImGui::SameLine(); if(ImGui::Button("m-t"))
+        {set_origin_for_all(glm::vec2(0.5f, 0.f));}
+        ImGui::SameLine(); if(ImGui::Button("r-t"))
+        {set_origin_for_all(glm::vec2(1.f, 0.f));}
+        if(ImGui::Button("l-m"))
+        {set_origin_for_all(glm::vec2(0.f, 0.5f));}
+        ImGui::SameLine(); if(ImGui::Button("m-m"))
+        {set_origin_for_all(glm::vec2(0.5f, 0.5f));}
+        ImGui::SameLine(); if(ImGui::Button("r-m"))
+        {set_origin_for_all(glm::vec2(1.f, 0.5f));}
+        if(ImGui::Button("l-b"))
+        {set_origin_for_all(glm::vec2(0.f, 1.f));}
+        ImGui::SameLine(); if(ImGui::Button("m-b"))
+        {set_origin_for_all(glm::vec2(0.5f, 1.f));}
+        ImGui::SameLine(); if(ImGui::Button("r-b"))
+        {set_origin_for_all(glm::vec2(1.f, 1.f));}
+
+        if(!anim->frames.size())
+            goto end;
+
+        ImGui::Separator();
+        ImGui::Spacing();
+        if(ImGui::Button("preview animation"))
+            set_new_scene<Preview>(anim->frames, preview_scale, *texture);
+
+        ImGui::SameLine();
+        ImGui::InputFloat("scale", &preview_scale, 0, 0, 2);
+        if(ImGui::Button("enter origin mode"))
+        {}
+        if(ImGui::Button("set collision data"))
+        {}
+        {
+            std::vector<const char*> anim_to_compare_names;
+            int num_anim_to_compare = 0;
+            for(auto& anim: animations)
+                if(anim.second.frames.size() && &anim.second != this->anim)
+                {
+                    ++num_anim_to_compare;
+                    anim_to_compare_names.push_back(anim.first.c_str());
+                }
+
+            if(num_anim_to_compare > 0)
+            {
+                ImGui::Separator();
+                ImGui::Spacing();
+                ImGui::Text("compare");
+                ImGui::SameLine();
+                ImGui::RadioButton("first", &first_frame, 1);
+                ImGui::SameLine();
+                ImGui::RadioButton("last", &first_frame, 0);
+                ImGui::SameLine();
+                ImGui::Text("frame with");
+                ImGui::Combo("##to_compare", &anim_to_compare, anim_to_compare_names.data(), num_anim_to_compare);
+                ImGui::SameLine();
+                ImGui::RadioButton("first##2", &first_frame_to_compare, 1);
+                ImGui::SameLine();
+                ImGui::RadioButton("last##2", &first_frame_to_compare, 0);
+                ImGui::SameLine();
+                ImGui::Text("frame");
+                if(ImGui::Button("start"))
+                {}
+            }
+        }
+        if(!anim->frames.front().is_selected)
+            goto end;
+
+        ImGui::Separator();
+        ImGui::Spacing();
+        ImGui::Text("id: %lu", anim->frames.front().id);
+        if(ImGui::InputFloat("frametime", &anim->frames.front().frametime, 0.01f, 0, 3))
+            if(anim->frames.front().frametime < 0.016f)
+                anim->frames.front().frametime = 0.016f;
+        ImGui::Text("orgin: %.2f, %.2f", static_cast<double>(anim->frames.front().origin.x),
+                    static_cast<double>(anim->frames.front().origin.y));
+        ImGui::Text("coordinates: %d, %d, %d, %d", anim->frames.front().get_coords().x, anim->frames.front().get_coords().y,
+                    anim->frames.front().get_coords().z, anim->frames.front().get_coords().w);
+end:
         if(ImGui::BeginPopup("anim name error"))
         {
             ImGui::Text("animation name must be unique and not empty");
@@ -153,7 +299,6 @@ anim_error:
             ImGui::EndPopup();
         }
     }
-end:
     ImGui::End();
 }
 
@@ -161,6 +306,7 @@ void Anim_creator::load_texture(const std::string& filename)
 {
     try
     {
+        clear();
         texture = std::make_unique<Texture>(filename);
         tex_filename = filename;
         set_sprite();
@@ -180,6 +326,23 @@ void Anim_creator::set_sprite()
     tex_sprite.sampl_type = Sampl_type::nearest;
     tex_sprite.texCoords = glm::ivec4(0, 0, texture->getSize());
     tex_sprite.texture = texture.get();
+}
+
+void Anim_creator::clear()
+{
+    texture.release();
+    animations.clear();
+    anim_names.clear();
+    store_anim_names.clear();
+    current_anim_name = -1;
+    anim = nullptr;
+}
+
+void Anim_creator::set_origin_for_all(const glm::vec2& origin)
+{
+    anim->global_origin = origin;
+    for(auto& frame: anim->frames)
+        frame.origin = origin;
 }
 
 void Anim_creator::set_grid()
