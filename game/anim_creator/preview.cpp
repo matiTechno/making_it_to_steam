@@ -1,5 +1,8 @@
 #include "preview.hpp"
 
+bool Preview::origin_visible = true;
+bool Preview::frame_rect_visible = true;
+
 Preview::Preview(const std::list<Anim_rect>& frames, float scale, const Texture& texture):
     frames(frames),
     scale(scale),
@@ -44,7 +47,7 @@ void Preview::render2()
     sprite.size = coords.size;
     sprite.color = glm::vec4(0, 0, 0, 0.5f);
     renderer.render(sprite);
-    renderer.load_projection(get_camera());
+    renderer.load_projection(camera);
     renderer.beg_batching();
 
     if(origin_visible)
@@ -52,7 +55,7 @@ void Preview::render2()
         Sprite sprite;
         sprite.position = glm::vec2(origin_pos) - origin_rect_size / 2.f;
         sprite.size = origin_rect_size;
-        sprite.color = glm::vec4(1.f, 0, 0, 0.3f);
+        sprite.color = glm::vec4(1.f, 0, 0, 0.1f);
         renderer.render(sprite);
     }
     if(frame_rect_visible)

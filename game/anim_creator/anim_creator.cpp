@@ -1,5 +1,6 @@
 #include "anim_creator.hpp"
 #include "preview.hpp"
+#include "origin_mode.hpp"
 
 Anim_creator::Anim_creator():
     tex_filename_input(100, 0),
@@ -26,7 +27,7 @@ void Anim_creator::processEvent2(const SDL_Event& event)
                 anim->new_frame_size = glm::ivec2(anim->frames.front().get_coords().z, anim->frames.front().get_coords().w);
                 anim->frames.front().is_selected = false;
             }
-            anim->frames.emplace_front(anim->id, get_cursor_cam_pos(get_cursor_pos().x, get_cursor_pos().y, get_camera())
+            anim->frames.emplace_front(anim->id, get_cursor_cam_pos(get_cursor_pos().x, get_cursor_pos().y, camera)
                                        - glm::vec2(anim->new_frame_size) / 2.f,
                                        anim->new_frame_size, anim->global_frametime, anim->global_origin);
             ++anim->id;
@@ -42,7 +43,7 @@ void Anim_creator::processEvent2(const SDL_Event& event)
     else if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
         for(auto it = anim->frames.begin(); it != anim->frames.end(); ++it)
         {
-            if(it->on_left_button_press(event.button.x, event.button.y, get_camera(), false))
+            if(it->on_left_button_press(event.button.x, event.button.y, camera, false))
             {
                 if(&*it != &anim->frames.front())
                 {
@@ -71,7 +72,7 @@ void Anim_creator::render2()
 
     if(texture)
     {
-        renderer.load_projection(get_camera());
+        renderer.load_projection(camera);
 
         Sprite shadow;
         shadow.position = tex_sprite.position;
@@ -92,8 +93,9 @@ void Anim_creator::render2()
 
 void Anim_creator::render_ImGui()
 {
-    ImGui::ShowTestWindow();
+    //ImGui::ShowTestWindow();
 
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.7f));
     ImGui::Begin("animation creator", nullptr);
     ImGui::PushItemWidth(200);
     {
@@ -241,7 +243,8 @@ out2:
         ImGui::SameLine();
         ImGui::InputFloat("scale", &preview_scale, 0, 0, 2);
         if(ImGui::Button("enter origin mode"))
-        {}
+            set_new_scene<Origin_mode>(anim->frames, *texture, &anim->global_frametime);
+
         if(ImGui::Button("set collision data"))
         {}
         {
@@ -256,22 +259,12 @@ out2:
 
             if(num_anim_to_compare > 0)
             {
+                if(anim_to_compare < 0)
+                    anim_to_compare = 0;
                 ImGui::Separator();
                 ImGui::Spacing();
-                ImGui::Text("compare");
-                ImGui::SameLine();
-                ImGui::RadioButton("first", &first_frame, 1);
-                ImGui::SameLine();
-                ImGui::RadioButton("last", &first_frame, 0);
-                ImGui::SameLine();
-                ImGui::Text("frame with");
+                ImGui::Text("adjust to");
                 ImGui::Combo("##to_compare", &anim_to_compare, anim_to_compare_names.data(), num_anim_to_compare);
-                ImGui::SameLine();
-                ImGui::RadioButton("first##2", &first_frame_to_compare, 1);
-                ImGui::SameLine();
-                ImGui::RadioButton("last##2", &first_frame_to_compare, 0);
-                ImGui::SameLine();
-                ImGui::Text("frame");
                 if(ImGui::Button("start"))
                 {}
             }

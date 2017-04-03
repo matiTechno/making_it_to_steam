@@ -22,8 +22,8 @@ private:
     std::list<Anim_rect>::iterator frame, prev_frame;
     glm::ivec2 origin_pos;
     glm::vec2 origin_rect_size{80.f};
-    bool origin_visible = true;
-    bool frame_rect_visible = true;
+    static bool origin_visible;
+    static bool frame_rect_visible;
 
     glm::vec2 get_origin_distance(std::list<Anim_rect>::iterator frame);
 

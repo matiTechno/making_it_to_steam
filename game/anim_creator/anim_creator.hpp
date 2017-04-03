@@ -32,7 +32,6 @@ private:
     std::vector<const char*> anim_names;
     int current_anim_name = -1;
     float preview_scale = 1.f;
-    int first_frame = 1, first_frame_to_compare = 1;
     int anim_to_compare = 0;
 
     void set_grid();

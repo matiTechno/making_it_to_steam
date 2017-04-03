@@ -34,7 +34,9 @@ bool Anim_rect::on_left_button_press(int x, int y, const glm::vec4& camera, bool
                 is_selected = true;
             }
 
-    if(!prev_selected && is_selected)
+    if(origin_mode)
+        move_lock = false;
+    else if(!prev_selected && is_selected)
         move_lock = true;
     else if(prev_selected && is_selected)
         move_lock = false;
@@ -145,3 +147,32 @@ bool Anim_rect::is_cursor_in_box(const glm::vec2& pos, const Box& box)
         return true;
     return false;
 }
+
+void Anim_rect::render(const Renderer_2D& renderer, const Texture& texture, const glm::ivec4& coords)
+{
+    update_boxes_to_main(snap_to_grid);
+    snap_to_grid = false;
+    {
+        Sprite sprite;
+        sprite.position = main_box.pos;
+        sprite.size = main_box.size;
+        if(is_selected)
+            sprite.color = col_main_origin_mode;
+        else
+            sprite.color = col_main_inactive;
+        renderer.render(sprite);
+    }
+    {
+        Sprite sprite;
+        sprite.position = main_box.pos;
+        sprite.size = main_box.size;
+        sprite.sampl_type = Sampl_type::nearest;
+        sprite.color.a = alpha;
+        sprite.texture = &texture;
+        sprite.texCoords = coords;
+        renderer.render(sprite);
+    }
+}
+
+void Anim_rect::set_position(const glm::vec2& pos)
+{main_box.pos = pos;}
