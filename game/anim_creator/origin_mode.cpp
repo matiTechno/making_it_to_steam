@@ -114,7 +114,7 @@ void Origin_mode::render2()
         renderer.render(sprite);
     }
     for(auto it = frames.rbegin(); it != frames.rend(); ++it)
-        it->render(renderer, texture, saved_coords.at(it->id));
+        it->render(renderer, texture, saved_coords.at(it->id), true);
     {
         Sprite sprite;
         sprite.position = origin_pos;

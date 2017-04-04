@@ -76,7 +76,7 @@ void Anim_rect::on_mouse_motion(int relx, int rely, float camera_scale)
         main_box.size.y = 1.f;
 }
 
-void Anim_rect::render(const Renderer_2D& renderer)
+void Anim_rect::render(const Renderer_2D& renderer) const
 {
     update_boxes_to_main(snap_to_grid);
     snap_to_grid = false;
@@ -101,7 +101,7 @@ void Anim_rect::render(const Renderer_2D& renderer)
         }
 }
 
-glm::ivec4 Anim_rect::get_coords()
+glm::ivec4 Anim_rect::get_coords() const
 {return glm::ivec4(main_box.pos, main_box.size);}
 
 void Anim_rect::on_left_button_release()
@@ -114,7 +114,7 @@ void Anim_rect::on_left_button_release()
     snap_to_grid = true;
 }
 
-void Anim_rect::update_boxes_to_main(bool snap_to_grid)
+void Anim_rect::update_boxes_to_main(bool snap_to_grid) const
 {
     if(snap_to_grid)
     {
@@ -140,7 +140,7 @@ void Anim_rect::update_boxes_to_main(bool snap_to_grid)
     boxes[bottom].size = boxes[top].size;
 }
 
-bool Anim_rect::is_cursor_in_box(const glm::vec2& pos, const Box& box)
+bool Anim_rect::is_cursor_in_box(const glm::vec2& pos, const Box& box) const
 {
     if(pos.x >= box.pos.x && pos.x < box.pos.x + box.size.x &&
             pos.y >= box.pos.y && pos.y < box.pos.y + box.size.y)
@@ -148,10 +148,11 @@ bool Anim_rect::is_cursor_in_box(const glm::vec2& pos, const Box& box)
     return false;
 }
 
-void Anim_rect::render(const Renderer_2D& renderer, const Texture& texture, const glm::ivec4& coords)
+void Anim_rect::render(const Renderer_2D& renderer, const Texture& texture, const glm::ivec4& coords, bool rect) const
 {
     update_boxes_to_main(snap_to_grid);
     snap_to_grid = false;
+    if(rect)
     {
         Sprite sprite;
         sprite.position = main_box.pos;

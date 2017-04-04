@@ -1,6 +1,7 @@
 #include "anim_creator.hpp"
 #include "preview.hpp"
 #include "origin_mode.hpp"
+#include "adjust_anims.hpp"
 
 Anim_creator::Anim_creator():
     tex_filename_input(100, 0),
@@ -95,7 +96,7 @@ void Anim_creator::render_ImGui()
 {
     //ImGui::ShowTestWindow();
 
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.7f));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.8f));
     ImGui::Begin("animation creator", nullptr);
     ImGui::PushItemWidth(200);
     {
@@ -266,7 +267,9 @@ out2:
                 ImGui::Text("adjust to");
                 ImGui::Combo("##to_compare", &anim_to_compare, anim_to_compare_names.data(), num_anim_to_compare);
                 if(ImGui::Button("start"))
-                {}
+                    set_new_scene<Adjust_anims>(*anim,
+                                                animations.at(anim_to_compare_names[static_cast<std::size_t>(anim_to_compare)]),
+                            *texture);
             }
         }
         if(!anim->frames.front().is_selected)
@@ -293,6 +296,7 @@ end:
         }
     }
     ImGui::End();
+    ImGui::PopStyleColor();
 }
 
 void Anim_creator::load_texture(const std::string& filename)

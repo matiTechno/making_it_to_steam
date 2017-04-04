@@ -37,6 +37,8 @@ public:
     static bool should_close;
     static glm::ivec2 get_fb_size()
     {return fbSize;}
+    static std::size_t get_num_scenes()
+    {return handle->scenes.size();}
 
 private:
     // don't change the order
