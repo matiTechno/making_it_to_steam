@@ -3,14 +3,14 @@
 bool Preview::origin_visible = true;
 bool Preview::frame_rect_visible = true;
 
-Preview::Preview(const std::list<Anim_rect>& frames, float scale, const Texture& texture):
+Preview::Preview(const std::list<Frame>& frames, float scale, const Texture& texture):
     frames(frames),
     scale(scale),
     texture(texture)
 {
     is_opaque = false;
-    this->frames.sort([](const Anim_rect& f1, const Anim_rect& f2)
-    {return f1.id < f2.id;});
+    this->frames.sort([](const Frame& f1, const Frame& f2)
+    {return f1.anim_rect.id < f2.anim_rect.id;});
 
     origin_pos = coords.size / 2;
 
@@ -24,9 +24,9 @@ Preview::Preview(const std::list<Anim_rect>& frames, float scale, const Texture&
 void Preview::update()
 {
     accumulator += dt;
-    while(accumulator >= frame->frametime)
+    while(accumulator >= frame->anim_rect.frametime)
     {
-        accumulator -= frame->frametime;
+        accumulator -= frame->anim_rect.frametime;
 
         ++frame;
         ++prev_frame;
@@ -62,16 +62,16 @@ void Preview::render2()
     {
         Sprite sprite;
         sprite.position = pos;
-        sprite.size = glm::vec2(frame->get_coords().z, frame->get_coords().w) * scale;
+        sprite.size = glm::vec2(frame->anim_rect.get_coords().z, frame->anim_rect.get_coords().w) * scale;
         sprite.color = glm::vec4(0, 1.f, 0, 0.3f);
         renderer.render(sprite);
     }
     {
         Sprite sprite;
         sprite.position = pos;
-        sprite.size = glm::vec2(frame->get_coords().z, frame->get_coords().w) * scale;
+        sprite.size = glm::vec2(frame->anim_rect.get_coords().z, frame->anim_rect.get_coords().w) * scale;
         sprite.texture = &texture;
-        sprite.texCoords = frame->get_coords();
+        sprite.texCoords = frame->anim_rect.get_coords();
         sprite.sampl_type = Sampl_type::nearest;
         renderer.render(sprite);
     }
@@ -99,7 +99,7 @@ void Preview::render_ImGui()
     ImGui::End();
 }
 
-glm::vec2 Preview::get_origin_distance(std::list<Anim_rect>::iterator frame)
+glm::vec2 Preview::get_origin_distance(std::list<Frame>::iterator frame)
 {
-    return glm::vec2(frame->origin * glm::vec2(frame->get_coords().z, frame->get_coords().w) * scale);
+    return glm::vec2(frame->anim_rect.origin * glm::vec2(frame->anim_rect.get_coords().z, frame->anim_rect.get_coords().w) * scale);
 }

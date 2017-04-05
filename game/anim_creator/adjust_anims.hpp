@@ -6,7 +6,7 @@
 class Adjust_anims: public Camera_scene
 {
 public:
-    Adjust_anims(Animation& anim1, const Animation& anim2, const Texture& texture);
+    Adjust_anims(Animation& anim1, const Animation& anim2, const Texture& texture, bool first);
 
     void render_ImGui() override;
 

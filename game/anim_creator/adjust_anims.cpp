@@ -1,6 +1,6 @@
 #include "adjust_anims.hpp"
 
-Adjust_anims::Adjust_anims(Animation& anim1, const Animation& anim2, const Texture& texture):
+Adjust_anims::Adjust_anims(Animation& anim1, const Animation& anim2, const Texture& texture, bool first):
     anim1(anim1),
     texture(texture)
 {
@@ -9,28 +9,43 @@ Adjust_anims::Adjust_anims(Animation& anim1, const Animation& anim2, const Textu
     {
         std::size_t id = 1000000;
         for(auto& frame: anim2.frames)
-            if(frame.id < id)
-                id = frame.id;
+            if(frame.anim_rect.id < id)
+                id = frame.anim_rect.id;
         for(auto& frame: anim2.frames)
-            if(frame.id == id)
-                back_frame = std::make_unique<Anim_rect>(frame);
+            if(frame.anim_rect.id == id)
+                back_frame = std::make_unique<Anim_rect>(frame.anim_rect);
 
         back_frame_coords = back_frame->get_coords();
         back_frame->set_position(glm::vec2(origin_pos) - get_origin_distance(*back_frame));
+        back_frame->is_selected = false;
     }
     {
-        std::size_t id = 1000000;
-        for(auto& frame: anim1.frames)
+        std::size_t id;
+        if(first)
         {
-            if(frame.id < id)
-                id = frame.id;
+            id = 1000000;
+            for(auto& frame: anim1.frames)
+            {
+                if(frame.anim_rect.id < id)
+                    id = frame.anim_rect.id;
+            }
+        }
+        else
+        {
+            id = 0;
+            for(auto& frame: anim1.frames)
+            {
+                if(frame.anim_rect.id > id)
+                    id = frame.anim_rect.id;
+            }
+
         }
         for(auto& frame: anim1.frames)
-            if(frame.id == id)
+            if(frame.anim_rect.id == id)
             {
-                if(frame.is_selected)
+                if(frame.anim_rect.is_selected)
                     was_selected = true;
-                front_frame = &frame;
+                front_frame = &frame.anim_rect;
             }
 
         front_frame_coords = front_frame->get_coords();
@@ -51,11 +66,12 @@ void Adjust_anims::render_ImGui()
 
             for(auto& frame: anim1.frames)
             {
-                frame.origin -= (glm::vec2(front_frame->get_coords().x, front_frame->get_coords().y)
-                                 - front_frame_init_pos)
+                frame.anim_rect.origin -= (glm::vec2(front_frame->get_coords().x, front_frame->get_coords().y)
+                                           - front_frame_init_pos)
                         / glm::vec2(front_frame->get_coords().z, front_frame->get_coords().w);
             }
             front_frame->set_position(glm::vec2(front_frame_coords.x, front_frame_coords.y));
+            front_frame->alpha = 1.f;
         }
 
         ImGui::SliderFloat("alpha", &front_frame->alpha, 0, 1.f, "%.2f");

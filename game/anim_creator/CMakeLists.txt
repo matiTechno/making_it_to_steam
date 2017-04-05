@@ -7,6 +7,7 @@ anim_rect.cpp
 origin_mode.cpp
 preview.cpp
 adjust_anims.cpp
+set_coll_data.cpp
 )
 
 add_executable(anim_creator ${anim_creator_SRCS})

@@ -20,7 +20,8 @@ private:
     glm::vec4 color1{0.7, 0.7, 0.7, 0.8};
     glm::vec4 color2{0.5, 0.5, 0.5, 0.8};
     glm::ivec2 max_fb_size{0, 0};
-    std::vector<char> tex_filename_input, anim_name_input, anim_rename_input;
+    std::vector<char> tex_filename_input, anim_name_input, anim_rename_input,
+    coll_group_input, coll_group_rename_input;
     std::unique_ptr<Texture> texture;
     std::string err_msg;
     bool countures = false;
@@ -28,11 +29,12 @@ private:
     std::string tex_filename;
     std::unordered_map<std::string, Animation> animations;
     Animation* anim = nullptr;
-    std::list<std::string> store_anim_names;
-    std::vector<const char*> anim_names;
-    int current_anim_name = -1;
+    std::list<std::string> store_anim_names, store_coll_group_names;
+    std::vector<const char*> anim_names, coll_group_names;
+    int current_anim_name = -1, current_coll_group_name = -1;
     float preview_scale = 1.f;
     int anim_to_compare = 0;
+    int first_frame = 1;
 
     void set_grid();
     void load_texture(const std::string& filename);
