@@ -180,6 +180,11 @@ out3:
         if(ImGui::InputText("rename##coll", coll_group_rename_input.data(), coll_group_rename_input.size(),
                             ImGuiInputTextFlags_EnterReturnsTrue))
         {
+            if(std::string(coll_group_rename_input.data()) == coll_group_names[static_cast<std::size_t>(current_coll_group_name)])
+            {
+                coll_group_rename_input.front() = 0;
+                goto out4;
+            }
             if(coll_group_rename_input.front() == 0)
             {
                 ImGui::OpenPopup("anim name error");
@@ -267,7 +272,6 @@ out1:
                 anim_rename_input.front() = 0;
                 goto out2;
             }
-
             if(anim_rename_input.front() == 0)
             {
                 ImGui::OpenPopup("anim name error");
@@ -326,12 +330,12 @@ out2:
         ImGui::Separator();
         ImGui::Spacing();
         if(ImGui::Button("preview animation"))
-            set_new_scene<Preview>(anim->frames, preview_scale, *texture);
+            set_new_scene<Preview>(anim->frames, preview_scale, *texture, coll_group_names);
 
         ImGui::SameLine();
         ImGui::InputFloat("scale", &preview_scale, 0, 0, 2);
         if(ImGui::Button("enter origin mode"))
-            set_new_scene<Origin_mode>(anim->frames, *texture, &anim->global_frametime);
+            set_new_scene<Origin_mode>(anim->frames, *texture, &anim->global_frametime, coll_group_names);
 
         {
             std::vector<const char*> anim_to_compare_names;

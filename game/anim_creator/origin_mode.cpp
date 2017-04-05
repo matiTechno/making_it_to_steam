@@ -1,10 +1,12 @@
 #include "origin_mode.hpp"
 #include "preview.hpp"
 
-Origin_mode::Origin_mode(std::list<Frame>& frames, const Texture& texture, float* global_frametime):
+Origin_mode::Origin_mode(std::list<Frame>& frames, const Texture& texture, float* global_frametime,
+                         const std::vector<const char*>& coll_group_names):
     frames(frames),
     texture(texture),
-    global_frametime(global_frametime)
+    global_frametime(global_frametime),
+    coll_group_names(coll_group_names)
 {
     is_opaque = false;
     camera.x = frames.front().anim_rect.get_coords().x;
@@ -52,7 +54,7 @@ void Origin_mode::render_ImGui()
         std::list<Frame> preview_frames = frames;
         for(auto& frame: preview_frames)
             frame.anim_rect.set_position(glm::vec2(saved_coords.at(frame.anim_rect.id).x, saved_coords.at(frame.anim_rect.id).y));
-        set_new_scene<Preview>(preview_frames, 1.f, texture);
+        set_new_scene<Preview>(preview_frames, 1.f, texture, coll_group_names);
     }
 
     if(frames.front().anim_rect.is_selected)

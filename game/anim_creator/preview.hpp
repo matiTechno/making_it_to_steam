@@ -3,11 +3,13 @@
 #include "camera_scene.hpp"
 #include "animation.hpp"
 #include <list>
+#include <deque>
 
 class Preview: public Camera_scene
 {
 public:
-    Preview(const std::list<Frame>& frames, float scale, const Texture& texture);
+    Preview(const std::list<Frame>& frames, float scale, const Texture& texture,
+            const std::vector<const char*>& coll_group_names);
 
     void update() override;
 
@@ -24,6 +26,9 @@ private:
     glm::vec2 origin_rect_size{80.f};
     static bool origin_visible;
     static bool frame_rect_visible;
+    bool play = true;
+    const std::vector<const char*>& coll_group_names;
+    std::deque<bool> show_coll_group;
 
     glm::vec2 get_origin_distance(std::list<Frame>::iterator frame);
 

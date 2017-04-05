@@ -3,10 +3,13 @@
 bool Preview::origin_visible = true;
 bool Preview::frame_rect_visible = true;
 
-Preview::Preview(const std::list<Frame>& frames, float scale, const Texture& texture):
+Preview::Preview(const std::list<Frame>& frames, float scale, const Texture& texture,
+                 const std::vector<const char*>& coll_group_names):
     frames(frames),
     scale(scale),
-    texture(texture)
+    texture(texture),
+    coll_group_names(coll_group_names),
+    show_coll_group(coll_group_names.size(), false)
 {
     is_opaque = false;
     this->frames.sort([](const Frame& f1, const Frame& f2)
@@ -23,6 +26,9 @@ Preview::Preview(const std::list<Frame>& frames, float scale, const Texture& tex
 
 void Preview::update()
 {
+    if(!play)
+        return;
+
     accumulator += dt;
     while(accumulator >= frame->anim_rect.frametime)
     {
@@ -74,6 +80,23 @@ void Preview::render2()
         sprite.texCoords = frame->anim_rect.get_coords();
         sprite.sampl_type = Sampl_type::nearest;
         renderer.render(sprite);
+
+        for(std::size_t i = 0; i < coll_group_names.size(); ++i)
+        {
+            if(show_coll_group[i])
+            {
+                auto it = frame->coll_groups.find(coll_group_names[i]);
+                if(it != frame->coll_groups.end())
+                    for(auto& rect: it->second)
+                    {
+                        Sprite sprite2;
+                        sprite2.position = glm::vec2(rect.coll_cords.x, rect.coll_cords.y) * sprite.size + pos;
+                        sprite2.size = glm::vec2(rect.coll_cords.z, rect.coll_cords.w) * sprite.size;
+                        sprite2.color = glm::vec4(1.f, 0, 0, 0.6f);
+                        renderer.render(sprite2);
+                    }
+            }
+        }
     }
     if(origin_visible)
     {
@@ -93,8 +116,17 @@ void Preview::render_ImGui()
         if(ImGui::Button("quit preview"))
             num_scenes_to_pop = 1;
 
+        if(ImGui::Button("play / stop"))
+            play = !play;
         ImGui::Checkbox("origin rect", &origin_visible);
         ImGui::Checkbox("frame rect", &frame_rect_visible);
+
+        if(ImGui::TreeNode("collision groups"))
+        {
+            for(std::size_t i = 0; i < coll_group_names.size(); ++i)
+                ImGui::Selectable(coll_group_names[i], &*&show_coll_group[i]);
+            ImGui::TreePop();
+        }
     }
     ImGui::End();
 }

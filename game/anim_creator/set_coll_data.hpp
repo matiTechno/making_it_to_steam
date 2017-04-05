@@ -11,7 +11,7 @@ public:
 private:
     Frame& frame;
     Texture& texture;
-    glm::ivec4 saved_coords;
+    glm::vec4 saved_coords;
     int current_name = 0;
     const std::vector<const char*>& coll_group_names;
     std::list<Anim_rect>* active_coll_group;

@@ -19,7 +19,7 @@ class Anim_rect
 public:
     Anim_rect(std::size_t id, const glm::vec2& pos, const glm::vec2& size, float frametime, const glm::vec2& origin);
 
-    void render(const Renderer_2D& renderer) const;
+    void render(const Renderer_2D& renderer, bool coll_mode = false) const;
     // for origin mode
     void render(const Renderer_2D& renderer, const Texture& texture, const glm::ivec4& coords, bool rect) const;
 
@@ -40,6 +40,7 @@ public:
     glm::vec2 origin;
     bool is_selected = true;
     float alpha = 1.f;
+    glm::vec4 coll_cords;
 
 private:
     enum
@@ -54,8 +55,9 @@ private:
     mutable Box main_box;
     int box_width = 5;
     glm::vec4 col_main{1.f, 0, 1.f, 0.1f};
-    glm::vec4 col_main_origin_mode{1.f, 0, 1.f, 0.3f};
     glm::vec4 col_main_inactive{0, 1.f, 0, 0.3f};
+    glm::vec4 col_main_origin_mode{1.f, 0, 1.f, 0.3f};
+    glm::vec4 col_main_coll_mode_inactive{1.f, 0, 0, 0.6f};
     glm::vec4 col_boxes{0, 0, 1.f, 0.6f};
     mutable bool snap_to_grid = true;
     bool move_lock = false;

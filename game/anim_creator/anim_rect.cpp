@@ -76,7 +76,7 @@ void Anim_rect::on_mouse_motion(int relx, int rely, float camera_scale)
         main_box.size.y = 1.f;
 }
 
-void Anim_rect::render(const Renderer_2D& renderer) const
+void Anim_rect::render(const Renderer_2D& renderer, bool coll_mode) const
 {
     update_boxes_to_main(snap_to_grid);
     snap_to_grid = false;
@@ -86,6 +86,8 @@ void Anim_rect::render(const Renderer_2D& renderer) const
     sprite.size = main_box.size;
     if(is_selected)
         sprite.color = col_main;
+    else if(coll_mode)
+        sprite.color = col_main_coll_mode_inactive;
     else
         sprite.color = col_main_inactive;
     renderer.render(sprite);
