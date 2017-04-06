@@ -4,12 +4,13 @@ bool Preview::origin_visible = true;
 bool Preview::frame_rect_visible = true;
 
 Preview::Preview(const std::list<Frame>& frames, float scale, const Texture& texture,
-                 const std::vector<const char*>& coll_group_names):
+                 const std::vector<const char*>& coll_group_names, bool flipped):
     frames(frames),
     scale(scale),
     texture(texture),
     coll_group_names(coll_group_names),
-    show_coll_group(coll_group_names.size(), false)
+    show_coll_group(coll_group_names.size(), false),
+    flipped(flipped)
 {
     is_opaque = false;
     this->frames.sort([](const Frame& f1, const Frame& f2)
@@ -79,7 +80,10 @@ void Preview::render2()
         sprite.texture = &texture;
         sprite.texCoords = frame->anim_rect.get_coords();
         sprite.sampl_type = Sampl_type::nearest;
-        renderer.render(sprite);
+        if(flipped)
+            renderer.render_flipped(sprite);
+        else
+            renderer.render(sprite);
 
         for(std::size_t i = 0; i < coll_group_names.size(); ++i)
         {

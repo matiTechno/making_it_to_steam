@@ -25,7 +25,13 @@ rendering/text.cpp
 if(NOT CMAKE_BUILD_TYPE)
 set (CMAKE_BUILD_TYPE Release)
 endif()
+
+FILE(GLOB_RECURSE shaders
+    "rendering/shaders/*"
+)
+
+add_custom_target(shaders SOURCES ${shaders})
+
 include_directories("/usr/include/freetype2")
 add_library(mits SHARED ${SRCS})
 target_link_libraries(mits -lfreetype -lSDL2_mixer -lSDL2 -lGL -ldl -lgcc_s -lgcc)
-

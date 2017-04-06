@@ -20,7 +20,7 @@ struct P_data_tCs;
 // * sampl_type
 // * texture / font
 // ...
-// calling rend_particles() after beg_batching
+// calling rend_particles() after beg_batching (the same for render_flipped)
 // will:
 // * call end_batching()
 // * render particles
@@ -55,6 +55,10 @@ public:
     void rend_particles(const P_data& p_data) const;
     void rend_particles(const P_data_tCs& p_data) const;
 
+    // texture is flipped horizontally
+    // no batching for this
+    void render_flipped(const Sprite& sprite) const;
+
     // camera position + view range
     void load_projection(const glm::vec4& coords) const;
     // if you want to calculate projection matrix yourself
@@ -68,7 +72,7 @@ private:
     VAO vao;
     BO vbo_static;
     Sampler sampler_linear, sampler_nearest;
-    Shader shader_uniform;
+    Shader shader_uniform, shader_flipped;
 
     // don't change the order
     struct Vbo_instance

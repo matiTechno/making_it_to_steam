@@ -15,6 +15,11 @@ Renderer_2D::Renderer_2D():
         ,
         #include "shaders/shader_2d.frag"
         , "", false, "renderer_2D"),
+    shader_flipped(
+        #include "shaders/shader_2d_flipped.vert"
+        ,
+        #include "shaders/shader_2d_flipped.frag"
+        , "", false, "renderer_2D_flipped"),
     shader_batching(
         #include "shaders/shader_2d_batching.vert"
         ,
@@ -231,6 +236,9 @@ void Renderer_2D::load_proj_impl(const glm::mat4& matrix) const
 
     shader_p_tCs.bind();
     glUniformMatrix4fv(shader_p_tCs.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
+
+    shader_flipped.bind();
+    glUniformMatrix4fv(shader_flipped.getUniLocation("projection"), 1, GL_FALSE, &matrix[0][0]);
 }
 
 void Renderer_2D::uniform_render(const Sprite& sprite) const
@@ -629,6 +637,63 @@ void Renderer_2D::rend_particles(const P_data_tCs& p_data) const
                  p_data.vbo_data.data(), GL_STREAM_DRAW);
 
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, static_cast<GLsizei>(p_data.num_to_render));
+
+    if(was_batching)
+        is_batching = true;
+}
+
+void Renderer_2D::render_flipped(const Sprite& sprite) const
+{
+    assert(sprite.texture);
+
+    bool was_batching = is_batching;
+    end_batching();
+
+    Blend_alpha::set(sprite.src_alpha, sprite.dst_alpha);
+    vao.bind();
+    shader_flipped.bind();
+
+    {
+        if(sprite.sampl_type == Sampl_type::linear)
+            sampler_linear.bind();
+        else
+            sampler_nearest.bind();
+
+        sprite.texture->bind();
+
+        auto& coords = sprite.texCoords;
+        auto texSize = sprite.texture->getSize();
+
+        glm::vec2 texSize_gl(static_cast<float>(coords.z) / static_cast<float>(texSize.x),
+                             static_cast<float>(coords.w) / static_cast<float>(texSize.y));
+        glm::vec2 texShift(static_cast<float>(coords.x) / static_cast<float>(texSize.x),
+                           static_cast<float>(coords.y) / static_cast<float>(texSize.y));
+
+        glUniform2f(shader_flipped.getUniLocation("texSize"), texSize_gl.x, texSize_gl.y);
+        glUniform2f(shader_flipped.getUniLocation("texShift"), texShift.x, texShift.y);
+    }
+
+    glm::mat4 model(1.f);
+    model = glm::translate(model, glm::vec3(sprite.position, 0.f));
+    if(sprite.rotation != 0.f)
+    {
+        model = glm::translate(model, glm::vec3(sprite.rotation_point, 0.f));
+        model = glm::rotate(model, sprite.rotation, glm::vec3(0.f, 0.f, -1.f));
+        model = glm::translate(model, glm::vec3(-sprite.rotation_point, 0.f));
+    }
+    model = glm::scale(model, glm::vec3(sprite.size, 1.f));
+
+    glUniformMatrix4fv(shader_flipped.getUniLocation("model"), 1, GL_FALSE, &model[0][0]);
+
+    auto& col = sprite.color;
+    glUniform4f(shader_flipped.getUniLocation("spriteColor"), col.x, col.y, col.z, col.w);
+
+    if(sprite.bloom)
+        glUniform1f(shader_flipped.getUniLocation("isBloom"), true);
+    else
+        glUniform1f(shader_flipped.getUniLocation("isBloom"), false);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     if(was_batching)
         is_batching = true;

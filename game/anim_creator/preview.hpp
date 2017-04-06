@@ -9,7 +9,7 @@ class Preview: public Camera_scene
 {
 public:
     Preview(const std::list<Frame>& frames, float scale, const Texture& texture,
-            const std::vector<const char*>& coll_group_names);
+            const std::vector<const char*>& coll_group_names, bool flipped = false);
 
     void update() override;
 
@@ -29,6 +29,7 @@ private:
     bool play = true;
     const std::vector<const char*>& coll_group_names;
     std::deque<bool> show_coll_group;
+    bool flipped;
 
     glm::vec2 get_origin_distance(std::list<Frame>::iterator frame);
 

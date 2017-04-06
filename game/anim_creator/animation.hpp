@@ -18,5 +18,5 @@ struct Animation
     float global_frametime = 0.4f;
     glm::vec2 global_origin{0};
     glm::ivec2 new_frame_size{80, 80};
-    bool mirror = false;
+    bool flipped = false;
 };
