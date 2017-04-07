@@ -14,6 +14,10 @@ public:
 
     void render_ImGui() override;
 
+    static const Anim_creator* handle;
+
+    mutable bool quit_request = false;
+
 private:
     P_data grids;
     int grid_size = 15.f;
@@ -21,7 +25,7 @@ private:
     glm::vec4 color2{0.5, 0.5, 0.5, 0.8};
     glm::ivec2 max_fb_size{0, 0};
     std::vector<char> tex_filename_input, anim_name_input, anim_rename_input,
-    coll_group_input, coll_group_rename_input;
+    coll_group_input, coll_group_rename_input, anim_filename_input, embedded_tex_input;
     std::unique_ptr<Texture> texture;
     std::string err_msg;
     bool countures = false;
@@ -35,12 +39,15 @@ private:
     float preview_scale = 1.f;
     int anim_to_compare = 0;
     int first_frame = 1;
+    std::string anim_filename;
 
     void set_grid();
     void load_texture(const std::string& filename);
     void set_sprite();
     void clear();
     void set_origin_for_all(const glm::vec2& origin);
+    void save(const std::string& filename);
+    void load_anim(const std::string& filename);
 
     void processEvent2(const SDL_Event& event) override;
     void render2() override;

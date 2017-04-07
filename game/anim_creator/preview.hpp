@@ -11,6 +11,8 @@ public:
     Preview(const std::list<Frame>& frames, float scale, const Texture& texture,
             const std::vector<const char*>& coll_group_names, bool flipped = false);
 
+    void on_quit_event() override;
+
     void update() override;
 
     void render_ImGui() override;
@@ -26,6 +28,7 @@ private:
     glm::vec2 origin_rect_size{80.f};
     static bool origin_visible;
     static bool frame_rect_visible;
+    static bool repeat;
     bool play = true;
     const std::vector<const char*>& coll_group_names;
     std::deque<bool> show_coll_group;

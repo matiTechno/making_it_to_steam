@@ -3,18 +3,27 @@
 #include "origin_mode.hpp"
 #include "adjust_anims.hpp"
 #include "set_coll_data.hpp"
+#include <fstream>
+
+const Anim_creator* Anim_creator::handle;
 
 Anim_creator::Anim_creator():
     tex_filename_input(100, 0),
     anim_name_input(100, 0),
     anim_rename_input(100, 0),
     coll_group_input(100, 0),
-    coll_group_rename_input(100, 0)
-{set_grid();}
+    coll_group_rename_input(100, 0),
+    anim_filename_input(100, 0),
+    embedded_tex_input(100, 0)
+{
+    handle = this;
+    set_grid();
+    render_ImGui_when_not_top = true;
+}
 
 void Anim_creator::on_quit_event()
 {
-    App::should_close = true;
+    quit_request = true;
 }
 
 void Anim_creator::processEvent2(const SDL_Event& event)
@@ -98,7 +107,29 @@ void Anim_creator::render2()
 
 void Anim_creator::render_ImGui()
 {
-    //ImGui::ShowTestWindow();
+    if(quit_request)
+    {
+        if(!texture)
+            App::should_close = true;
+        else
+            ImGui::OpenPopup("##exit");
+        quit_request = false;
+    }
+    if(ImGui::BeginPopupModal("##exit"))
+    {
+        ImGui::Text("all data will be lost, exit?");
+        ImGui::Separator();
+        ImGui::Spacing();
+        if(ImGui::Button("yes", ImVec2(65, 0)))
+            App::should_close = true;
+        ImGui::SameLine();
+        if(ImGui::Button("cancel", ImVec2(65, 0)))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+
+    if(!is_on_top())
+        return;
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0.8f));
     ImGui::Begin("animation creator", nullptr);
@@ -108,9 +139,16 @@ void Anim_creator::render_ImGui()
         ImGui::Spacing();
         if(ImGui::Button("load example texture"))
             load_texture("res/i8aic.png");
+        ImGui::SameLine();
+        if(ImGui::Button("load example animation file"))
+        {}
         if(ImGui::InputText("texture filename", tex_filename_input.data(), tex_filename_input.size(),
                             ImGuiInputTextFlags_EnterReturnsTrue))
             load_texture(tex_filename_input.data());
+
+        if(ImGui::InputText("anim filename", anim_filename_input.data(), anim_filename_input.size(),
+                            ImGuiInputTextFlags_EnterReturnsTrue))
+        {}
 
         if(ImGui::BeginPopup("tex_load_failed"))
         {
@@ -123,6 +161,18 @@ void Anim_creator::render_ImGui()
 
         if(!texture)
             goto end;
+
+        ImGui::Separator();
+        ImGui::Spacing();
+        ImGui::InputText("embedded texture filename", embedded_tex_input.data(), embedded_tex_input.size());
+        if(ImGui::Button("save as"))
+            save("demo.anim");
+        if(anim_filename.size())
+        {
+            ImGui::SameLine();
+            if(ImGui::Button("save"))
+            {}
+        }
 
         ImGui::Separator();
         ImGui::Spacing();
@@ -579,3 +629,47 @@ void Anim_creator::set_grid()
     }
     grids.num_to_render = grids.vbo_data.size();
 }
+
+void Anim_creator::save(const std::string& filename)
+{
+    std::ofstream file(filename);
+    file << "texture_filename: " << embedded_tex_input.data() << '\n';
+    file << "num_coll_groups: " << coll_group_names.size() << '\n';
+    for(auto& group: coll_group_names)
+        file << "name: " << group << '\n';
+    file << "num_anims: " << animations.size() << '\n';
+    for(auto& anim: animations)
+    {
+        file << "anim_name: " << anim.first << '\n';
+        file << "id: " << anim.second.id << '\n';
+        file << "global_frametime: " << anim.second.global_frametime << '\n';
+        file << "global_origin: " << anim.second.global_origin.x << ' ' << anim.second.global_origin.y << '\n';
+        file << "new_frame_size: " << anim.second.new_frame_size.x << ' ' << anim.second.new_frame_size.y << '\n';
+        file << "flipped: " << anim.second.flipped << '\n';
+        file << "num_frames: " << anim.second.frames.size() << '\n';
+        for(auto& frame: anim.second.frames)
+        {
+            file << "id: " << frame.anim_rect.id << '\n';
+            file << "frametime: " << frame.anim_rect.frametime << '\n';
+            file << "origin: " << frame.anim_rect.origin.x << ' ' << frame.anim_rect.origin.y << '\n';
+            file << "coords: " << frame.anim_rect.get_coords().x << ' ' << frame.anim_rect.get_coords().y << ' '
+                 << frame.anim_rect.get_coords().z << ' ' << frame.anim_rect.get_coords().w << '\n';
+            file << "num_coll_groups: " << frame.coll_groups.size() << '\n';
+            for(auto& group: frame.coll_groups)
+            {
+                file << "name: " << group.first << '\n';
+                file << "num_rects: " << group.second.size() << '\n';
+                for(auto& rect: group.second)
+                {
+                    file << "coords: " << rect.get_coords().x << ' ' << rect.get_coords().y << ' '
+                         << rect.get_coords().z << ' ' << rect.get_coords().w << '\n';
+                    file << "coll_coords: " << rect.coll_cords.x << ' ' << rect.coll_cords.y << ' '
+                         << rect.coll_cords.z << ' ' << rect.coll_cords.w << '\n';
+                }
+            }
+        }
+    }
+}
+
+void Anim_creator::load_anim(const std::string& filename)
+{(void)filename;}

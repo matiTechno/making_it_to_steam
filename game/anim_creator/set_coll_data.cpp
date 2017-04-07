@@ -1,4 +1,5 @@
 #include "set_coll_data.hpp"
+#include "anim_creator.hpp"
 
 Set_coll_data::Set_coll_data(Frame& frame, Texture& texture, const std::vector<const char*>& coll_group_names):
     frame(frame),
@@ -14,6 +15,11 @@ Set_coll_data::Set_coll_data(Frame& frame, Texture& texture, const std::vector<c
         frame.coll_groups[name];
 
     active_coll_group = &frame.coll_groups.at(coll_group_names.front());
+}
+
+void Set_coll_data::on_quit_event()
+{
+    Anim_creator::handle->quit_request = true;
 }
 
 void Set_coll_data::processEvent2(const SDL_Event& event)

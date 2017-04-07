@@ -1,5 +1,6 @@
 #include "origin_mode.hpp"
 #include "preview.hpp"
+#include "anim_creator.hpp"
 
 Origin_mode::Origin_mode(std::list<Frame>& frames, const Texture& texture, float* global_frametime,
                          const std::vector<const char*>& coll_group_names):
@@ -26,6 +27,11 @@ Origin_mode::Origin_mode(std::list<Frame>& frames, const Texture& texture, float
 
     for(auto& frame: frames)
         saved_coords.emplace(frame.anim_rect.id, frame.anim_rect.get_coords());
+}
+
+void Origin_mode::on_quit_event()
+{
+    Anim_creator::handle->quit_request = true;
 }
 
 void Origin_mode::render_ImGui()

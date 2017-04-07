@@ -8,6 +8,8 @@ public:
 
     void render_ImGui() override;
 
+    void on_quit_event() override;
+
 private:
     Frame& frame;
     Texture& texture;

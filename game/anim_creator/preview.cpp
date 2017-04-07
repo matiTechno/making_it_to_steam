@@ -1,7 +1,9 @@
 #include "preview.hpp"
+#include "anim_creator.hpp"
 
 bool Preview::origin_visible = true;
 bool Preview::frame_rect_visible = true;
+bool Preview::repeat = true;
 
 Preview::Preview(const std::list<Frame>& frames, float scale, const Texture& texture,
                  const std::vector<const char*>& coll_group_names, bool flipped):
@@ -25,6 +27,11 @@ Preview::Preview(const std::list<Frame>& frames, float scale, const Texture& tex
     pos = glm::vec2(origin_pos) - get_origin_distance(frame);
 }
 
+void Preview::on_quit_event()
+{
+    Anim_creator::handle->quit_request = true;
+}
+
 void Preview::update()
 {
     if(!play)
@@ -37,12 +44,20 @@ void Preview::update()
 
         ++frame;
         ++prev_frame;
+
         if(frame == frames.end())
+        {
             frame = frames.begin();
+            if(!repeat)
+                play = false;
+        }
         if(prev_frame == frames.end())
             prev_frame = frames.begin();
 
         pos += get_origin_distance(prev_frame) - get_origin_distance(frame);
+
+        if(!play)
+            break;
     }
 }
 
@@ -117,11 +132,22 @@ void Preview::render_ImGui()
 {
     ImGui::Begin("preview");
     {
-        if(ImGui::Button("quit preview"))
+        if(ImGui::Button("quit preview", ImVec2(100, 0)))
             num_scenes_to_pop = 1;
+        ImGui::Spacing();
 
-        if(ImGui::Button("play / stop"))
+        std::string button_name;
+        if(play)
+            button_name = "stop";
+        else
+            button_name = "play";
+
+        if(ImGui::Button(button_name.c_str(), ImVec2(100, 0)))
+        {
             play = !play;
+        }
+        ImGui::Spacing();
+        ImGui::Checkbox("replay", &repeat);
         ImGui::Checkbox("origin rect", &origin_visible);
         ImGui::Checkbox("frame rect", &frame_rect_visible);
 

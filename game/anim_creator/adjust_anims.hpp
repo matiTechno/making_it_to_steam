@@ -8,6 +8,8 @@ class Adjust_anims: public Camera_scene
 public:
     Adjust_anims(Animation& anim1, const Animation& anim2, const Texture& texture, bool first);
 
+    void on_quit_event() override;
+
     void render_ImGui() override;
 
 private:

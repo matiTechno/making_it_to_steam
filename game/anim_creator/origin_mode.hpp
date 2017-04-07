@@ -10,6 +10,8 @@ public:
     Origin_mode(std::list<Frame>& frames, const Texture& texture, float* global_frametime,
                 const std::vector<const char*>& coll_group_names);
 
+    void on_quit_event() override;
+
     void render_ImGui() override;
 
 private:

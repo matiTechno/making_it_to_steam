@@ -1,4 +1,5 @@
 #include "adjust_anims.hpp"
+#include "anim_creator.hpp"
 
 Adjust_anims::Adjust_anims(Animation& anim1, const Animation& anim2, const Texture& texture, bool first):
     anim1(anim1),
@@ -52,6 +53,11 @@ Adjust_anims::Adjust_anims(Animation& anim1, const Animation& anim2, const Textu
         front_frame_init_pos = glm::vec2(origin_pos) - get_origin_distance(*front_frame);
         front_frame->set_position(front_frame_init_pos);
     }
+}
+
+void Adjust_anims::on_quit_event()
+{
+    Anim_creator::handle->quit_request =  true;
 }
 
 void Adjust_anims::render_ImGui()
