@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include "animation.hpp"
 #include <list>
+#include <fstream>
 
 class Anim_creator: public Camera_scene
 {
@@ -25,7 +26,7 @@ private:
     glm::vec4 color2{0.5, 0.5, 0.5, 0.8};
     glm::ivec2 max_fb_size{0, 0};
     std::vector<char> tex_filename_input, anim_name_input, anim_rename_input,
-    coll_group_input, coll_group_rename_input, anim_filename_input, embedded_tex_input;
+    coll_group_input, coll_group_rename_input, anim_filename_input, save_anim_input;
     std::unique_ptr<Texture> texture;
     std::string err_msg;
     bool countures = false;
@@ -39,15 +40,16 @@ private:
     float preview_scale = 1.f;
     int anim_to_compare = 0;
     int first_frame = 1;
-    std::string anim_filename;
+    std::string anim_filename, anim_file_to_load;
 
     void set_grid();
-    void load_texture(const std::string& filename);
+    bool load_texture(const std::string& filename);
     void set_sprite();
     void clear();
     void set_origin_for_all(const glm::vec2& origin);
-    void save(const std::string& filename);
+    bool save(const std::string& filename, bool allow_override);
     void load_anim(const std::string& filename);
+    void popups();
 
     void processEvent2(const SDL_Event& event) override;
     void render2() override;

@@ -3,7 +3,6 @@
 #include "origin_mode.hpp"
 #include "adjust_anims.hpp"
 #include "set_coll_data.hpp"
-#include <fstream>
 
 const Anim_creator* Anim_creator::handle;
 
@@ -14,7 +13,7 @@ Anim_creator::Anim_creator():
     coll_group_input(100, 0),
     coll_group_rename_input(100, 0),
     anim_filename_input(100, 0),
-    embedded_tex_input(100, 0)
+    save_anim_input(100, 0)
 {
     handle = this;
     set_grid();
@@ -109,7 +108,7 @@ void Anim_creator::render_ImGui()
 {
     if(quit_request)
     {
-        if(!texture)
+        if(!animations.size())
             App::should_close = true;
         else
             ImGui::OpenPopup("##exit");
@@ -137,26 +136,34 @@ void Anim_creator::render_ImGui()
     {
         ImGui::Text("Welcome to animation creator!\nm a t i T e c h n o");
         ImGui::Spacing();
-        if(ImGui::Button("load example texture"))
-            load_texture("res/i8aic.png");
-        ImGui::SameLine();
         if(ImGui::Button("load example animation file"))
-        {}
+        {
+            if(!animations.size())
+                load_anim("demo.anim");
+            else
+                ImGui::OpenPopup("new_example_anim_pop");
+        }
+
+
         if(ImGui::InputText("texture filename", tex_filename_input.data(), tex_filename_input.size(),
                             ImGuiInputTextFlags_EnterReturnsTrue))
-            load_texture(tex_filename_input.data());
+        {
+            if(!animations.size())
+            {
+                clear();
+                load_texture(tex_filename_input.data());
+            }
+            else
+                ImGui::OpenPopup("new_tex_pop");
+        }
 
         if(ImGui::InputText("anim filename", anim_filename_input.data(), anim_filename_input.size(),
                             ImGuiInputTextFlags_EnterReturnsTrue))
-        {}
-
-        if(ImGui::BeginPopup("tex_load_failed"))
         {
-            ImGui::Text("%s", err_msg.c_str());
-            ImGui::Separator();
-            if(ImGui::Button("OK"))
-                ImGui::CloseCurrentPopup();
-            ImGui::EndPopup();
+            if(!animations.size())
+                load_anim(anim_filename_input.data());
+            else
+                ImGui::OpenPopup("new_anim_pop");
         }
 
         if(!texture)
@@ -164,14 +171,14 @@ void Anim_creator::render_ImGui()
 
         ImGui::Separator();
         ImGui::Spacing();
-        ImGui::InputText("embedded texture filename", embedded_tex_input.data(), embedded_tex_input.size());
+        ImGui::Text("animation filename: %s", anim_filename.c_str());
         if(ImGui::Button("save as"))
-            save("demo.anim");
+            ImGui::OpenPopup("save_pop");
         if(anim_filename.size())
         {
             ImGui::SameLine();
             if(ImGui::Button("save"))
-            {}
+                save(anim_filename, true);
         }
 
         ImGui::Separator();
@@ -180,7 +187,6 @@ void Anim_creator::render_ImGui()
         ImGui::Text("size: %d x %d", texture->getSize().x, texture->getSize().y);
         ImGui::Checkbox("countures", &countures);
 
-        // collisions groups
         ImGui::Separator();
         ImGui::Spacing();
         if(ImGui::InputText("new collision group", coll_group_input.data(), coll_group_input.size(),
@@ -212,32 +218,7 @@ out3:
         if(ImGui::Button("delete##coll"))
             ImGui::OpenPopup("popup_coll_del");
 
-        if(ImGui::BeginPopup("popup_coll_del"))
-        {
-            ImGui::Text("remove this group?");
-            ImGui::Separator();
-            ImGui::Spacing();
-            if(ImGui::Button("yes", ImVec2(65, 0)))
-            {
-                for(auto& anim: animations)
-                    for(auto& frame: anim.second.frames)
-                        frame.coll_groups.erase(coll_group_names[static_cast<std::size_t>(current_coll_group_name)]);
-                {
-                    auto it = store_coll_group_names.begin();
-                    std::advance(it, current_coll_group_name);
-                    store_coll_group_names.erase(it);
-                }
-                {
-                    auto it = coll_group_names.begin() + current_coll_group_name;
-                    coll_group_names.erase(it);
-                }
-                current_coll_group_name = -1;
-            }
-            ImGui::SameLine();
-            if(ImGui::Button("cancel", ImVec2(65, 0)))
-                ImGui::CloseCurrentPopup();
-            ImGui::EndPopup();
-        }
+
 
         ImGui::SameLine();
         if(ImGui::InputText("rename##coll", coll_group_rename_input.data(), coll_group_rename_input.size(),
@@ -313,33 +294,7 @@ out1:
         if(ImGui::Button("delete"))
             ImGui::OpenPopup("popup_del_anim");
 
-        if(ImGui::BeginPopup("popup_del_anim"))
-        {
-            ImGui::Text("delete this animation?");
-            ImGui::Separator();
-            ImGui::Spacing();
-            if(ImGui::Button("yes", ImVec2(65, 0)))
-            {
-                animations.erase(anim_names[static_cast<std::size_t>(current_anim_name)]);
-                {
-                    auto it = store_anim_names.begin();
-                    std::advance(it, current_anim_name);
-                    store_anim_names.erase(it);
-                }
-                {
-                    auto it = anim_names.begin() + current_anim_name;
-                    anim_names.erase(it);
-                }
-                current_anim_name = -1;
-                anim = nullptr;
-                ImGui::EndPopup();
-                goto end;
-            }
-            ImGui::SameLine();
-            if(ImGui::Button("cancel", ImVec2(65, 0)))
-                ImGui::CloseCurrentPopup();
-            ImGui::EndPopup();
-        }
+
 
         if(anim->flipped)
         {
@@ -467,25 +422,11 @@ out2:
         if(ImGui::Button("enter origin mode"))
             ImGui::OpenPopup("popup_origin_mode");
 
-        if(ImGui::BeginPopup("popup_origin_mode"))
-        {
-            ImGui::Text("all origin data for current animation\n"
-                        "will be lost, continue?");
-            ImGui::Separator();
-            ImGui::Spacing();
-            if(ImGui::Button("yes", ImVec2(65, 0)))
-                set_new_scene<Origin_mode>(anim->frames, *texture, &anim->global_frametime, coll_group_names);
-            ImGui::SameLine();
-            if(ImGui::Button("cancel", ImVec2(65, 0)))
-                ImGui::CloseCurrentPopup();
-            ImGui::EndPopup();
-        }
-
         {
             std::vector<const char*> anim_to_compare_names;
             int num_anim_to_compare = 0;
             for(auto& anim: animations)
-                if(anim.second.frames.size() && &anim.second != this->anim && anim.first.find("_#_flipped") == std::string::npos)
+                if(anim.second.frames.size() && &anim.second != this->anim && !anim.second.flipped)
                 {
                     ++num_anim_to_compare;
                     anim_to_compare_names.push_back(anim.first.c_str());
@@ -532,33 +473,226 @@ out2:
 
         if(ImGui::Button("set collision data"))
             set_new_scene<Set_coll_data>(anim->frames.front(), *texture, coll_group_names);
-end:
-        if(ImGui::BeginPopup("anim name error"))
-        {
-            ImGui::Text("animation / collision group\nname must be unique and not empty");
-            ImGui::Separator();
-            if(ImGui::Button("OK"))
-                ImGui::CloseCurrentPopup();
-            ImGui::EndPopup();
-        }
+end:;
+        popups();
     }
     ImGui::End();
     ImGui::PopStyleColor();
 }
 
-void Anim_creator::load_texture(const std::string& filename)
+void Anim_creator::popups()
+{
+    bool load_demo_anim = false;
+    if(ImGui::BeginPopup("new_example_anim_pop"))
+    {
+        ImGui::Text("all data will be lost, continue?");
+        ImGui::Separator();
+        ImGui::Spacing();
+        if(ImGui::Button("yes", ImVec2(65, 0)))
+        {
+            load_demo_anim = true;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("cancel", ImVec2(65, 0)))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+    if(load_demo_anim)
+        load_anim("demo.anim");
+
+    bool load_tex_pop = false;
+    if(ImGui::BeginPopup("new_tex_pop"))
+    {
+        ImGui::Text("all data will be lost, continue?");
+        ImGui::Separator();
+        ImGui::Spacing();
+        if(ImGui::Button("yes", ImVec2(65, 0)))
+        {
+            clear();
+            load_tex_pop = true;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("cancel", ImVec2(65, 0)))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+    if(load_tex_pop)
+        load_texture(tex_filename_input.data());
+
+    bool load_new_anim = false;
+    if(ImGui::BeginPopup("new_anim_pop"))
+    {
+        ImGui::Text("all data will be lost, continue?");
+        ImGui::Separator();
+        ImGui::Spacing();
+        if(ImGui::Button("yes", ImVec2(65, 0)))
+        {
+            load_new_anim = true;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("cancel", ImVec2(65, 0)))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+    if(load_new_anim)
+        load_anim(anim_filename.data());
+
+    if(ImGui::BeginPopup("tex_load_failed"))
+    {
+        ImGui::Text("%s", err_msg.c_str());
+        ImGui::Separator();
+        if(ImGui::Button("OK"))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+    if(ImGui::BeginPopup("save_pop"))
+    {
+        if(ImGui::InputText("filename", save_anim_input.data(), save_anim_input.size(),
+                            ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            if(save(save_anim_input.data(), false))
+                ImGui::CloseCurrentPopup();
+        }
+        bool override = false;
+        if(ImGui::BeginPopup("override"))
+        {
+            ImGui::Text("this name is already used in current directory, override?");
+            ImGui::Separator();
+            ImGui::Spacing();
+            if(ImGui::Button("yes", ImVec2(65, 0)))
+            {
+                override = true;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if(ImGui::Button("cancel", ImVec2(65, 0)))
+                ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+        if(override)
+            if(save(save_anim_input.data(), true))
+                ImGui::CloseCurrentPopup();
+        if(ImGui::BeginPopup("saveerror"))
+        {
+            ImGui::Text("could not write to file");
+            ImGui::Separator();
+            ImGui::Spacing();
+            if(ImGui::Button("OK"))
+                ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+        ImGui::EndPopup();
+    }
+    if(ImGui::BeginPopup("saveerror"))
+    {
+        ImGui::Text("could not write to file");
+        ImGui::Separator();
+        ImGui::Spacing();
+        if(ImGui::Button("OK"))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+    if(ImGui::BeginPopup("popup_coll_del"))
+    {
+        ImGui::Text("remove this group?");
+        ImGui::Separator();
+        ImGui::Spacing();
+        if(ImGui::Button("yes", ImVec2(65, 0)))
+        {
+            for(auto& anim: animations)
+                for(auto& frame: anim.second.frames)
+                    frame.coll_groups.erase(coll_group_names[static_cast<std::size_t>(current_coll_group_name)]);
+            {
+                auto it = store_coll_group_names.begin();
+                std::advance(it, current_coll_group_name);
+                store_coll_group_names.erase(it);
+            }
+            {
+                auto it = coll_group_names.begin() + current_coll_group_name;
+                coll_group_names.erase(it);
+            }
+            current_coll_group_name = -1;
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("cancel", ImVec2(65, 0)))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+    if(ImGui::BeginPopup("popup_del_anim"))
+    {
+        ImGui::Text("delete this animation?");
+        ImGui::Separator();
+        ImGui::Spacing();
+        if(ImGui::Button("yes", ImVec2(65, 0)))
+        {
+            animations.erase(anim_names[static_cast<std::size_t>(current_anim_name)]);
+            {
+                auto it = store_anim_names.begin();
+                std::advance(it, current_anim_name);
+                store_anim_names.erase(it);
+            }
+            {
+                auto it = anim_names.begin() + current_anim_name;
+                anim_names.erase(it);
+            }
+            current_anim_name = -1;
+            anim = nullptr;
+            ImGui::EndPopup();
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("cancel", ImVec2(65, 0)))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+    if(ImGui::BeginPopup("popup_origin_mode"))
+    {
+        ImGui::Text("all origin data for current animation\n"
+                    "will be lost, continue?");
+        ImGui::Separator();
+        ImGui::Spacing();
+        if(ImGui::Button("yes", ImVec2(65, 0)))
+            set_new_scene<Origin_mode>(anim->frames, *texture, &anim->global_frametime, coll_group_names);
+        ImGui::SameLine();
+        if(ImGui::Button("cancel", ImVec2(65, 0)))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+    if(ImGui::BeginPopup("anim name error"))
+    {
+        ImGui::Text("animation / collision group\nname must be unique and not empty");
+        ImGui::Separator();
+        if(ImGui::Button("OK"))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+    if(ImGui::BeginPopup("anim_load_failed"))
+    {
+        ImGui::Text("%s", ("could not open: " + anim_file_to_load).c_str());
+        ImGui::Separator();
+        ImGui::Spacing();
+        if(ImGui::Button("OK"))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+}
+
+bool Anim_creator::load_texture(const std::string& filename)
 {
     try
     {
-        clear();
         texture = std::make_unique<Texture>(filename);
         tex_filename = filename;
         set_sprite();
+        return true;
     }
     catch(const std::exception& e)
     {
         err_msg = e.what();
         ImGui::OpenPopup("tex_load_failed");
+        return false;
     }
 }
 
@@ -583,6 +717,12 @@ void Anim_creator::clear()
     coll_group_names.clear();
     store_coll_group_names.clear();
     current_coll_group_name = -1;
+    anim_filename.clear();
+    anim_name_input.front() = 0;
+    anim_rename_input.front() = 0;
+    coll_group_input.front() = 0;
+    coll_group_rename_input.front() = 0;
+    save_anim_input.front() = 0;
 }
 
 void Anim_creator::set_origin_for_all(const glm::vec2& origin)
@@ -630,10 +770,22 @@ void Anim_creator::set_grid()
     grids.num_to_render = grids.vbo_data.size();
 }
 
-void Anim_creator::save(const std::string& filename)
+bool Anim_creator::save(const std::string& filename, bool allow_override)
 {
+    if(!allow_override && std::ifstream(filename))
+    {
+        ImGui::OpenPopup("override");
+        return false;
+    }
+
     std::ofstream file(filename);
-    file << "texture_filename: " << embedded_tex_input.data() << '\n';
+    if(!file)
+    {
+        ImGui::OpenPopup("saveerror");
+        return false;
+    }
+
+    file << "texture_filename: " << tex_filename << '\n';
     file << "num_coll_groups: " << coll_group_names.size() << '\n';
     for(auto& group: coll_group_names)
         file << "name: " << group << '\n';
@@ -669,7 +821,126 @@ void Anim_creator::save(const std::string& filename)
             }
         }
     }
+    if(!anim_filename.size())
+        anim_filename = filename;
+    return true;
 }
 
 void Anim_creator::load_anim(const std::string& filename)
-{(void)filename;}
+{
+    clear();
+    anim_file_to_load = filename;
+
+    std::ifstream file(filename);
+    if(!file.is_open())
+    {
+        ImGui::OpenPopup("anim_load_failed");
+        return;
+    }
+
+    std::string dummy;
+    file >> dummy;
+    std::string tex_filename;
+    file >> tex_filename;
+
+    if(!load_texture(tex_filename))
+        return;
+
+    int num_coll_groups;
+    file >> dummy;
+    file >> num_coll_groups;
+    for(int i = 0; i < num_coll_groups; ++i)
+    {
+        file >> dummy;
+        std::string name;
+        file >> name;
+        store_coll_group_names.emplace_back(std::move(name));
+        coll_group_names.emplace_back(store_coll_group_names.back().c_str());
+    }
+    file >> dummy;
+    int num_anims;
+    file >> num_anims;
+    for(int i = 0; i < num_anims; ++i)
+    {
+        file >> dummy;
+        std::string name;
+        file >> name;
+        store_anim_names.emplace_back(name);
+        anim_names.emplace_back(store_anim_names.back().c_str());
+        animations.emplace(name, Animation{});
+        file >> dummy;
+        file >> animations.at(name).id;
+        file >> dummy;
+        file >> animations.at(name).global_frametime;
+        file >> dummy;
+        file >> animations.at(name).global_origin.x;
+        file >> animations.at(name).global_origin.y;
+        file >> dummy;
+        file >> animations.at(name).new_frame_size.x;
+        file >> animations.at(name).new_frame_size.y;
+        file >> dummy;
+        file >> animations.at(name).flipped;
+        int num_frames;
+        file >> dummy;
+        file >> num_frames;
+        for(int i = 0; i < num_frames; ++i)
+        {
+            std::size_t id;
+            glm::vec2 pos;
+            glm::vec2 size;
+            float frametime;
+            glm::vec2 origin;
+            file >> dummy;
+            file >> id;
+            file >> dummy;
+            file >> frametime;
+            file >> dummy;
+            file >> origin.x;
+            file >> origin.y;
+            file >> dummy;
+            file >> pos.x;
+            file >> pos.y;
+            file >> size.x;
+            file >> size.y;
+            Frame frame = {Anim_rect(id, pos, size, frametime, origin),
+                           std::unordered_map<std::string, std::list<Anim_rect>>()};
+            frame.anim_rect.is_selected = false;
+
+            file >> dummy;
+            file >> num_coll_groups;
+            for(int i = 0; i < num_coll_groups; ++i)
+            {
+                file >> dummy;
+                std::string name;
+                file >> name;
+                frame.coll_groups[name];
+                file >> dummy;
+                int num_rects;
+                file >> num_rects;
+                for(int i = 0; i < num_rects; ++i)
+                {
+                    glm::vec2 pos;
+                    glm::vec2 size;
+                    glm::vec4 coll_coords;
+                    file >> dummy;
+                    file >> pos.x;
+                    file >> pos.y;
+                    file >> size.x;
+                    file >> size.y;
+                    file >> dummy;
+                    file >> coll_coords.x;
+                    file >> coll_coords.y;
+                    file >> coll_coords.z;
+                    file >> coll_coords.w;
+
+                    Anim_rect rect(0, pos, size, 0, glm::vec2());
+                    rect.coll_cords = coll_coords;
+                    rect.is_selected = false;
+                    frame.coll_groups.at(name).push_back(std::move(rect));
+                }
+            }
+            animations.at(name).frames.push_back(std::move(frame));
+        }
+    }
+    anim_filename = filename;
+}
