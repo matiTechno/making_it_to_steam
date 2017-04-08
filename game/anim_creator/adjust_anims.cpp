@@ -70,12 +70,11 @@ void Adjust_anims::render_ImGui()
             if(!was_selected)
                 front_frame->is_selected = false;
 
+            glm::vec2 pos_diff = glm::vec2(front_frame->get_coords().x, front_frame->get_coords().y) - front_frame_init_pos;
+
             for(auto& frame: anim1.frames)
-            {
-                frame.anim_rect.origin -= (glm::vec2(front_frame->get_coords().x, front_frame->get_coords().y)
-                                           - front_frame_init_pos)
-                        / glm::vec2(front_frame->get_coords().z, front_frame->get_coords().w);
-            }
+                frame.anim_rect.origin -= pos_diff / glm::vec2(frame.anim_rect.get_coords().z, frame.anim_rect.get_coords().w);
+
             front_frame->set_position(glm::vec2(front_frame_coords.x, front_frame_coords.y));
             front_frame->alpha = 1.f;
         }

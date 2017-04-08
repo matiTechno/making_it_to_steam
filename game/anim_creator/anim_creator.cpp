@@ -841,7 +841,9 @@ void Anim_creator::load_anim(const std::string& filename)
     std::string dummy;
     file >> dummy;
     std::string tex_filename;
-    file >> tex_filename;
+    char dum;
+    file.get(dum);
+    std::getline(file, tex_filename);
 
     if(!load_texture(tex_filename))
         return;
@@ -853,7 +855,9 @@ void Anim_creator::load_anim(const std::string& filename)
     {
         file >> dummy;
         std::string name;
-        file >> name;
+        char dum;
+        file.get(dum);
+        std::getline(file, name);
         store_coll_group_names.emplace_back(std::move(name));
         coll_group_names.emplace_back(store_coll_group_names.back().c_str());
     }
@@ -864,7 +868,9 @@ void Anim_creator::load_anim(const std::string& filename)
     {
         file >> dummy;
         std::string name;
-        file >> name;
+        char dum;
+        file.get(dum);
+        std::getline(file, name);
         store_anim_names.emplace_back(name);
         anim_names.emplace_back(store_anim_names.back().c_str());
         animations.emplace(name, Animation{});
@@ -912,7 +918,9 @@ void Anim_creator::load_anim(const std::string& filename)
             {
                 file >> dummy;
                 std::string name;
-                file >> name;
+                char dum;
+                file.get(dum);
+                std::getline(file, name);
                 frame.coll_groups[name];
                 file >> dummy;
                 int num_rects;
