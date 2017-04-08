@@ -139,7 +139,7 @@ void Anim_creator::render_ImGui()
         if(ImGui::Button("load example animation file"))
         {
             if(!animations.size())
-                load_anim("demo.anim");
+                load_anim("res/demo.anim");
             else
                 ImGui::OpenPopup("new_example_anim_pop");
         }
@@ -538,7 +538,7 @@ void Anim_creator::popups()
         ImGui::EndPopup();
     }
     if(load_new_anim)
-        load_anim(anim_filename.data());
+        load_anim(anim_filename_input.data());
 
     if(ImGui::BeginPopup("tex_load_failed"))
     {
