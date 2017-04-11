@@ -18,3 +18,10 @@ documented in source
 see examples
 
 works with cmake only on linux (most simplest CMakeLists.txt ever)
+
+##### update:
+
+on mac os: install homebrew (package manager for mac)  
+then:  
+brew install sdl2 sdl2_mixer --with-libvorbis freetype glm  
+and now compilation should succeed
