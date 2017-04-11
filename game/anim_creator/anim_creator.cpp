@@ -499,7 +499,7 @@ void Anim_creator::popups()
         ImGui::EndPopup();
     }
     if(load_demo_anim)
-        load_anim("demo.anim");
+        load_anim("res/demo.anim");
 
     bool load_tex_pop = false;
     if(ImGui::BeginPopup("new_tex_pop"))
