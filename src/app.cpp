@@ -75,6 +75,9 @@ App::App(int w, int h, const char* title, unsigned int win_flags_sdl, int x, int
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+#if(__APPLE__)
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+#endif
 
         SDL_Window* temp = SDL_CreateWindow(title, x, y, w, h, SDL_WINDOW_OPENGL | win_flags_sdl);
         if(temp == nullptr)

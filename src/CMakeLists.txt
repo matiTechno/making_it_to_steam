@@ -22,16 +22,22 @@ rendering/renderer_2d.cpp
 rendering/text.cpp
 )
 
-if(NOT CMAKE_BUILD_TYPE)
-set (CMAKE_BUILD_TYPE Release)
-endif()
-
 FILE(GLOB_RECURSE shaders
     "rendering/shaders/*"
 )
 
 add_custom_target(shaders SOURCES ${shaders})
 
-include_directories("/usr/include/freetype2")
+if(NOT APPLE)
+    include_directories("/usr/include/freetype2")
+else()
+    include_directories("/usr/local/include/freetype2")
+endif()
+
 add_library(mits SHARED ${SRCS})
-target_link_libraries(mits -lfreetype -lSDL2_mixer -lSDL2 -lGL -ldl -lgcc_s -lgcc)
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(mits -lfreetype -lSDL2_mixer -lSDL2 -lGL -ldl -lgcc_s -lgcc)
+elseif(APPLE)
+    target_link_libraries(mits -lfreetype -lSDL2_mixer -lSDL2 -ldl)
+endif()
