@@ -29,7 +29,7 @@ struct Vbo_p_tCs: public Vbo_p
 
 struct P_data_base
 {
-    Texture* texture = nullptr;
+    const Texture* texture = nullptr;
     // for blending
     GLenum src_alpha = GL_SRC_ALPHA, dst_alpha = GL_ONE_MINUS_SRC_ALPHA;
     Sampl_type sampl_type = Sampl_type::linear;
