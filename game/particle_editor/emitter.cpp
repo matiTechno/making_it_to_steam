@@ -49,15 +49,24 @@ void Emitter::spawn_particle()
     particle.texCoords = texCoords;
 
     std::uniform_real_distribution<float> uni;
-    if(pos_in_center)
-        std::uniform_real_distribution<float>(-0.5f, 0.5f);
+    if(pos_is_center)
+        uni = std::uniform_real_distribution<float>(-0.5f, 0.5f);
     else
-        std::uniform_real_distribution<float>(0, 1.f);
+        uni = std::uniform_real_distribution<float>(0, 1.f);
 
     particle.pos.x = position.x + uni(rn_eng) * size.x;
 
     if(circle_spawn)
-    {}
+    {
+        float y_range;
+        if(pos_is_center)
+            y_range = glm::sqrt(glm::pow(size.x / 2.f, 2.f) - glm::pow(particle.pos.x - position.x, 2.f));
+        else
+            y_range = glm::sqrt(glm::pow(size.x / 2.f, 2.f) - glm::pow(particle.pos.x - position.x - size.x / 2.f, 2.f));
+
+        std::uniform_real_distribution<float> uni_y(-y_range, y_range);
+        particle.pos.y = uni_y(rn_eng) + position.y;
+    }
     else
         particle.pos.y = position.y + uni(rn_eng) * size.y;
 
@@ -70,6 +79,8 @@ void Emitter::spawn_particle()
         std::uniform_real_distribution<float> s_y(ranges.size_low.y, ranges.size_high.y);
         particle.size.y = s_y(rn_eng);
     }
+
+    particle.pos -= particle.size / 2.f;
 
     std::uniform_real_distribution<float> r(ranges.color_low.r, ranges.color_low.r);
     std::uniform_real_distribution<float> g(ranges.color_low.g, ranges.color_low.g);

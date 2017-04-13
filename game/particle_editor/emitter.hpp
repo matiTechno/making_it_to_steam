@@ -13,20 +13,19 @@ public:
 
     const P_data_tCs& get_render_data();
 
-    float life;
-    bool always_active = false;
-    bool pos_in_center;
     glm::vec2 position;
     glm::vec2 size;
-    bool circle_spawn = false;
-    bool quads = true;
+    bool pos_is_center;
+    bool circle_spawn;
+    bool quads;
+    float life;
+    bool always_active = false;
     float spawn_time;
+    bool bloom;
+    GLenum &src_alpha; // GL_SRC_ALPHA
+    GLenum &dst_alpha; // GL_ONE_MINUS_SRC_ALPHA
+    Sampl_type &sampl_type; // linear
     P_ranges ranges;
-    bool bloom = false;
-
-    GLenum &src_alpha;
-    GLenum &dst_alpha;
-    Sampl_type &sampl_type;
 
 private:
     P_data_tCs render_data;
