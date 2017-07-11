@@ -813,8 +813,6 @@ bool Anim_creator::save(const std::string& filename, bool allow_override)
                 file << "num_rects: " << group.second.size() << '\n';
                 for(auto& rect: group.second)
                 {
-                    file << "coords: " << rect.get_coords().x << ' ' << rect.get_coords().y << ' '
-                         << rect.get_coords().z << ' ' << rect.get_coords().w << '\n';
                     file << "coll_coords: " << rect.coll_cords.x << ' ' << rect.coll_cords.y << ' '
                          << rect.coll_cords.z << ' ' << rect.coll_cords.w << '\n';
                 }
@@ -927,21 +925,14 @@ void Anim_creator::load_anim(const std::string& filename)
                 file >> num_rects;
                 for(int i = 0; i < num_rects; ++i)
                 {
-                    glm::vec2 pos;
-                    glm::vec2 size;
                     glm::vec4 coll_coords;
-                    file >> dummy;
-                    file >> pos.x;
-                    file >> pos.y;
-                    file >> size.x;
-                    file >> size.y;
                     file >> dummy;
                     file >> coll_coords.x;
                     file >> coll_coords.y;
                     file >> coll_coords.z;
                     file >> coll_coords.w;
 
-                    Anim_rect rect(0, pos, size, 0, glm::vec2());
+                    Anim_rect rect(0, glm::vec2(), glm::vec2(), 0, glm::vec2());
                     rect.coll_cords = coll_coords;
                     rect.is_selected = false;
                     frame.coll_groups.at(name).push_back(std::move(rect));

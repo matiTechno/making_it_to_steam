@@ -3,399 +3,16 @@ num_coll_groups: 2
 name: body
 name: attack 1
 num_anims: 20
-anim_name: shadow step_#_flipped
-id: 7
-global_frametime: 0.19
-global_origin: 0 0
-new_frame_size: 46 58
-flipped: 1
-num_frames: 7
-id: 6
-frametime: 0.19
-origin: 0.826087 1
-coords: 356 550 46 58
-num_coll_groups: 0
-id: 5
-frametime: 0.19
-origin: 0.826087 1
-coords: 300 551 46 58
-num_coll_groups: 0
-id: 4
-frametime: 0.19
-origin: 0.826087 1
-coords: 250 550 46 58
-num_coll_groups: 0
-id: 3
-frametime: 0.19
-origin: 0.826087 1
-coords: 192 552 46 58
-num_coll_groups: 0
-id: 2
-frametime: 0.19
-origin: 0.826087 1
-coords: 134 552 46 58
-num_coll_groups: 0
-id: 1
-frametime: 0.19
-origin: 0.647059 1
-coords: 63 556 34 56
-num_coll_groups: 0
-id: 0
-frametime: 0.19
-origin: 0.564103 1
-coords: 10 541 39 71
-num_coll_groups: 0
-anim_name: idle_#_flipped
-id: 5
-global_frametime: 0.16
-global_origin: 0 0
-new_frame_size: 39 71
-flipped: 1
-num_frames: 4
-id: 3
-frametime: 0.16
-origin: 0.564103 1
-coords: 143 20 39 71
-num_coll_groups: 0
-id: 2
-frametime: 0.16
-origin: 0.578947 1
-coords: 99 21 38 70
-num_coll_groups: 0
-id: 1
-frametime: 0.16
-origin: 0.564103 1
-coords: 53 20 39 71
-num_coll_groups: 0
-id: 0
-frametime: 0.16
-origin: 0.564103 1
-coords: 8 19 39 72
-num_coll_groups: 0
-anim_name: ball_#_flipped
-id: 9
-global_frametime: 0.17
-global_origin: 0 0
-new_frame_size: 30 30
-flipped: 1
-num_frames: 8
-id: 8
-frametime: 0.24
-origin: 0.6 1
-coords: 281 316 30 30
-num_coll_groups: 0
-id: 7
-frametime: 0.24
-origin: 0.6 1
-coords: 249 316 30 30
-num_coll_groups: 0
-id: 5
-frametime: 0.24
-origin: 0.6 1
-coords: 183 316 30 30
-num_coll_groups: 0
-id: 6
-frametime: 0.24
-origin: 0.6 1
-coords: 215 316 30 30
-num_coll_groups: 0
-id: 3
-frametime: 0.17
-origin: 0.625 1
-coords: 108 303 32 42
-num_coll_groups: 0
-id: 4
-frametime: 0.17
-origin: 0.6 1
-coords: 148 313 30 32
-num_coll_groups: 0
-id: 2
-frametime: 0.17
-origin: 0.529412 1
-coords: 62 282 34 62
-num_coll_groups: 0
-id: 1
-frametime: 0.17
-origin: 0.542857 1
-coords: 12 278 35 66
-num_coll_groups: 0
-anim_name: power kick_#_flipped
-id: 4
-global_frametime: 0.2
-global_origin: 0 0
-new_frame_size: 63 68
-flipped: 1
-num_frames: 4
-id: 3
-frametime: 0.11
-origin: 0.539682 1
-coords: 202 755 63 68
-num_coll_groups: 2
-name: body
-num_rects: 1
-coords: 587 304 54 68
-coll_coords: 0.142857 0 0.857143 1
-name: attack 1
-num_rects: 1
-coords: 633 322 8 12
-coll_coords: 0.142857 0.264706 0.126984 0.176471
-id: 2
-frametime: 0.11
-origin: 0.539682 1
-coords: 123 755 63 68
-num_coll_groups: 2
-name: body
-num_rects: 1
-coords: 587 304 54 68
-coll_coords: 0.142857 0 0.857143 1
-name: attack 1
-num_rects: 1
-coords: 633 322 8 13
-coll_coords: 0.142857 0.264706 0.126984 0.191176
-id: 1
-frametime: 0.2
-origin: 0.40625 1
-coords: 70 748 32 74
-num_coll_groups: 0
-id: 0
-frametime: 0.2
-origin: 0.485714 1
-coords: 10 752 35 68
-num_coll_groups: 0
-anim_name: thunder_#_flipped
-id: 5
-global_frametime: 0.0900001
-global_origin: 0 0
-new_frame_size: 113 69
-flipped: 1
-num_frames: 5
-id: 4
-frametime: 0.0500001
-origin: 0.898649 1
-coords: 386 368 148 69
-num_coll_groups: 2
-name: attack 1
-num_rects: 1
-coords: 557 333 93 13
-coll_coords: 0 0.434783 0.628378 0.188406
-name: body
-num_rects: 1
-coords: 502 303 55 69
-coll_coords: 0.628378 0 0.371622 1
-id: 3
-frametime: 0.0500001
-origin: 0.867257 1
-coords: 249 366 113 69
-num_coll_groups: 2
-name: attack 1
-num_rects: 1
-coords: 593 334 57 13
-coll_coords: 5.96046e-08 0.449275 0.504425 0.188406
-name: body
-num_rects: 1
-coords: 537 303 56 69
-coll_coords: 0.504425 0 0.495575 1
-id: 2
-frametime: 0.0500001
-origin: 0.821429 1
-coords: 148 365 84 69
-num_coll_groups: 2
-name: attack 1
-num_rects: 1
-coords: 624 334 26 10
-coll_coords: 0 0.449275 0.309524 0.144928
-name: body
-num_rects: 1
-coords: 566 303 58 69
-coll_coords: 0.309524 0 0.690476 1
-id: 0
-frametime: 0.12
-origin: 0.571428 1
-coords: 10 362 35 71
-num_coll_groups: 0
-id: 1
-frametime: 0.12
-origin: 0.74138 1
-coords: 66 364 58 69
-num_coll_groups: 0
-anim_name: jump_#_flipped
-id: 8
-global_frametime: 0.2
-global_origin: 0 0
-new_frame_size: 50 80
-flipped: 1
-num_frames: 8
-id: 2
-frametime: 0.18
-origin: 0.542857 1
-coords: 138 186 35 73
-num_coll_groups: 0
-id: 1
-frametime: 0.16
-origin: 0.542857 1
-coords: 77 189 35 66
-num_coll_groups: 0
-id: 0
-frametime: 0.16
-origin: 0.564103 1
-coords: 5 184 39 71
-num_coll_groups: 0
-id: 6
-frametime: 0.28
-origin: 0.58 1
-coords: 344 175 50 80
-num_coll_groups: 0
-id: 5
-frametime: 0.34
-origin: 0.371429 1
-coords: 294 188 35 69
-num_coll_groups: 0
-id: 4
-frametime: 0.32
-origin: 0.400001 1
-coords: 249 185 35 68
-num_coll_groups: 0
-id: 3
-frametime: 0.3
-origin: 0.400001 1
-coords: 200 182 35 70
-num_coll_groups: 0
-id: 7
-frametime: 0.2
-origin: 0.578947 1
-coords: 402 189 38 67
-num_coll_groups: 0
-anim_name: kick_#_flipped
-id: 3
-global_frametime: 0.2
-global_origin: 0 0
-new_frame_size: 32 74
-flipped: 1
-num_frames: 3
-id: 2
-frametime: 0.12
-origin: 0.472728 1
-coords: 123 832 55 68
-num_coll_groups: 2
-name: body
-num_rects: 0
-name: attack 1
-num_rects: 1
-coords: 641 321 9 13
-coll_coords: 2.98023e-08 0.25 0.163636 0.191176
-id: 1
-frametime: 0.2
-origin: 0.40625 1
-coords: 71 826 32 74
-num_coll_groups: 0
-id: 0
-frametime: 0.2
-origin: 0.485714 1
-coords: 11 830 35 68
-num_coll_groups: 0
-anim_name: run_#_flipped
-id: 6
-global_frametime: 0.0600001
-global_origin: 0 1
-new_frame_size: 46 62
-flipped: 1
-num_frames: 6
-id: 2
-frametime: 0.0600001
-origin: 0.702128 1
-coords: 149 109 47 61
-num_coll_groups: 0
-id: 1
-frametime: 0.0600001
-origin: 0.702128 1
-coords: 78 107 47 61
-num_coll_groups: 0
-id: 0
-frametime: 0.0600001
-origin: 0.714286 1
-coords: 5 107 49 61
-num_coll_groups: 0
-id: 5
-frametime: 0.0600001
-origin: 0.702128 1
-coords: 345 106 47 62
-num_coll_groups: 0
-id: 4
-frametime: 0.0600001
-origin: 0.695652 1
-coords: 285 106 46 62
-num_coll_groups: 0
-id: 3
-frametime: 0.0600001
-origin: 0.688889 1
-coords: 217 107 45 61
-num_coll_groups: 0
-anim_name: thunder
-id: 5
-global_frametime: 0.0900001
-global_origin: 0 0
-new_frame_size: 113 69
-flipped: 0
-num_frames: 5
-id: 4
-frametime: 0.0500001
-origin: 0.101351 1
-coords: 386 368 148 69
-num_coll_groups: 2
-name: attack 1
-num_rects: 1
-coords: 557 333 93 13
-coll_coords: 0.371622 0.434783 0.628378 0.188406
-name: body
-num_rects: 1
-coords: 502 303 55 69
-coll_coords: 0 0 0.371622 1
-id: 3
-frametime: 0.0500001
-origin: 0.132743 1
-coords: 249 366 113 69
-num_coll_groups: 2
-name: attack 1
-num_rects: 1
-coords: 593 334 57 13
-coll_coords: 0.495575 0.449275 0.504425 0.188406
-name: body
-num_rects: 1
-coords: 537 303 56 69
-coll_coords: 0 0 0.495575 1
-id: 2
-frametime: 0.0500001
-origin: 0.178571 1
-coords: 148 365 84 69
-num_coll_groups: 2
-name: attack 1
-num_rects: 1
-coords: 624 334 26 10
-coll_coords: 0.690476 0.449275 0.309524 0.144928
-name: body
-num_rects: 1
-coords: 566 303 58 69
-coll_coords: 0 0 0.690476 1
-id: 0
-frametime: 0.12
-origin: 0.428572 1
-coords: 10 362 35 71
-num_coll_groups: 0
-id: 1
-frametime: 0.12
-origin: 0.25862 1
-coords: 66 364 58 69
-num_coll_groups: 0
-anim_name: powerup_#_flipped
+anim_name: powerup
 id: 8
 global_frametime: 0.13
 global_origin: 0 0
 new_frame_size: 50 80
-flipped: 1
+flipped: 0
 num_frames: 8
 id: 7
 frametime: 0.13
-origin: 0.578947 1
+origin: 0.421053 1
 coords: 382 670 38 67
 num_coll_groups: 0
 id: 6
@@ -405,138 +22,53 @@ coords: 324 656 50 80
 num_coll_groups: 0
 id: 5
 frametime: 0.13
-origin: 0.454545 1
+origin: 0.545455 1
 coords: 263 638 44 103
 num_coll_groups: 2
 name: body
 num_rects: 1
-coords: 606 298 39 74
-coll_coords: 0.113636 0.281553 0.886364 0.718447
+coll_coords: 0 0.281553 0.886364 0.718447
 name: attack 1
 num_rects: 0
 id: 4
 frametime: 0.13
-origin: 0.456522 1
+origin: 0.543478 1
 coords: 209 654 46 88
 num_coll_groups: 2
 name: body
 num_rects: 1
-coords: 604 301 39 71
-coll_coords: 0.152174 0.193182 0.847826 0.806818
+coll_coords: 0 0.193182 0.847826 0.806818
 name: attack 1
 num_rects: 0
 id: 3
 frametime: 0.13
-origin: 0.444445 1
+origin: 0.555555 1
 coords: 156 652 45 87
 num_coll_groups: 2
 name: body
 num_rects: 1
-coords: 605 302 39 70
-coll_coords: 0.133333 0.195402 0.866667 0.804598
+coll_coords: 0 0.195402 0.866667 0.804598
 name: attack 1
 num_rects: 0
 id: 2
 frametime: 0.13
-origin: 0.444445 1
+origin: 0.555555 1
 coords: 99 656 45 79
 num_coll_groups: 2
 name: body
 num_rects: 1
-coords: 605 301 39 71
-coll_coords: 0.133333 0.101266 0.866667 0.898734
+coll_coords: 0 0.101266 0.866667 0.898734
 name: attack 1
 num_rects: 0
 id: 1
 frametime: 0.13
-origin: 0.571429 1
+origin: 0.428571 1
 coords: 55 667 35 66
 num_coll_groups: 0
 id: 0
 frametime: 0.13
-origin: 0.564103 1
+origin: 0.435897 1
 coords: 6 662 39 71
-num_coll_groups: 0
-anim_name: run
-id: 6
-global_frametime: 0.0600001
-global_origin: 0 1
-new_frame_size: 46 62
-flipped: 0
-num_frames: 6
-id: 2
-frametime: 0.0600001
-origin: 0.297872 1
-coords: 149 109 47 61
-num_coll_groups: 0
-id: 1
-frametime: 0.0600001
-origin: 0.297872 1
-coords: 78 107 47 61
-num_coll_groups: 0
-id: 0
-frametime: 0.0600001
-origin: 0.285714 1
-coords: 5 107 49 61
-num_coll_groups: 0
-id: 5
-frametime: 0.0600001
-origin: 0.297872 1
-coords: 345 106 47 62
-num_coll_groups: 0
-id: 4
-frametime: 0.0600001
-origin: 0.304348 1
-coords: 285 106 46 62
-num_coll_groups: 0
-id: 3
-frametime: 0.0600001
-origin: 0.311111 1
-coords: 217 107 45 61
-num_coll_groups: 0
-anim_name: punch_#_flipped
-id: 5
-global_frametime: 0.13
-global_origin: 0 0
-new_frame_size: 34 68
-flipped: 1
-num_frames: 5
-id: 4
-frametime: 0.13
-origin: 0.679245 1
-coords: 198 452 53 68
-num_coll_groups: 2
-name: attack 1
-num_rects: 1
-coords: 641 336 9 9
-coll_coords: 1.49012e-08 0.470588 0.169811 0.132353
-name: body
-num_rects: 0
-id: 2
-frametime: 0.13
-origin: 0.485714 1
-coords: 112 452 35 68
-num_coll_groups: 0
-id: 1
-frametime: 0.13
-origin: 0.690909 1
-coords: 50 451 55 68
-num_coll_groups: 2
-name: attack 1
-num_rects: 1
-coords: 639 338 11 9
-coll_coords: -1.49012e-08 0.5 0.2 0.132353
-name: body
-num_rects: 0
-id: 0
-frametime: 0.13
-origin: 0.485714 1
-coords: 6 451 35 68
-num_coll_groups: 0
-id: 3
-frametime: 0.13
-origin: 0.5 1
-coords: 157 452 34 68
 num_coll_groups: 0
 anim_name: jump
 id: 8
@@ -585,6 +117,515 @@ frametime: 0.2
 origin: 0.421053 1
 coords: 402 189 38 67
 num_coll_groups: 0
+anim_name: run
+id: 6
+global_frametime: 0.0600001
+global_origin: 0 1
+new_frame_size: 46 62
+flipped: 0
+num_frames: 6
+id: 2
+frametime: 0.0600001
+origin: 0.297872 1
+coords: 149 109 47 61
+num_coll_groups: 0
+id: 1
+frametime: 0.0600001
+origin: 0.297872 1
+coords: 78 107 47 61
+num_coll_groups: 0
+id: 0
+frametime: 0.0600001
+origin: 0.285714 1
+coords: 5 107 49 61
+num_coll_groups: 0
+id: 5
+frametime: 0.0600001
+origin: 0.297872 1
+coords: 345 106 47 62
+num_coll_groups: 0
+id: 4
+frametime: 0.0600001
+origin: 0.304348 1
+coords: 285 106 46 62
+num_coll_groups: 0
+id: 3
+frametime: 0.0600001
+origin: 0.311111 1
+coords: 217 107 45 61
+num_coll_groups: 0
+anim_name: powerup_#_flipped
+id: 8
+global_frametime: 0.13
+global_origin: 0 0
+new_frame_size: 50 80
+flipped: 1
+num_frames: 8
+id: 7
+frametime: 0.13
+origin: 0.578947 1
+coords: 382 670 38 67
+num_coll_groups: 0
+id: 6
+frametime: 0.13
+origin: 0.5 1
+coords: 324 656 50 80
+num_coll_groups: 0
+id: 5
+frametime: 0.13
+origin: 0.454545 1
+coords: 263 638 44 103
+num_coll_groups: 2
+name: body
+num_rects: 1
+coll_coords: 0.113636 0.281553 0.886364 0.718447
+name: attack 1
+num_rects: 0
+id: 4
+frametime: 0.13
+origin: 0.456522 1
+coords: 209 654 46 88
+num_coll_groups: 2
+name: body
+num_rects: 1
+coll_coords: 0.152174 0.193182 0.847826 0.806818
+name: attack 1
+num_rects: 0
+id: 3
+frametime: 0.13
+origin: 0.444445 1
+coords: 156 652 45 87
+num_coll_groups: 2
+name: body
+num_rects: 1
+coll_coords: 0.133333 0.195402 0.866667 0.804598
+name: attack 1
+num_rects: 0
+id: 2
+frametime: 0.13
+origin: 0.444445 1
+coords: 99 656 45 79
+num_coll_groups: 2
+name: body
+num_rects: 1
+coll_coords: 0.133333 0.101266 0.866667 0.898734
+name: attack 1
+num_rects: 0
+id: 1
+frametime: 0.13
+origin: 0.571429 1
+coords: 55 667 35 66
+num_coll_groups: 0
+id: 0
+frametime: 0.13
+origin: 0.564103 1
+coords: 6 662 39 71
+num_coll_groups: 0
+anim_name: thunder_#_flipped
+id: 5
+global_frametime: 0.0900001
+global_origin: 0 0
+new_frame_size: 113 69
+flipped: 1
+num_frames: 5
+id: 4
+frametime: 0.0500001
+origin: 0.898649 1
+coords: 386 368 148 69
+num_coll_groups: 2
+name: attack 1
+num_rects: 1
+coll_coords: 0 0.434783 0.628378 0.188406
+name: body
+num_rects: 1
+coll_coords: 0.628378 0 0.371622 1
+id: 3
+frametime: 0.0500001
+origin: 0.867257 1
+coords: 249 366 113 69
+num_coll_groups: 2
+name: attack 1
+num_rects: 1
+coll_coords: 5.96046e-08 0.449275 0.504425 0.188406
+name: body
+num_rects: 1
+coll_coords: 0.504425 0 0.495575 1
+id: 2
+frametime: 0.0500001
+origin: 0.821429 1
+coords: 148 365 84 69
+num_coll_groups: 2
+name: attack 1
+num_rects: 1
+coll_coords: 0 0.449275 0.309524 0.144928
+name: body
+num_rects: 1
+coll_coords: 0.309524 0 0.690476 1
+id: 0
+frametime: 0.12
+origin: 0.571428 1
+coords: 10 362 35 71
+num_coll_groups: 0
+id: 1
+frametime: 0.12
+origin: 0.74138 1
+coords: 66 364 58 69
+num_coll_groups: 0
+anim_name: kick
+id: 3
+global_frametime: 0.2
+global_origin: 0 0
+new_frame_size: 32 74
+flipped: 0
+num_frames: 3
+id: 2
+frametime: 0.12
+origin: 0.527272 1
+coords: 123 832 55 68
+num_coll_groups: 2
+name: body
+num_rects: 0
+name: attack 1
+num_rects: 1
+coll_coords: 0.836364 0.25 0.163636 0.191176
+id: 1
+frametime: 0.2
+origin: 0.59375 1
+coords: 71 826 32 74
+num_coll_groups: 0
+id: 0
+frametime: 0.2
+origin: 0.514286 1
+coords: 11 830 35 68
+num_coll_groups: 0
+anim_name: shadow step_#_flipped
+id: 7
+global_frametime: 0.19
+global_origin: 0 0
+new_frame_size: 46 58
+flipped: 1
+num_frames: 7
+id: 6
+frametime: 0.19
+origin: 0.826087 1
+coords: 356 550 46 58
+num_coll_groups: 0
+id: 5
+frametime: 0.19
+origin: 0.826087 1
+coords: 300 551 46 58
+num_coll_groups: 0
+id: 4
+frametime: 0.19
+origin: 0.826087 1
+coords: 250 550 46 58
+num_coll_groups: 0
+id: 3
+frametime: 0.19
+origin: 0.826087 1
+coords: 192 552 46 58
+num_coll_groups: 0
+id: 2
+frametime: 0.19
+origin: 0.826087 1
+coords: 134 552 46 58
+num_coll_groups: 0
+id: 1
+frametime: 0.19
+origin: 0.647059 1
+coords: 63 556 34 56
+num_coll_groups: 0
+id: 0
+frametime: 0.19
+origin: 0.564103 1
+coords: 10 541 39 71
+num_coll_groups: 0
+anim_name: jump_#_flipped
+id: 8
+global_frametime: 0.2
+global_origin: 0 0
+new_frame_size: 50 80
+flipped: 1
+num_frames: 8
+id: 2
+frametime: 0.18
+origin: 0.542857 1
+coords: 138 186 35 73
+num_coll_groups: 0
+id: 1
+frametime: 0.16
+origin: 0.542857 1
+coords: 77 189 35 66
+num_coll_groups: 0
+id: 0
+frametime: 0.16
+origin: 0.564103 1
+coords: 5 184 39 71
+num_coll_groups: 0
+id: 6
+frametime: 0.28
+origin: 0.58 1
+coords: 344 175 50 80
+num_coll_groups: 0
+id: 5
+frametime: 0.34
+origin: 0.371429 1
+coords: 294 188 35 69
+num_coll_groups: 0
+id: 4
+frametime: 0.32
+origin: 0.400001 1
+coords: 249 185 35 68
+num_coll_groups: 0
+id: 3
+frametime: 0.3
+origin: 0.400001 1
+coords: 200 182 35 70
+num_coll_groups: 0
+id: 7
+frametime: 0.2
+origin: 0.578947 1
+coords: 402 189 38 67
+num_coll_groups: 0
+anim_name: punch
+id: 5
+global_frametime: 0.13
+global_origin: 0 0
+new_frame_size: 34 68
+flipped: 0
+num_frames: 5
+id: 4
+frametime: 0.13
+origin: 0.320755 1
+coords: 198 452 53 68
+num_coll_groups: 2
+name: attack 1
+num_rects: 1
+coll_coords: 0.830189 0.470588 0.169811 0.132353
+name: body
+num_rects: 0
+id: 2
+frametime: 0.13
+origin: 0.514286 1
+coords: 112 452 35 68
+num_coll_groups: 0
+id: 1
+frametime: 0.13
+origin: 0.309091 1
+coords: 50 451 55 68
+num_coll_groups: 2
+name: attack 1
+num_rects: 1
+coll_coords: 0.8 0.5 0.2 0.132353
+name: body
+num_rects: 0
+id: 0
+frametime: 0.13
+origin: 0.514286 1
+coords: 6 451 35 68
+num_coll_groups: 0
+id: 3
+frametime: 0.13
+origin: 0.5 1
+coords: 157 452 34 68
+num_coll_groups: 0
+anim_name: shadow step
+id: 7
+global_frametime: 0.19
+global_origin: 0 0
+new_frame_size: 46 58
+flipped: 0
+num_frames: 7
+id: 6
+frametime: 0.19
+origin: 0.173913 1
+coords: 356 550 46 58
+num_coll_groups: 0
+id: 5
+frametime: 0.19
+origin: 0.173913 1
+coords: 300 551 46 58
+num_coll_groups: 0
+id: 4
+frametime: 0.19
+origin: 0.173913 1
+coords: 250 550 46 58
+num_coll_groups: 0
+id: 3
+frametime: 0.19
+origin: 0.173913 1
+coords: 192 552 46 58
+num_coll_groups: 0
+id: 2
+frametime: 0.19
+origin: 0.173913 1
+coords: 134 552 46 58
+num_coll_groups: 0
+id: 1
+frametime: 0.19
+origin: 0.352941 1
+coords: 63 556 34 56
+num_coll_groups: 0
+id: 0
+frametime: 0.19
+origin: 0.435897 1
+coords: 10 541 39 71
+num_coll_groups: 0
+anim_name: power kick_#_flipped
+id: 4
+global_frametime: 0.2
+global_origin: 0 0
+new_frame_size: 63 68
+flipped: 1
+num_frames: 4
+id: 3
+frametime: 0.11
+origin: 0.539682 1
+coords: 202 755 63 68
+num_coll_groups: 2
+name: body
+num_rects: 1
+coll_coords: 0.142857 0 0.857143 1
+name: attack 1
+num_rects: 1
+coll_coords: 0.142857 0.264706 0.126984 0.176471
+id: 2
+frametime: 0.11
+origin: 0.539682 1
+coords: 123 755 63 68
+num_coll_groups: 2
+name: body
+num_rects: 1
+coll_coords: 0.142857 0 0.857143 1
+name: attack 1
+num_rects: 1
+coll_coords: 0.142857 0.264706 0.126984 0.191176
+id: 1
+frametime: 0.2
+origin: 0.40625 1
+coords: 70 748 32 74
+num_coll_groups: 0
+id: 0
+frametime: 0.2
+origin: 0.485714 1
+coords: 10 752 35 68
+num_coll_groups: 0
+anim_name: punch_#_flipped
+id: 5
+global_frametime: 0.13
+global_origin: 0 0
+new_frame_size: 34 68
+flipped: 1
+num_frames: 5
+id: 4
+frametime: 0.13
+origin: 0.679245 1
+coords: 198 452 53 68
+num_coll_groups: 2
+name: attack 1
+num_rects: 1
+coll_coords: 1.49012e-08 0.470588 0.169811 0.132353
+name: body
+num_rects: 0
+id: 2
+frametime: 0.13
+origin: 0.485714 1
+coords: 112 452 35 68
+num_coll_groups: 0
+id: 1
+frametime: 0.13
+origin: 0.690909 1
+coords: 50 451 55 68
+num_coll_groups: 2
+name: attack 1
+num_rects: 1
+coll_coords: -1.49012e-08 0.5 0.2 0.132353
+name: body
+num_rects: 0
+id: 0
+frametime: 0.13
+origin: 0.485714 1
+coords: 6 451 35 68
+num_coll_groups: 0
+id: 3
+frametime: 0.13
+origin: 0.5 1
+coords: 157 452 34 68
+num_coll_groups: 0
+anim_name: ball_#_flipped
+id: 9
+global_frametime: 0.17
+global_origin: 0 0
+new_frame_size: 30 30
+flipped: 1
+num_frames: 8
+id: 8
+frametime: 0.24
+origin: 0.6 1
+coords: 281 316 30 30
+num_coll_groups: 0
+id: 7
+frametime: 0.24
+origin: 0.6 1
+coords: 249 316 30 30
+num_coll_groups: 0
+id: 5
+frametime: 0.24
+origin: 0.6 1
+coords: 183 316 30 30
+num_coll_groups: 0
+id: 6
+frametime: 0.24
+origin: 0.6 1
+coords: 215 316 30 30
+num_coll_groups: 0
+id: 3
+frametime: 0.17
+origin: 0.625 1
+coords: 108 303 32 42
+num_coll_groups: 0
+id: 4
+frametime: 0.17
+origin: 0.6 1
+coords: 148 313 30 32
+num_coll_groups: 0
+id: 2
+frametime: 0.17
+origin: 0.529412 1
+coords: 62 282 34 62
+num_coll_groups: 0
+id: 1
+frametime: 0.17
+origin: 0.542857 1
+coords: 12 278 35 66
+num_coll_groups: 0
+anim_name: idle_#_flipped
+id: 5
+global_frametime: 0.16
+global_origin: 0 0
+new_frame_size: 39 71
+flipped: 1
+num_frames: 4
+id: 3
+frametime: 0.16
+origin: 0.564103 1
+coords: 143 20 39 71
+num_coll_groups: 0
+id: 2
+frametime: 0.16
+origin: 0.578947 1
+coords: 99 21 38 70
+num_coll_groups: 0
+id: 1
+frametime: 0.16
+origin: 0.564103 1
+coords: 53 20 39 71
+num_coll_groups: 0
+id: 0
+frametime: 0.16
+origin: 0.564103 1
+coords: 8 19 39 72
+num_coll_groups: 0
 anim_name: power kick
 id: 4
 global_frametime: 0.2
@@ -599,11 +640,9 @@ coords: 202 755 63 68
 num_coll_groups: 2
 name: body
 num_rects: 1
-coords: 587 304 54 68
 coll_coords: 0 0 0.857143 1
 name: attack 1
 num_rects: 1
-coords: 633 322 8 12
 coll_coords: 0.730159 0.264706 0.126984 0.176471
 id: 2
 frametime: 0.11
@@ -612,11 +651,9 @@ coords: 123 755 63 68
 num_coll_groups: 2
 name: body
 num_rects: 1
-coords: 587 304 54 68
 coll_coords: 0 0 0.857143 1
 name: attack 1
 num_rects: 1
-coords: 633 322 8 13
 coll_coords: 0.730159 0.264706 0.126984 0.191176
 id: 1
 frametime: 0.2
@@ -628,76 +665,69 @@ frametime: 0.2
 origin: 0.514286 1
 coords: 10 752 35 68
 num_coll_groups: 0
-anim_name: powerup
-id: 8
-global_frametime: 0.13
-global_origin: 0 0
-new_frame_size: 50 80
-flipped: 0
-num_frames: 8
-id: 7
-frametime: 0.13
-origin: 0.421053 1
-coords: 382 670 38 67
-num_coll_groups: 0
-id: 6
-frametime: 0.13
-origin: 0.5 1
-coords: 324 656 50 80
-num_coll_groups: 0
-id: 5
-frametime: 0.13
-origin: 0.545455 1
-coords: 263 638 44 103
-num_coll_groups: 2
-name: body
-num_rects: 1
-coords: 606 298 39 74
-coll_coords: 0 0.281553 0.886364 0.718447
-name: attack 1
-num_rects: 0
-id: 4
-frametime: 0.13
-origin: 0.543478 1
-coords: 209 654 46 88
-num_coll_groups: 2
-name: body
-num_rects: 1
-coords: 604 301 39 71
-coll_coords: 0 0.193182 0.847826 0.806818
-name: attack 1
-num_rects: 0
+anim_name: kick_#_flipped
 id: 3
-frametime: 0.13
-origin: 0.555555 1
-coords: 156 652 45 87
-num_coll_groups: 2
-name: body
-num_rects: 1
-coords: 605 302 39 70
-coll_coords: 0 0.195402 0.866667 0.804598
-name: attack 1
-num_rects: 0
+global_frametime: 0.2
+global_origin: 0 0
+new_frame_size: 32 74
+flipped: 1
+num_frames: 3
 id: 2
-frametime: 0.13
-origin: 0.555555 1
-coords: 99 656 45 79
+frametime: 0.12
+origin: 0.472728 1
+coords: 123 832 55 68
 num_coll_groups: 2
 name: body
-num_rects: 1
-coords: 605 301 39 71
-coll_coords: 0 0.101266 0.866667 0.898734
-name: attack 1
 num_rects: 0
+name: attack 1
+num_rects: 1
+coll_coords: 2.98023e-08 0.25 0.163636 0.191176
 id: 1
-frametime: 0.13
-origin: 0.428571 1
-coords: 55 667 35 66
+frametime: 0.2
+origin: 0.40625 1
+coords: 71 826 32 74
 num_coll_groups: 0
 id: 0
-frametime: 0.13
-origin: 0.435897 1
-coords: 6 662 39 71
+frametime: 0.2
+origin: 0.485714 1
+coords: 11 830 35 68
+num_coll_groups: 0
+anim_name: run_#_flipped
+id: 6
+global_frametime: 0.0600001
+global_origin: 0 1
+new_frame_size: 46 62
+flipped: 1
+num_frames: 6
+id: 2
+frametime: 0.0600001
+origin: 0.702128 1
+coords: 149 109 47 61
+num_coll_groups: 0
+id: 1
+frametime: 0.0600001
+origin: 0.702128 1
+coords: 78 107 47 61
+num_coll_groups: 0
+id: 0
+frametime: 0.0600001
+origin: 0.714286 1
+coords: 5 107 49 61
+num_coll_groups: 0
+id: 5
+frametime: 0.0600001
+origin: 0.702128 1
+coords: 345 106 47 62
+num_coll_groups: 0
+id: 4
+frametime: 0.0600001
+origin: 0.695652 1
+coords: 285 106 46 62
+num_coll_groups: 0
+id: 3
+frametime: 0.0600001
+origin: 0.688889 1
+coords: 217 107 45 61
 num_coll_groups: 0
 anim_name: ball
 id: 9
@@ -746,78 +776,6 @@ frametime: 0.17
 origin: 0.457143 1
 coords: 12 278 35 66
 num_coll_groups: 0
-anim_name: punch
-id: 5
-global_frametime: 0.13
-global_origin: 0 0
-new_frame_size: 34 68
-flipped: 0
-num_frames: 5
-id: 4
-frametime: 0.13
-origin: 0.320755 1
-coords: 198 452 53 68
-num_coll_groups: 2
-name: attack 1
-num_rects: 1
-coords: 641 336 9 9
-coll_coords: 0.830189 0.470588 0.169811 0.132353
-name: body
-num_rects: 0
-id: 2
-frametime: 0.13
-origin: 0.514286 1
-coords: 112 452 35 68
-num_coll_groups: 0
-id: 1
-frametime: 0.13
-origin: 0.309091 1
-coords: 50 451 55 68
-num_coll_groups: 2
-name: attack 1
-num_rects: 1
-coords: 639 338 11 9
-coll_coords: 0.8 0.5 0.2 0.132353
-name: body
-num_rects: 0
-id: 0
-frametime: 0.13
-origin: 0.514286 1
-coords: 6 451 35 68
-num_coll_groups: 0
-id: 3
-frametime: 0.13
-origin: 0.5 1
-coords: 157 452 34 68
-num_coll_groups: 0
-anim_name: kick
-id: 3
-global_frametime: 0.2
-global_origin: 0 0
-new_frame_size: 32 74
-flipped: 0
-num_frames: 3
-id: 2
-frametime: 0.12
-origin: 0.527272 1
-coords: 123 832 55 68
-num_coll_groups: 2
-name: body
-num_rects: 0
-name: attack 1
-num_rects: 1
-coords: 641 321 9 13
-coll_coords: 0.836364 0.25 0.163636 0.191176
-id: 1
-frametime: 0.2
-origin: 0.59375 1
-coords: 71 826 32 74
-num_coll_groups: 0
-id: 0
-frametime: 0.2
-origin: 0.514286 1
-coords: 11 830 35 68
-num_coll_groups: 0
 anim_name: idle
 id: 5
 global_frametime: 0.16
@@ -845,45 +803,53 @@ frametime: 0.16
 origin: 0.435897 1
 coords: 8 19 39 72
 num_coll_groups: 0
-anim_name: shadow step
-id: 7
-global_frametime: 0.19
-global_origin: 0 0
-new_frame_size: 46 58
-flipped: 0
-num_frames: 7
-id: 6
-frametime: 0.19
-origin: 0.173913 1
-coords: 356 550 46 58
-num_coll_groups: 0
+anim_name: thunder
 id: 5
-frametime: 0.19
-origin: 0.173913 1
-coords: 300 551 46 58
-num_coll_groups: 0
+global_frametime: 0.0900001
+global_origin: 0 0
+new_frame_size: 113 69
+flipped: 0
+num_frames: 5
 id: 4
-frametime: 0.19
-origin: 0.173913 1
-coords: 250 550 46 58
-num_coll_groups: 0
+frametime: 0.0500001
+origin: 0.101351 1
+coords: 386 368 148 69
+num_coll_groups: 2
+name: attack 1
+num_rects: 1
+coll_coords: 0.371622 0.434783 0.628378 0.188406
+name: body
+num_rects: 1
+coll_coords: 0 0 0.371622 1
 id: 3
-frametime: 0.19
-origin: 0.173913 1
-coords: 192 552 46 58
-num_coll_groups: 0
+frametime: 0.0500001
+origin: 0.132743 1
+coords: 249 366 113 69
+num_coll_groups: 2
+name: attack 1
+num_rects: 1
+coll_coords: 0.495575 0.449275 0.504425 0.188406
+name: body
+num_rects: 1
+coll_coords: 0 0 0.495575 1
 id: 2
-frametime: 0.19
-origin: 0.173913 1
-coords: 134 552 46 58
+frametime: 0.0500001
+origin: 0.178571 1
+coords: 148 365 84 69
+num_coll_groups: 2
+name: attack 1
+num_rects: 1
+coll_coords: 0.690476 0.449275 0.309524 0.144928
+name: body
+num_rects: 1
+coll_coords: 0 0 0.690476 1
+id: 0
+frametime: 0.12
+origin: 0.428572 1
+coords: 10 362 35 71
 num_coll_groups: 0
 id: 1
-frametime: 0.19
-origin: 0.352941 1
-coords: 63 556 34 56
-num_coll_groups: 0
-id: 0
-frametime: 0.19
-origin: 0.435897 1
-coords: 10 541 39 71
+frametime: 0.12
+origin: 0.25862 1
+coords: 66 364 58 69
 num_coll_groups: 0

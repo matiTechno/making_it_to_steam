@@ -35,6 +35,8 @@ public:
 
     void set_position(const glm::vec2& pos);
 
+    void set_size(const glm::vec2& size);
+
     std::size_t id;
     float frametime;
     glm::vec2 origin;

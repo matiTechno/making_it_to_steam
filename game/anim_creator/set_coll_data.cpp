@@ -8,11 +8,21 @@ Set_coll_data::Set_coll_data(Frame& frame, Texture& texture, const std::vector<c
 {
     is_opaque = false;
     saved_coords = frame.anim_rect.get_coords();
-    frame.anim_rect.set_position(coords.size / 2 - glm::ivec2(saved_coords.z,
-                                                              saved_coords.w));
+
+    glm::vec2 anim_rect_size(saved_coords.z, saved_coords.w);
+    glm::vec2 new_pos(coords.size / 2 - glm::ivec2(saved_coords.z, saved_coords.w));
+
+    frame.anim_rect.set_position(new_pos);
 
     for(auto name: coll_group_names)
-        frame.coll_groups[name];
+    {
+        auto& group = frame.coll_groups[name];
+        for(auto& rect: group)
+        {
+            rect.set_position(glm::vec2(rect.coll_cords.x, rect.coll_cords.y) * anim_rect_size + new_pos);
+            rect.set_size(glm::vec2(rect.coll_cords.z, rect.coll_cords.w) * anim_rect_size);
+        }
+    }
 
     active_coll_group = &frame.coll_groups.at(coll_group_names.front());
 }

@@ -179,3 +179,6 @@ void Anim_rect::render(const Renderer_2D& renderer, const Texture& texture, cons
 
 void Anim_rect::set_position(const glm::vec2& pos)
 {main_box.pos = pos;}
+
+void Anim_rect::set_size(const glm::vec2& size)
+{main_box.size = size;}
