@@ -649,7 +649,7 @@ void Anim_creator::popups()
             }
             current_anim_name = -1;
             anim = nullptr;
-            ImGui::EndPopup();
+            ImGui::CloseCurrentPopup();
         }
         ImGui::SameLine();
         if(ImGui::Button("cancel", ImVec2(65, 0)))
