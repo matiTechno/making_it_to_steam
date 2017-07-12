@@ -47,10 +47,11 @@ void Anim_creator::processEvent2(const SDL_Event& event)
                 anim->new_frame_size = glm::ivec2(anim->frames.front().anim_rect.get_coords().z, anim->frames.front().anim_rect.get_coords().w);
                 anim->frames.front().anim_rect.is_selected = false;
             }
-            anim->frames.emplace_front(Frame{Anim_rect(anim->frames.size(), get_cursor_cam_pos(get_cursor_pos().x, get_cursor_pos().y, camera)
+            anim->frames.emplace_front(Frame{Anim_rect(anim->id, get_cursor_cam_pos(get_cursor_pos().x, get_cursor_pos().y, camera)
                                              - glm::vec2(anim->new_frame_size) / 2.f,
                                              anim->new_frame_size, anim->global_frametime, anim->global_origin),
                                              std::unordered_map<std::string, std::list<Anim_rect>>()});
+            ++anim->id;
         }
         else if(event.key.keysym.sym == SDLK_r && anim->frames.size() && anim->frames.front().anim_rect.is_selected)
             anim->frames.erase(anim->frames.begin());
@@ -622,6 +623,7 @@ void Anim_creator::popups()
                 coll_group_names.erase(it);
             }
             current_coll_group_name = -1;
+            ImGui::CloseCurrentPopup();
         }
         ImGui::SameLine();
         if(ImGui::Button("cancel", ImVec2(65, 0)))
@@ -886,6 +888,7 @@ void Anim_creator::load_anim(const std::string& filename)
         int num_frames;
         file >> dummy;
         file >> num_frames;
+        animations[name].id = num_frames;
         for(int i = 0; i < num_frames; ++i)
         {
             glm::vec2 pos;

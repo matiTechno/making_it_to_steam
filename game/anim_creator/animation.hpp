@@ -18,4 +18,5 @@ struct Animation
     glm::vec2 global_origin{0};
     glm::ivec2 new_frame_size{80, 80};
     bool flipped = false;
+    int id = 0;
 };
