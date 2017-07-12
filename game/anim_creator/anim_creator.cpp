@@ -6,6 +6,14 @@
 
 const Anim_creator* Anim_creator::handle;
 
+bool endsWith(const std::string& string, const std::string& ending)
+{
+    if(ending.size() > string.size())
+        return false;
+
+    return (0 == string.compare(string.size() - ending.size(), ending.size(), ending));
+}
+
 Anim_creator::Anim_creator():
     tex_filename_input(100, 0),
     anim_name_input(100, 0),
@@ -39,11 +47,10 @@ void Anim_creator::processEvent2(const SDL_Event& event)
                 anim->new_frame_size = glm::ivec2(anim->frames.front().anim_rect.get_coords().z, anim->frames.front().anim_rect.get_coords().w);
                 anim->frames.front().anim_rect.is_selected = false;
             }
-            anim->frames.emplace_front(Frame{Anim_rect(anim->id, get_cursor_cam_pos(get_cursor_pos().x, get_cursor_pos().y, camera)
+            anim->frames.emplace_front(Frame{Anim_rect(anim->frames.size(), get_cursor_cam_pos(get_cursor_pos().x, get_cursor_pos().y, camera)
                                              - glm::vec2(anim->new_frame_size) / 2.f,
                                              anim->new_frame_size, anim->global_frametime, anim->global_origin),
                                              std::unordered_map<std::string, std::list<Anim_rect>>()});
-            ++anim->id;
         }
         else if(event.key.keysym.sym == SDLK_r && anim->frames.size() && anim->frames.front().anim_rect.is_selected)
             anim->frames.erase(anim->frames.begin());
@@ -267,7 +274,7 @@ skip_coll_del:
         if(ImGui::InputText("new animation", anim_name_input.data(), anim_name_input.size(),
                             ImGuiInputTextFlags_EnterReturnsTrue))
         {
-            if(anim_name_input.front() == 0)
+            if(anim_name_input.front() == 0 || endsWith(anim_name_input.data(), "-flipped"))
             {
                 ImGui::OpenPopup("anim name error");
                 goto out1;
@@ -320,7 +327,7 @@ out1:
                 anim_rename_input.front() = 0;
                 goto out2;
             }
-            if(anim_rename_input.front() == 0)
+            if(anim_rename_input.front() == 0 || endsWith(anim_rename_input.data(), "-flipped"))
             {
                 ImGui::OpenPopup("anim name error");
                 goto out2;
@@ -356,7 +363,7 @@ out1:
                             coll_rect.coll_cords.x = 1.f - coll_rect.coll_cords.x - coll_rect.coll_cords.z;
                 }
             }
-            std::string new_name = anim_names[static_cast<std::size_t>(current_anim_name)] + std::string("_#_flipped");
+            std::string new_name = anim_names[static_cast<std::size_t>(current_anim_name)] + std::string("-flipped");
 
             for(auto& anim: animations)
                 if(anim.first == new_name)
@@ -662,7 +669,8 @@ void Anim_creator::popups()
     }
     if(ImGui::BeginPopup("anim name error"))
     {
-        ImGui::Text("animation / collision group\nname must be unique and not empty");
+        ImGui::Text("animation / collision group\nname must be unique and not empty\n"
+                    "and must not end with '-flipped'");
         ImGui::Separator();
         if(ImGui::Button("OK"))
             ImGui::CloseCurrentPopup();
@@ -788,28 +796,28 @@ bool Anim_creator::save(const std::string& filename, bool allow_override)
     file << "texture_filename: " << tex_filename << '\n';
     file << "num_coll_groups: " << coll_group_names.size() << '\n';
     for(auto& group: coll_group_names)
-        file << "name: " << group << '\n';
+        file << "coll_group_name: " << group << '\n';
     file << "num_anims: " << animations.size() << '\n';
-    for(auto& anim: animations)
+    for(auto& name: store_anim_names)
     {
-        file << "anim_name: " << anim.first << '\n';
-        file << "id: " << anim.second.id << '\n';
-        file << "global_frametime: " << anim.second.global_frametime << '\n';
-        file << "global_origin: " << anim.second.global_origin.x << ' ' << anim.second.global_origin.y << '\n';
-        file << "new_frame_size: " << anim.second.new_frame_size.x << ' ' << anim.second.new_frame_size.y << '\n';
-        file << "flipped: " << anim.second.flipped << '\n';
-        file << "num_frames: " << anim.second.frames.size() << '\n';
-        for(auto& frame: anim.second.frames)
+        auto& anim = animations[name];
+        file << "anim_name: " << name << '\n';
+        file << "num_frames: " << anim.frames.size() << '\n';
+
+        std::list<Frame> sorted_frames = anim.frames;
+        sorted_frames.sort([](const Frame& f1, const Frame& f2)
+        {return f1.anim_rect.id < f2.anim_rect.id;});
+
+        for(auto& frame: sorted_frames)
         {
-            file << "id: " << frame.anim_rect.id << '\n';
             file << "frametime: " << frame.anim_rect.frametime << '\n';
-            file << "origin: " << frame.anim_rect.origin.x << ' ' << frame.anim_rect.origin.y << '\n';
+            file << "offset: " << -frame.anim_rect.origin.x << ' ' << -frame.anim_rect.origin.y << '\n';
             file << "coords: " << frame.anim_rect.get_coords().x << ' ' << frame.anim_rect.get_coords().y << ' '
                  << frame.anim_rect.get_coords().z << ' ' << frame.anim_rect.get_coords().w << '\n';
             file << "num_coll_groups: " << frame.coll_groups.size() << '\n';
             for(auto& group: frame.coll_groups)
             {
-                file << "name: " << group.first << '\n';
+                file << "coll_group_name: " << group.first << '\n';
                 file << "num_rects: " << group.second.size() << '\n';
                 for(auto& rect: group.second)
                 {
@@ -872,41 +880,31 @@ void Anim_creator::load_anim(const std::string& filename)
         store_anim_names.emplace_back(name);
         anim_names.emplace_back(store_anim_names.back().c_str());
         animations.emplace(name, Animation{});
-        file >> dummy;
-        file >> animations.at(name).id;
-        file >> dummy;
-        file >> animations.at(name).global_frametime;
-        file >> dummy;
-        file >> animations.at(name).global_origin.x;
-        file >> animations.at(name).global_origin.y;
-        file >> dummy;
-        file >> animations.at(name).new_frame_size.x;
-        file >> animations.at(name).new_frame_size.y;
-        file >> dummy;
-        file >> animations.at(name).flipped;
+
+        animations[name].flipped = endsWith(name, "-flipped");
+
         int num_frames;
         file >> dummy;
         file >> num_frames;
         for(int i = 0; i < num_frames; ++i)
         {
-            std::size_t id;
             glm::vec2 pos;
             glm::vec2 size;
             float frametime;
             glm::vec2 origin;
             file >> dummy;
-            file >> id;
-            file >> dummy;
             file >> frametime;
             file >> dummy;
             file >> origin.x;
+            origin.x *= -1;
             file >> origin.y;
+            origin.y *= -1;
             file >> dummy;
             file >> pos.x;
             file >> pos.y;
             file >> size.x;
             file >> size.y;
-            Frame frame = {Anim_rect(id, pos, size, frametime, origin),
+            Frame frame = {Anim_rect(i, pos, size, frametime, origin),
                            std::unordered_map<std::string, std::list<Anim_rect>>()};
             frame.anim_rect.is_selected = false;
 
