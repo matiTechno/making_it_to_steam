@@ -1,5 +1,9 @@
 # making_it_to_steam
 
+[youtube video](https://youtu.be/fEQpRWuxpLY)
+
+[screenshots](https://github.com/matiTechno/making_it_to_steam/issues/3)
+
 2d game (now it's only graphics engine)
 
 dependencies:  
